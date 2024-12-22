@@ -1,0 +1,7 @@
+flask==3.0.0
+flask-cors==4.0.0
+requests==2.31.0
+beautifulsoup4==4.12.2
+google==3.0.0
+google-search==1.1.1
+ollama==0.1.6
