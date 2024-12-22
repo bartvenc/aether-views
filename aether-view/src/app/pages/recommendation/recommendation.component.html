@@ -1,0 +1,50 @@
+<div class="p-8">
+    <h1 class="text-3xl font-bold mb-6">Recommendations</h1>
+  
+    <div class="search-container mb-6">
+      <input
+        type="text"
+        [(ngModel)]="userQuery"
+        placeholder="Enter your query"
+        class="border border-gray-300 p-2 rounded-md text-black w-3/4"
+      />
+      <button
+        (click)="getRecommendations()"
+        class="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+      >
+        Get Recommendations
+      </button>
+    </div>
+  
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div
+        *ngFor="let series of recommendations"
+        class="relative group bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300"
+      >
+        <img
+          [src]="getPosterUrl(series?.poster_path)"
+          [alt]="series.name"
+          class="w-full h-full object-cover"
+        />
+  
+        <!-- Overlay displayed on hover -->
+        <div
+          class="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 text-white"
+        >
+          <!-- Series Name in the Middle -->
+          <div class="h-full flex flex-col justify-center items-center">
+            <h3 class="text-xl font-bold text-center">{{ series.name }}</h3>
+          </div>
+  
+          <!-- Rating at the Bottom Middle -->
+          <div class="absolute bottom-4 left-0 right-0 text-center">
+            <p class="text-sm">Rating: {{ series.vote_average }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="mt-4">
+      <a routerLink="/" class="text-blue-400 hover:underline">Back to Home</a>
+    </div>
+  </div>
