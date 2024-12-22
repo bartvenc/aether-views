@@ -1,0 +1,40 @@
+<div class="p-8 space-y-12">
+    <!-- Popular Movies Slider -->
+    <section>
+        <h2 class="text-3xl font-bold mb-4">Popular Movies</h2>
+        <swiper-container [slidesPerView]="'auto'" [spaceBetween]="16" class="mySwiper">
+            @for(movie of popularMovies(); track movie){
+            <swiper-slide>
+                <div class="relative group bg-gray-800 rounded-lg overflow-hidden shadow-lg w-[200px] h-[300px]">
+                    <img [src]="movie.poster_path" [alt]="movie.name" class="w-full h-full object-cover">
+                    <div
+                        class="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 text-white">
+                        <h3 class="text-lg font-bold">{{ movie.name }}</h3>
+                        <p class="text-sm">{{ movie.release_date }}</p>
+                    </div>
+                </div>
+            </swiper-slide>
+            }
+        </swiper-container>
+    </section>
+
+    <!-- Popular Series Slider -->
+    <section>
+        <h2 class="text-3xl font-bold mb-4">Popular Series</h2>
+        <swiper-container slides-per-view="10" space-between="5" free-mode="true" class="mySwiper">
+            @for(series of popularSeries(); track series){
+            <swiper-slide>
+                <div  [routerLink]="['/tv',series.id]" class="relative group bg-gray-800 rounded-lg overflow-hidden shadow-lg w-[200px] h-[300px]">
+                    <img [src]="'https://image.tmdb.org/t/p/w500' + series.poster_path" [alt]="series.name"
+                        class="w-full h-full object-cover">
+                    <div
+                        class="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 text-white">
+                        <h3 class="text-lg font-bold">{{ series.name }}</h3>
+                        <p class="text-sm">{{ series.first_air_date }}</p>
+                    </div>
+                </div>
+            </swiper-slide>
+            }
+        </swiper-container>
+    </section>
+</div>
