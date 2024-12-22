@@ -1,0 +1,114 @@
+@if(series()){
+<div class="relative text-white bg-black">
+    <!-- Backdrop Section -->
+    <div class="relative w-full h-[600px] overflow-hidden">
+        <img *ngIf="series()?.backdrop_path" [src]="getBackDrop(series()?.backdrop_path)" [alt]="series()?.name"
+            class="absolute w-full h-full object-cover" />
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+
+        <!-- Poster, Title, Tagline, and Trailer -->
+        <div class="relative z-10 w-full mx-auto px-8 h-full flex items-center justify-between">
+            <!-- Poster -->
+            <div class="w-64 flex-shrink-0">
+                <img *ngIf="series()?.poster_path" [src]="getPosterUrl(series()?.poster_path)" [alt]="series()?.name"
+                    class="rounded-lg shadow-lg" />
+            </div>
+
+            <!-- Title and Info -->
+            <div class="flex-1 px-8">
+                <h1 class="text-5xl font-extrabold mb-2">
+                    {{ series()?.name }}
+                    <span *ngIf="series()?.first_air_date" class="text-gray-400 text-3xl">
+                        ({{ series()?.first_air_date | date: 'yyyy' }})
+                    </span>
+                </h1>
+                <div class="text-lg text-gray-300 mb-4">
+                    {{ series()?.content_ratings?.results?.[0]?.rating || 'TV-MA' }}
+                    {{ series()?.number_of_seasons || '1' }} Season |
+                    @for (genre of series()?.genres || []; track genre) {
+                    {{ genre.name }}<span *ngIf="!$last">, </span>
+                    }
+                </div>
+            </div>
+
+            <!-- Tagline -->
+            <p *ngIf="series()?.tagline" class="absolute bottom-8 text-3xl italic text-gray-200">
+                {{ series()?.tagline }}
+            </p>
+
+            <!-- Trailer Button -->
+            @if (getTrailerUrl()) {
+            <a [href]="getTrailerUrl()" target="_blank"
+                class="absolute bottom-8 right-8 inline-block bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-4 rounded">
+                Watch Trailer
+            </a>
+            }
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative z-20 w-full mx-auto px-8 py-12">
+        <!-- Overview Section -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold mb-4">Overview</h2>
+            <p *ngIf="series()?.overview" class="text-gray-300 mb-6 leading-relaxed">
+                {{ series()?.overview }}
+            </p>
+        </div>
+
+        <!-- Creators and Producers -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-300 text-sm mb-8">
+            <div>
+                <strong class="text-white">Creator:</strong>
+                @for (creator of series()?.created_by || []; track creator) {
+                <div>{{ creator.name }}</div>
+                }
+            </div>
+            <div>
+                <strong class="text-white">Producer:</strong>
+                <div>Robert Lloyd Lewis</div>
+            </div>
+            <div>
+                <strong class="text-white">Executive Producers:</strong>
+                @for (producer of series()?.production_companies || []; track producer) {
+                <div>{{ producer.name }}</div>
+                }
+            </div>
+            <div>
+                <strong class="text-white">Network:</strong>
+                @for (network of series()?.networks || []; track network) {
+                <div>{{ network.name }}</div>
+                }
+            </div>
+        </div>
+
+        <!-- Keywords -->
+        <div *ngIf="series()?.keywords?.results?.length" class="flex flex-wrap gap-2 mb-6">
+            @for (keyword of series()?.keywords?.results || []; track keyword) {
+            <span class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+                {{ keyword.name }}
+            </span>
+            }
+        </div>
+
+        <!-- Seasons -->
+        <h2 *ngIf="series()" class="text-3xl font-bold mt-8 mb-4">
+            Seasons <span class="text-sm text-gray-400">({{ series()?.number_of_episodes }} Episodes)</span>
+        </h2>
+
+        <!-- Recommendations -->
+        <h2 *ngIf="series()?.recommendations?.results?.length" class="text-3xl font-bold mt-8 mb-4">
+            Recommendations
+        </h2>
+        <app-slider [seriesList]="series()?.recommendations?.results || []"></app-slider>
+
+        <!-- Similar Series -->
+        <h2 *ngIf="series()?.similar?.results?.length" class="text-3xl font-bold mt-12 mb-4">Similar Series</h2>
+        <app-slider [seriesList]="series()?.similar?.results || []"></app-slider>
+
+        <h2 *ngIf="series()?.credits?.cast?.results?.length" class="text-3xl font-bold mt-12 mb-4">Cast</h2>
+        <!-- <app-slider [seriesList]="series()?.credits?.cast?.results || []"></app-slider>-->
+    </div>
+</div>
+}
