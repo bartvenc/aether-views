@@ -1,0 +1,17 @@
+<div class="swiper-container">
+    <swiper-container [slidesPerView]="swiperOptions.slidesPerView" [spaceBetween]="swiperOptions.spaceBetween"
+        [breakpoints]="swiperOptions.breakpoints" [freeMode]="swiperOptions.freeMode" class="mySwiper">
+        @for(series of seriesList; track series){
+        <swiper-slide>
+            <div class="series-card group">
+                <img [src]="series.poster_path ? tmdbService.getPosterUrl(series.poster_path) : 'assets/no-image.jpg'"
+                    [alt]="series.name" class="w-full h-full object-cover rounded-lg shadow-lg" />
+                <div class="overlay">
+                    <h3 class="title">{{ series.name }}</h3>
+                    <p class="year">{{ series.first_air_date | date: 'yyyy' }}</p>
+                </div>
+            </div>
+        </swiper-slide>
+        }
+    </swiper-container>
+</div>
