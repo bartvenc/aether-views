@@ -5,6 +5,7 @@ export interface Person {
   original_name: string;
   gender: number;
   profile_path: string | null;
+  character: string;
 }
 
 export interface Episode {
@@ -122,8 +123,8 @@ export interface Series {
   vote_count?: number;
   adult?: boolean;
   credits?: {
-    cast?: { results: Person[]; }
-    crew?: { results: Person[]; }
+    cast?: Person[]; 
+    crew?:  Person[]; 
   };
 
   created_by?: Person[];
