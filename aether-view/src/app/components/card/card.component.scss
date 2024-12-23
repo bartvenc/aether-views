@@ -1,15 +1,21 @@
 .card-container {
-    position: relative;
-    overflow: hidden;
-    border-radius: 0.5rem;
-    background-color: #000;
+    width: 100%;
+    max-width: 150px; // Default max width for larger screens
+    transition: transform 0.3s ease-in-out;
   
     img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.3s ease-in-out;
+      height: auto;
     }
+  
+    @media (max-width: 768px) {
+      max-width: 120px; // Adjust for tablets
+    }
+  
+    @media (max-width: 480px) {
+      max-width: 100px; // Adjust for small phones
+    }
+  
   
     &:hover img {
       transform: scale(1.05);

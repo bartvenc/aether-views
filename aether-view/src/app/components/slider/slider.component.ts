@@ -25,18 +25,38 @@ export class SliderComponent {
     slidesPerView: 1,
     spaceBetween: 10,
     breakpoints: {
-      640: {
+      320: {
         slidesPerView: 2,
-        spaceBetween: 15,
+        spaceBetween: 10,
+      },
+      480: {
+        slidesPerView: 3,
+        spaceBetween: 10,
+      },
+      640: {
+        slidesPerView: 4,
+        spaceBetween: 10,
       },
       768: {
-        slidesPerView: 3,
-        spaceBetween: 20,
+        slidesPerView: 5,
+        spaceBetween: 10,
       },
       1024: {
-        slidesPerView: 5,
-        spaceBetween: 25,
+        slidesPerView: 6,
+        spaceBetween: 10,
       },
+      1440: {
+        slidesPerView: 8,
+        spaceBetween: 10,
+      },
+      2560: {
+        slidesPerView: 15,
+        spaceBetween: 10,
+      },
+      3440: {
+        slidesPerView: 20,
+        spaceBetween: 10,
+      }
     },
     freeMode: true,
   };
