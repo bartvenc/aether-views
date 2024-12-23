@@ -95,6 +95,15 @@ export class TmdbService {
   getPosterUrl(path: string | null | undefined): string {
     return path ? `https://image.tmdb.org/t/p/w500${path}` : '';
   }
+
+  getBackDrop(path: string | null | undefined): string | null {
+    return path ? `https://image.tmdb.org/t/p/original${path}` : null;
+  }
+
+  getTrailerUrl(series: Series | undefined): string | null {
+    const videos = series?.videos?.results;
+    return videos?.length ? `https://www.youtube.com/watch?v=${videos[0].key}` : null;
+  }
 }
   
 
