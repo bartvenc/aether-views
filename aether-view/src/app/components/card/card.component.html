@@ -1,0 +1,29 @@
+<div class="card-container" [ngClass]="type">
+    <ng-container [ngSwitch]="type">
+      <!-- Movie/Series Card -->
+      <div *ngSwitchCase="'movieSeries'" class="content">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
+        <div class="overlay">
+          <p class="card-title">{{ title }}</p>
+          <p class="card-subtitle">{{ subtitle }}</p>
+          <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
+        </div>
+      </div>
+  
+      <!-- Person Card -->
+      <div *ngSwitchCase="'person'" class="content person">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="rounded-full" />
+        <h3 class="title">{{ title }}</h3>
+        <p class="subtitle">{{ subtitle }}</p>
+      </div>
+  
+      <!-- Genre/Studio Card -->
+      <div *ngSwitchCase="'genreStudio'" class="content genre-studio">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" />
+        <div class="genre-overlay">
+          <h3 class="title">{{ title }}</h3>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  
