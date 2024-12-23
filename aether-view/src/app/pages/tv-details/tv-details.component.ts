@@ -36,18 +36,5 @@ export class TvDetailsComponent implements OnInit {
       this.series.set(data);
     });
   }
-
-  getPosterUrl(path: string | null | undefined): string {
-    return path ? `https://image.tmdb.org/t/p/w500${path}` : '';
-  }
-
-  getBackDrop(path: string | null | undefined): string {
-    return path ? `https://image.tmdb.org/t/p/original${path}` : '';
-  }
-
-  getTrailerUrl(): string | null {
-    const videos = this.series()?.videos?.results;
-    return videos?.length ? `https://www.youtube.com/watch?v=${videos[0].key}` : null;
-  }
 }
 
