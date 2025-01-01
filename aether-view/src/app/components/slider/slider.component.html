@@ -1,22 +1,24 @@
 <div class="swiper-container">
-    <swiper-container
-      [slidesPerView]="swiperOptions.slidesPerView"
-      [spaceBetween]="swiperOptions.spaceBetween"
-      [breakpoints]="swiperOptions.breakpoints"
-      [freeMode]="swiperOptions.freeMode"
-      class="mySwiper"
-    >
-      @for (item of items; track item) {
-        <swiper-slide>
-          <app-card
-            [type]="cardType"
-            [imageUrl]="item[imageField] ? tmdbService.getPosterUrl(item[imageField]) : null"
-            [title]="item[titleField]"
-            [subtitle]="item[subtitleField]"
-            [overview]="item[overviewField]"
-          ></app-card>
-        </swiper-slide>
-      }
-    </swiper-container>
-  </div>
-  
+  <swiper-container
+    [slidesPerView]="swiperOptions.slidesPerView"
+    [spaceBetween]="swiperOptions.spaceBetween"
+    [breakpoints]="swiperOptions.breakpoints"
+    [freeMode]="swiperOptions.freeMode"
+    class="mySwiper"
+  >
+    @for (item of items; track item) {
+      <swiper-slide 
+        class="cursor-pointer transition-transform hover:scale-105" 
+        (click)="onItemClicked(item)"
+      >
+        <app-card
+          [type]="cardType"
+          [imageUrl]="item ? tmdbService.getImageUrl(item) : null"
+          [title]="item[titleField]"
+          [subtitle]="item[subtitleField]"
+          [overview]="item[overviewField]"
+        ></app-card>
+      </swiper-slide>
+    }
+  </swiper-container>
+</div>
