@@ -6,3 +6,15 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+    font-family: "Bruno Ace SC";
+    font-style: normal;
+    font-weight: 800;
+    src: url("https://fonts.gstatic.com/s/brunoacesc/v4/8QIRdiDOrfiq0b7RYcw88HNPlpKY62zk.ttf") format("truetype");
+}
+
+.bruno-ace-sc-regular { 
+    font-family: "Bruno Ace SC", serif;
+    font-weight: 800;
+    font-style: normal;
+}
