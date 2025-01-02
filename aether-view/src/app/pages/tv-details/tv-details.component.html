@@ -1,13 +1,13 @@
 @if(series()){
-<div class="relative text-white bg-black">
+<div class="relative text-white">
     <!-- Backdrop Section -->
     <div class="relative w-full h-[600px] overflow-hidden">
         @if(tmdbService.getBackDrop(series()?.backdrop_path)){
         <img [src]="tmdbService.getBackDrop(series()?.backdrop_path)" [alt]="series()?.name"
             class="absolute w-full h-full object-cover" />
         }
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black"></div>
-        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#201a23]"></div>
+        <div class="absolute inset-0 bg-[#201a23] bg-opacity-40"></div>
 
         <!-- Poster, Title, Tagline, and Trailer -->
         <div class="relative z-10 w-full mx-auto px-8 h-full flex items-center justify-between">
