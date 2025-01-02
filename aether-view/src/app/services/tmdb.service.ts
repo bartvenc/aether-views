@@ -56,6 +56,72 @@ export class TmdbService {
     { initialValue: [] }
   );
 
+  fetchMoviesByPopularity(page: number = 1) {
+    const url = `${this.baseUrl}/discover/movie?api_key=${this.apiKey}&sort_by=popularity.desc&page=${page}`;
+    return this.http.get<any>(url);
+  }
+
+  fetchMovies(filters: any, page: number = 1) {
+    console.log(filters);
+    const params: any = {
+      api_key: this.apiKey,
+      language: 'en-US',
+      page: page.toString(),
+      include_adult: false,
+      include_video: false,
+    };
+  
+    switch (filters.category) {
+      case 'Popular':
+        params.sort_by = 'popularity.desc';
+        if (filters.year > 0) params.primary_release_year = filters.year; // Append release year
+        break;
+  
+      case 'New':
+        params.sort_by = 'release_date.desc';
+        console.log('Year:', filters.year);
+        if (filters.year > 0) params.primary_release_year = filters.year;
+        break;
+  
+      case 'Top Rated':
+        params.sort_by = 'vote_average.desc';
+        params['vote_count.gte'] = '200';
+        params.without_genres = '99,10755'; // Exclude genres
+        if (filters.year > 0) params.primary_release_year = filters.year; // Append release year
+        break;
+  
+      case 'Now Playing':
+        params.sort_by = 'popularity.desc';
+        params.with_release_type = '2|3';
+        const today = new Date();
+        params['release_date.gte'] = `${today.getFullYear()}-${today.getMonth() + 1}-01`;
+        params['release_date.lte'] = `${today.getFullYear()}-${today.getMonth() + 1}-28`; // Approx end of month
+        break;
+  
+      default:
+        params.sort_by = 'popularity.desc';
+    }
+  
+    // Append additional filters if set
+    if (filters.genres && filters.genres.length != 0) {
+      params.with_genres = filters.genres.join(',');
+    }
+    if (filters.studioOrNetwork && filters.studioOrNetwork != 0) {
+      params.with_companies = filters.studioOrNetwork;
+    }
+    if (filters.keywords && filters.keywords.length != 0) {
+      params.with_keywords = filters.keywords;
+    }
+  
+    const queryString = new URLSearchParams(params).toString();
+    return this.http.get<any>(`${this.baseUrl}/discover/movie?${queryString}`);
+  }
+  
+  
+  searchKeyword(query: string) {
+    const url = `${this.baseUrl}/search/keyword?api_key=${this.apiKey}&query=${encodeURIComponent(query)}&language=en-US`;
+    return this.http.get<{ results: { id: number; name: string }[] }>(url);
+  }
 
   getImageUrl(item: Series | Movie | Studio | Genre | Person | null | undefined): string | null {
     if (!item) return null;
