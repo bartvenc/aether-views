@@ -1,4 +1,4 @@
-<div class="card-container" [ngClass]="type">
+<div class="card-container" [ngClass]="type" (click)="onItemClicked()">
   <ng-container [ngSwitch]="type">
     <!-- Movie/Series Card -->
     <div *ngSwitchCase="'movieSeries'" class="movieSeries">
