@@ -1,12 +1,8 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, Input } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CardComponent } from '../card/card.component';
 import { TmdbService } from '../../services/tmdb.service';
-import { Series } from '../../interfaces/series';
-import { Movie } from '../../interfaces/movies';
-import { Studio } from '../../../../public/assets/studios';
-import { Genre } from '../../interfaces/common-interfaces';
+
 
 @Component({
   selector: 'app-slider',
@@ -25,19 +21,6 @@ export class SliderComponent {
   @Input() overviewField: string = 'overview';
 
   tmdbService = inject(TmdbService);
-  router = inject(Router);
-
-  onItemClicked(item: any): void {
-    if (this.tmdbService.isSeries(item)) {
-      this.router.navigate(['/tv', item.id]);
-    } else if (this.tmdbService.isMovie(item)) {
-      this.router.navigate(['/movie', item.id]);
-    } else if (this.tmdbService.isGenre(item)) {
-      this.router.navigate(['/genre', item.id]);
-    } else {
-      console.warn('Unknown item type:', item);
-    }
-  }
 
   swiperOptions = {
     slidesPerView: 1,

@@ -9,7 +9,6 @@
     @for (item of items; track item) {
       <swiper-slide 
         class="cursor-pointer transition-transform hover:scale-105" 
-        (click)="onItemClicked(item)"
       >
         <app-card
           [type]="cardType"
@@ -17,6 +16,7 @@
           [title]="item[titleField]"
           [subtitle]="item[subtitleField]"
           [overview]="item[overviewField]"
+          [item]="item"
         ></app-card>
       </swiper-slide>
     }
