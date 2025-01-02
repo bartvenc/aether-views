@@ -1,0 +1,28 @@
+<div class="p-6 bg-[#201a23] text-white min-h-screen">
+    <!-- Filters -->
+    <app-filter [type]="type" (filterChange)="updateFilters($event)" [genres]="currentGenres"
+        [years]="[2025, 2024, 2023, 2022]" [studiosOrNetworks]="curentStudiosOrNetwork"></app-filter>
+
+    <!-- Items Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-6">
+        @for (item of items(); track item) {
+        <app-card 
+            [type]="'movieSeries'" 
+            [subtitle]="item.title" 
+            [title]="item.release_date ? item.release_date : item.first_air_date"
+            [imageUrl]="item ? tmdbService.getImageUrl(item) : null" 
+            [overview]="item.overview"
+            [item]="item"
+            ></app-card>
+        }
+
+        <!-- Skeleton Loading for Cards -->
+        @if (isLoading()) {
+        @for (item of repeatArray; track item) {
+        <div class="w-full h-64 bg-gray-800 animate-pulse rounded-lg">
+            <!-- Optional: use the index if needed -->
+        </div>
+        }
+        }
+    </div>
+</div>
