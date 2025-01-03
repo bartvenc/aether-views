@@ -10,7 +10,7 @@ import { TmdbService } from '../../services/tmdb.service';
   selector: 'app-filter',
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
-  templateUrl: './filter.component.html'
+  templateUrl: './filter.component.html',
 })
 export class FilterComponent {
   @Input() type: 'movies' | 'series' = 'movies'; // Default type
@@ -31,37 +31,37 @@ export class FilterComponent {
   genreDropdownOpen = signal<boolean>(false);
 
   updateFilter() {
-    if (this.selectedCategory() === 'New' && this.selectedYear()  === 0) {
+    if (this.selectedCategory() === 'New' && this.selectedYear() === 0) {
       this.selectedYear.set(new Date().getFullYear());
     }
-  
+
     this.filterChange.emit({
       category: this.selectedCategory(),
       year: this.selectedYear(),
       genres: this.selectedGenres(),
       studioOrNetwork: this.selectedStudiosOrNetworks(),
-      keywords: this.selectedKeywords().map((kw) => kw.id),
+      keywords: this.selectedKeywords().map(kw => kw.id),
     });
     console.log('Filter from filter component updated:', {
       type: this.type,
       category: this.selectedCategory(),
       year: this.selectedYear(),
       genres: this.selectedGenres(),
-      keyword: this.selectedKeywords().map((kw) => kw.id),
+      keyword: this.selectedKeywords().map(kw => kw.id),
       studioOrNetwork: this.selectedStudiosOrNetworks(),
     });
   }
 
   toggleGenreDropdown() {
-    this.genreDropdownOpen.update((state) => !state);
+    this.genreDropdownOpen.update(state => !state);
   }
 
   updateSelectedGenres(genreId: number, isChecked: boolean) {
-    this.selectedGenres.update((currentGenres) => {
+    this.selectedGenres.update(currentGenres => {
       if (isChecked) {
         return [...currentGenres, genreId];
       } else {
-        return currentGenres.filter((id) => id !== genreId);
+        return currentGenres.filter(id => id !== genreId);
       }
     });
     this.updateFilter();
@@ -70,7 +70,7 @@ export class FilterComponent {
   onKeywordInput(query: string) {
     this.keywordInput.set(query);
     if (query.length >= 3) {
-      this.tmdbService.searchKeyword(query).subscribe((response) => {
+      this.tmdbService.searchKeyword(query).subscribe(response => {
         this.keywordResults.set(response.results);
       });
     } else {
@@ -79,8 +79,8 @@ export class FilterComponent {
   }
 
   addKeyword(keyword: { id: number; name: string }) {
-    if (!this.selectedKeywords().find((kw) => kw.id === keyword.id)) {
-      this.selectedKeywords.update((keywords) => [...keywords, keyword]);
+    if (!this.selectedKeywords().find(kw => kw.id === keyword.id)) {
+      this.selectedKeywords.update(keywords => [...keywords, keyword]);
       this.updateFilter();
     }
     this.keywordResults.set([]); // Clear results after selection
@@ -88,8 +88,7 @@ export class FilterComponent {
   }
 
   removeKeyword(keywordId: number) {
-    this.selectedKeywords.update((keywords) => keywords.filter((kw) => kw.id !== keywordId));
+    this.selectedKeywords.update(keywords => keywords.filter(kw => kw.id !== keywordId));
     this.updateFilter();
   }
-
 }

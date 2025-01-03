@@ -1,120 +1,125 @@
-@if(movie()){
-<div class="relative text-white bg-black">
+@if (movie()) {
+  <div class="relative text-white bg-black">
     <!-- Backdrop Section -->
     <div class="relative w-full h-[600px] overflow-hidden">
-        @if(tmdbService.getBackDrop(movie()?.backdrop_path)){
-        <img [src]="tmdbService.getBackDrop(movie()?.backdrop_path)" [alt]="movie()?.title"
-            class="absolute w-full h-full object-cover" />
-        }
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black"></div>
-        <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      @if (tmdbService.getBackDrop(movie()?.backdrop_path)) {
+        <img [src]="tmdbService.getBackDrop(movie()?.backdrop_path)" [alt]="movie()?.title" class="absolute w-full h-full object-cover" />
+      }
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black"></div>
+      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
 
-        <!-- Poster, Title, Tagline, and Trailer -->
-        <div class="relative z-10 w-full mx-auto px-8 h-full flex items-center justify-between">
-            <!-- Poster -->
-            <div class="w-64 flex-shrink-0">
-                <img *ngIf="movie()?.poster_path" [src]="tmdbService.getPosterUrl(movie()?.poster_path)"
-                    [alt]="movie()?.title" class="rounded-lg shadow-lg" />
-            </div>
-
-            <!-- Title and Info -->
-            <div class="flex-1 px-8">
-                <h1 class="text-5xl font-extrabold mb-2">
-                    {{ movie()?.title }}
-                    <span *ngIf="movie()?.release_date" class="text-gray-400 text-3xl">
-                        ({{ movie()?.release_date | date: 'yyyy' }})
-                    </span>
-                </h1>
-                <div class="text-lg text-gray-300 mb-4">
-                    {{ movie()?.runtime || '' }} minutes |
-                    @for (genre of movie()?.genres || []; track genre) {
-                    {{ genre.name }}<span *ngIf="!$last">, </span>
-                    }
-                </div>
-            </div>
-
-            <!-- Tagline -->
-            <p *ngIf="movie()?.tagline" class="absolute bottom-8 text-3xl italic text-gray-200">
-                {{ movie()?.tagline }}
-            </p>
-
-            <!-- Trailer Button -->
-            @if (tmdbService.getTrailerUrl(movie())) {
-            <a [href]="tmdbService.getTrailerUrl(movie())" target="_blank"
-                class="absolute bottom-8 right-8 inline-block bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-4 rounded">
-                Watch Trailer
-            </a>
-            }
+      <!-- Poster, Title, Tagline, and Trailer -->
+      <div class="relative z-10 w-full mx-auto px-8 h-full flex items-center justify-between">
+        <!-- Poster -->
+        <div class="w-64 flex-shrink-0">
+          <img
+            *ngIf="movie()?.poster_path"
+            [src]="tmdbService.getPosterUrl(movie()?.poster_path)"
+            [alt]="movie()?.title"
+            class="rounded-lg shadow-lg" />
         </div>
+
+        <!-- Title and Info -->
+        <div class="flex-1 px-8">
+          <h1 class="text-5xl font-extrabold mb-2">
+            {{ movie()?.title }}
+            <span *ngIf="movie()?.release_date" class="text-gray-400 text-3xl"> ({{ movie()?.release_date | date: 'yyyy' }}) </span>
+          </h1>
+          <div class="text-lg text-gray-300 mb-4">
+            {{ movie()?.runtime || '' }} minutes |
+            @for (genre of movie()?.genres || []; track genre) {
+              {{ genre.name }}<span *ngIf="!$last">, </span>
+            }
+          </div>
+        </div>
+
+        <!-- Tagline -->
+        <p *ngIf="movie()?.tagline" class="absolute bottom-8 text-3xl italic text-gray-200">
+          {{ movie()?.tagline }}
+        </p>
+
+        <!-- Trailer Button -->
+        @if (tmdbService.getTrailerUrl(movie())) {
+          <a
+            [href]="tmdbService.getTrailerUrl(movie())"
+            target="_blank"
+            class="absolute bottom-8 right-8 inline-block bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-4 rounded">
+            Watch Trailer
+          </a>
+        }
+      </div>
     </div>
 
     <!-- Main Content -->
     <div class="relative z-20 w-full mx-auto px-8 py-12">
-        <!-- Overview Section -->
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold mb-4">Overview</h2>
-            <p *ngIf="movie()?.overview" class="text-gray-300 mb-6 leading-relaxed">
-                {{ movie()?.overview }}
-            </p>
-        </div>
+      <!-- Overview Section -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold mb-4">Overview</h2>
+        <p *ngIf="movie()?.overview" class="text-gray-300 mb-6 leading-relaxed">
+          {{ movie()?.overview }}
+        </p>
+      </div>
 
-        <!-- Creators and Producers -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-300 text-sm mb-8">
-            <div>
-                <strong class="text-white">Director:</strong>
-                @for (director of movie()?.credits?.crew || []; track director) {
-                @if(director.job === 'Director'){
-                <div>{{ director.name }}</div>
-                }
-                }
-            </div>
-            <div>
-                <strong class="text-white">Producers:</strong>
-                @for (producer of movie()?.credits?.crew || []; track producer) {
-                    @if(producer.job === 'Producer'){
-                <div>{{ producer.name }}</div>
-                    }
-                }
-            </div>
-            <div>
-                <strong class="text-white">Executive Producers:</strong>
-                @for (producer of movie()?.credits?.crew || []; track producer) {
-                    @if(producer.job === 'Executive Producer'){
-                <div>{{ producer.name }}</div>
-                    }
-                }
-            </div>
-        </div>
-
-        <!-- Keywords -->
-        <div *ngIf="movie()?.keywords?.keywords?.length" class="flex flex-wrap gap-2 mb-6">
-            @for (keyword of movie()?.keywords?.keywords || []; track keyword) {
-            <span class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
-                {{ keyword.name }}
-            </span>
+      <!-- Creators and Producers -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-300 text-sm mb-8">
+        <div>
+          <strong class="text-white">Director:</strong>
+          @for (director of movie()?.credits?.crew || []; track director) {
+            @if (director.job === 'Director') {
+              <div>{{ director.name }}</div>
             }
+          }
         </div>
+        <div>
+          <strong class="text-white">Producers:</strong>
+          @for (producer of movie()?.credits?.crew || []; track producer) {
+            @if (producer.job === 'Producer') {
+              <div>{{ producer.name }}</div>
+            }
+          }
+        </div>
+        <div>
+          <strong class="text-white">Executive Producers:</strong>
+          @for (producer of movie()?.credits?.crew || []; track producer) {
+            @if (producer.job === 'Executive Producer') {
+              <div>{{ producer.name }}</div>
+            }
+          }
+        </div>
+      </div>
 
-        <!-- Recommendations -->
+      <!-- Keywords -->
+      <div *ngIf="movie()?.keywords?.keywords?.length" class="flex flex-wrap gap-2 mb-6">
+        @for (keyword of movie()?.keywords?.keywords || []; track keyword) {
+          <span class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+            {{ keyword.name }}
+          </span>
+        }
+      </div>
 
-        @if(movie()?.recommendations?.results?.length){
+      <!-- Recommendations -->
+
+      @if (movie()?.recommendations?.results?.length) {
         <h2 class="text-3xl font-bold mt-8 mb-4">Recommendations</h2>
         <app-slider [items]="movie()?.recommendations?.results || []" overview="overview"></app-slider>
-        }
+      }
 
-        @if(movie()?.recommendations?.results?.length){
+      @if (movie()?.recommendations?.results?.length) {
         <!-- Similar Series -->
         <h2 class="text-3xl font-bold mt-12 mb-4">Similar Movies</h2>
         <app-slider [items]="movie()?.similar?.results || []" overview="overview"></app-slider>
-        }
+      }
 
-        @if(movie()?.credits?.cast?.length){
+      @if (movie()?.credits?.cast?.length) {
         <!-- Cast -->
         <h2 class="text-3xl font-bold mt-12 mb-4">Cast</h2>
-        <app-slider [items]="movie()?.credits?.cast || []" cardType="person" imageField="profile_path"
-            titleField="character" subtitleField="name"></app-slider>
-        }
-
+        <app-slider
+          [items]="movie()?.credits?.cast || []"
+          cardType="person"
+          imageField="profile_path"
+          titleField="character"
+          subtitleField="name"></app-slider>
+      }
     </div>
-</div>
+  </div>
 }

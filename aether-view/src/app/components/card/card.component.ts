@@ -11,9 +11,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./card.component.scss'],
 })
 export class CardComponent {
-  @Input() imageUrl?: string | null = null; 
-  @Input() title?: string = ''; 
-  @Input() subtitle?: string | null = null; 
+  @Input() imageUrl?: string | null = null;
+  @Input() title?: string = '';
+  @Input() subtitle?: string | null = null;
   @Input() type: 'movieSeries' | 'person' | 'genreStudio' | 'studio' = 'movieSeries'; // Card type
   @Input() overview?: string | null = null; // Overview/Summary
   @Input() maxOverviewLength?: number = 100;

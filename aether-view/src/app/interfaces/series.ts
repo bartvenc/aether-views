@@ -8,7 +8,8 @@ import {
   ContentRating,
   Credits,
   RecommendationResponse,
-  SimilarResponse
+  SimilarResponse,
+  Image,
 } from './common-interfaces';
 
 export interface Episode {
@@ -69,10 +70,10 @@ export interface Series {
   vote_average?: number;
   vote_count?: number;
   adult?: boolean;
-  credits?: Credits
+  credits?: Credits;
 
   created_by?: Person[];
-  genres?: { id: number; name: string; }[];
+  genres?: { id: number; name: string }[];
   genre_ids?: number[];
   networks?: Network[];
   production_companies?: ProductionCompany[];
@@ -84,9 +85,9 @@ export interface Series {
   next_episode_to_air?: Episode | null;
 
   images?: {
-    backdrops?: any[];
-    logos?: any[];
-    posters?: any[];
+    backdrops?: Image[];
+    logos?: Image[];
+    posters?: Image[];
   };
   videos?: {
     results: Video[];

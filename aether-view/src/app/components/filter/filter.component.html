@@ -1,81 +1,76 @@
 <div class="flex items-center space-x-4 bg-[#201a23] p-4 rounded-md">
-    <select class="bg-gray-800 text-white p-2 rounded" [(ngModel)]="selectedCategory" (change)="updateFilter()">
-        <option value="Popular">Popular</option>
-        <option value="New">New</option>
-        <option value="Top Rated">Top Rated</option>
-        <option value="Now Playing">Now Playing</option>
-    </select>
+  <select class="bg-gray-800 text-white p-2 rounded" [(ngModel)]="selectedCategory" (change)="updateFilter()">
+    <option value="Popular">Popular</option>
+    <option value="New">New</option>
+    <option value="Top Rated">Top Rated</option>
+    <option value="Now Playing">Now Playing</option>
+  </select>
 
-    <select class="bg-gray-800 text-white p-2 rounded" [(ngModel)]="selectedYear" (change)="updateFilter()">
-        <option [value]="0">Year</option>
-        @for (year of years; track year) {
-        <option [value]="year">{{ year }}</option>
+  <select class="bg-gray-800 text-white p-2 rounded" [(ngModel)]="selectedYear" (change)="updateFilter()">
+    <option [value]="0">Year</option>
+    @for (year of years; track year) {
+      <option [value]="year">{{ year }}</option>
+    }
+  </select>
+
+  <!-- Multi-Select Dropdown for Genres -->
+  <div class="relative">
+    <button class="bg-gray-800 text-white p-2 rounded flex items-center space-x-2" (click)="toggleGenreDropdown()">
+      <span>Genres</span>
+      <span class="material-icons">arrow_drop_down</span>
+    </button>
+    @if (genreDropdownOpen()) {
+      <div class="absolute mt-2 bg-gray-800 text-white rounded shadow-lg z-10 p-2 w-48">
+        @for (genre of genres; track genre) {
+          <div class="flex items-center space-x-2 mb-2">
+            <input
+              id="genre-{{ genre.id }}"
+              type="checkbox"
+              [value]="genre.id"
+              [checked]="selectedGenres().includes(genre.id)"
+              (change)="updateSelectedGenres(genre.id, $any($event.target).checked)" />
+            <label for="genre-{{ genre.id }}">{{ genre.name }}</label>
+          </div>
         }
-    </select>
+      </div>
+    }
+  </div>
 
-    <!-- Multi-Select Dropdown for Genres -->
+  <select class="bg-gray-800 text-white p-2 rounded" [(ngModel)]="selectedStudiosOrNetworks" (change)="updateFilter()">
+    <option [value]="0">{{ type === 'movies' ? 'Studios' : 'Network' }}</option>
+    @for (studioNetwork of studiosOrNetworks; track studioNetwork) {
+      <option [value]="studioNetwork.id">{{ studioNetwork.name }}</option>
+    }
+  </select>
+
+  <div class="flex items-center space-x-4 bg-[#201a23] p-4 rounded-md">
+    <!-- Keyword Input -->
     <div class="relative">
-        <button class="bg-gray-800 text-white p-2 rounded flex items-center space-x-2" (click)="toggleGenreDropdown()">
-            <span>Genres</span>
-            <span class="material-icons">arrow_drop_down</span>
-        </button>
-        @if(genreDropdownOpen()) {
-        <div class="absolute mt-2 bg-gray-800 text-white rounded shadow-lg z-10 p-2 w-48">
-            @for (genre of genres; track genre) {
-            <div class="flex items-center space-x-2 mb-2">
-                <input
-                type="checkbox"
-                [value]="genre.id"
-                [checked]="selectedGenres().includes(genre.id)"
-                (change)="updateSelectedGenres(genre.id, $any($event.target).checked)"
-              />
-                <label>{{ genre.name }}</label>
-            </div>
-            }
-        </div>
-        }
-
+      <input
+        type="text"
+        placeholder="Search keyword"
+        class="bg-gray-800 text-white p-2 rounded"
+        [value]="keywordInput()"
+        (input)="onKeywordInput($any($event.target).value)" />
+      @if (keywordResults().length) {
+        <ul class="absolute bg-gray-800 text-white rounded shadow-lg mt-2 w-48 z-10 p-2">
+          @for (keyword of keywordResults(); track keyword.id) {
+            <li class="p-2 hover:bg-gray-700 cursor-pointer" (click)="addKeyword(keyword)">
+              {{ keyword.name }}
+            </li>
+          }
+        </ul>
+      }
     </div>
 
-    <select class="bg-gray-800 text-white p-2 rounded" [(ngModel)]="selectedStudiosOrNetworks" (change)="updateFilter()">
-        <option [value]="0">{{ type === 'movies' ? 'Studios' : 'Network' }}</option>
-        @for (studioNetwork of studiosOrNetworks; track studioNetwork) {
-            <option [value]="studioNetwork.id">{{ studioNetwork.name }}</option>
-        }
-    </select>
-
-    <div class="flex items-center space-x-4 bg-[#201a23] p-4 rounded-md">
-        <!-- Keyword Input -->
-        <div class="relative">
-          <input
-            type="text"
-            placeholder="Search keyword"
-            class="bg-gray-800 text-white p-2 rounded"
-            [value]="keywordInput()"
-            (input)="onKeywordInput($any($event.target).value)"
-          />
-          @if (keywordResults().length) {
-            <ul class="absolute bg-gray-800 text-white rounded shadow-lg mt-2 w-48 z-10 p-2">
-              @for (keyword of keywordResults(); track keyword.id) {
-                <li
-                  class="p-2 hover:bg-gray-700 cursor-pointer"
-                  (click)="addKeyword(keyword)"
-                >
-                  {{ keyword.name }}
-                </li>
-              }
-            </ul>
-          }
-        </div>
-      
-        <!-- Selected Keywords -->
-        <div class="flex flex-wrap gap-2">
-          @for (keyword of selectedKeywords(); track keyword.id) {
-            <span class="bg-blue-600 text-white px-2 py-1 rounded flex items-center">
-              {{ keyword.name }}
-              <button class="ml-2 text-red-500" (click)="removeKeyword(keyword.id)">x</button>
-            </span>
-          }
-        </div>
-      </div>
+    <!-- Selected Keywords -->
+    <div class="flex flex-wrap gap-2">
+      @for (keyword of selectedKeywords(); track keyword.id) {
+        <span class="bg-blue-600 text-white px-2 py-1 rounded flex items-center">
+          {{ keyword.name }}
+          <button class="ml-2 text-red-500" (click)="removeKeyword(keyword.id)">x</button>
+        </span>
+      }
+    </div>
+  </div>
 </div>

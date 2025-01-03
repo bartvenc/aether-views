@@ -1,5 +1,5 @@
 import { Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FilterComponent } from '../../components/filter/filter.component';
 import { CardComponent } from '../../components/card/card.component';
 import { TmdbService } from '../../services/tmdb.service';
@@ -11,17 +11,17 @@ import { Network } from '../../interfaces/series';
 @Component({
   selector: 'app-filter-page',
   standalone: true,
-  imports: [FilterComponent, CardComponent, RouterLink],
-  templateUrl: './filter-page.component.html'
+  imports: [FilterComponent, CardComponent],
+  templateUrl: './filter-page.component.html',
 })
 export class FilterPageComponent implements OnInit, OnDestroy {
   @Input() type: 'movies' | 'series' = 'movies';
   filters = signal({
     category: 'Popular',
-    year: null as number | null,  
+    year: null as number | null,
     genres: [] as Genre[],
     keywords: [],
-    studiosOrNetworks: [] as Studio[] | Network [],
+    studiosOrNetworks: [] as Studio[] | Network[],
   });
 
   movieGenres = MOVIE_GENRES;
@@ -41,11 +41,10 @@ export class FilterPageComponent implements OnInit, OnDestroy {
   tmdbService = inject(TmdbService);
 
   ngOnInit(): void {
-
     this.type = this.route.snapshot.data['type'];
 
     console.log('Type:', this.type);
-    if(this.type === 'movies') {
+    if (this.type === 'movies') {
       this.currentGenres = this.movieGenres;
       this.curentStudiosOrNetwork = this.studios;
       this.fetchMovies(true);
@@ -57,13 +56,14 @@ export class FilterPageComponent implements OnInit, OnDestroy {
   // Triggered by the filter component
   updateFilters(newFilters: any) {
     console.log('Updating filters:', newFilters);
-    this.filters.update((currentFilters) => {
-      const updatedYear = newFilters.category === 'New' && !newFilters.year
-        ? new Date().getFullYear()
-        : newFilters.year !== undefined
-          ? newFilters.year
-          : currentFilters.year;
-  
+    this.filters.update(currentFilters => {
+      const updatedYear =
+        newFilters.category === 'New' && !newFilters.year
+          ? new Date().getFullYear()
+          : newFilters.year !== undefined
+            ? newFilters.year
+            : currentFilters.year;
+
       return {
         ...currentFilters,
         ...newFilters,
@@ -76,32 +76,25 @@ export class FilterPageComponent implements OnInit, OnDestroy {
     this.items.set([]);
     this.fetchMovies(true);
   }
-  
 
-
-
-  fetchMovies(initialLoad: boolean = false) {
+  fetchMovies(initialLoad = false) {
     if (this.isLoading() || (!initialLoad && this.currentPage() > 500)) return; // TMDB API limit
 
     this.isLoading.set(true);
     const filterValues = this.filters();
     const pagesToFetch = initialLoad ? [1, 2] : [this.currentPage()];
 
-    Promise.all(
-      pagesToFetch.map((page) =>
-        this.tmdbService.fetchMovies(filterValues, page).toPromise()
-      )
-    )
-      .then((responses) => {
-        responses.forEach((response) => {
-          this.items.update((existingItems) => [...existingItems, ...response.results]);
+    Promise.all(pagesToFetch.map(page => this.tmdbService.fetchMovies(filterValues, page).toPromise()))
+      .then(responses => {
+        responses.forEach(response => {
+          this.items.update(existingItems => [...existingItems, ...response.results]);
         });
         if (!initialLoad) {
-          this.currentPage.update((page) => page + 1);
+          this.currentPage.update(page => page + 1);
         }
         this.isLoading.set(false);
       })
-      .catch((err) => {
+      .catch(err => {
         console.error('Error fetching movies:', err);
         this.isLoading.set(false);
       });
@@ -117,12 +110,11 @@ export class FilterPageComponent implements OnInit, OnDestroy {
     }
   }
 
-
   ngOnDestroy(): void {
     window.removeEventListener('scroll', this.onScroll.bind(this));
   }
 
-/*
+  /*
   this.route.queryParams.subscribe((params) => {
     if (params['releaseYear']) {
       this.filters.update((f) => ({ ...f, year: +params['releaseYear'] }));

@@ -6,10 +6,9 @@ import {
   Genre,
   VideoResult,
   Credits,
-  KeywordsResult,
   RecommendationResponse,
   SimilarResponse,
-  Keyword
+  Keyword,
 } from './common-interfaces';
 
 export interface BelongsToCollection {
@@ -18,7 +17,6 @@ export interface BelongsToCollection {
   poster_path: string | null;
   backdrop_path: string | null;
 }
-
 
 export interface Movie {
   adult: boolean;

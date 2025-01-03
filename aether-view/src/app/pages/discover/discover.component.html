@@ -1,59 +1,52 @@
 <div class="p-8 space-y-12">
-
-    @if(trendingMovies().length){
+  @if (trendingMovies().length) {
     <section>
-        <h2 class="text-3xl font-bold mt-8 mb-4">Trending Movies</h2>
-        <app-slider [items]="trendingMovies() || []" overview="overview" titleField="release_date"
-            subtitleField="title"></app-slider>
+      <h2 class="text-3xl font-bold mt-8 mb-4">Trending Movies</h2>
+      <app-slider [items]="trendingMovies() || []" overview="overview" titleField="release_date" subtitleField="title"></app-slider>
     </section>
-    }
+  }
 
-
-    @if(upcomingMovies().length){
+  @if (upcomingMovies().length) {
     <section>
-        <h2 class="text-3xl font-bold mt-8 mb-4">Upcoming Movies</h2>
-        <app-slider [items]="upcomingMovies() || []" overview="overview" titleField="release_date"
-            subtitleField="title"></app-slider>
+      <h2 class="text-3xl font-bold mt-8 mb-4">Upcoming Movies</h2>
+      <app-slider [items]="upcomingMovies() || []" overview="overview" titleField="release_date" subtitleField="title"></app-slider>
     </section>
-    }
+  }
 
-    @if(MOVIE_GENRES){
+  @if (MOVIE_GENRES) {
     <section>
-        <h2 class="text-3xl font-bold mt-8 mb-4">Movie Genres</h2>
-        <app-slider [items]="MOVIE_GENRES || []" titleField="name" imageField="posterUrl" cardType="genreStudio"></app-slider>
+      <h2 class="text-3xl font-bold mt-8 mb-4">Movie Genres</h2>
+      <app-slider [items]="MOVIE_GENRES || []" titleField="name" imageField="posterUrl" cardType="genreStudio"></app-slider>
     </section>
-    }
+  }
 
-    @if(STUDIOS){
-        <section>
-            <h2 class="text-3xl font-bold mt-8 mb-4">Studios</h2>
-            <app-slider [items]="STUDIOS || []" imageField="logo_path" cardType="studio"></app-slider>
-        </section>
-    }
-
-
-
-    @if(trendingSeries().length){
+  @if (STUDIOS) {
     <section>
-        <h2 class="text-3xl font-bold mt-8 mb-4">Trending Series</h2>
-        <app-slider [items]="trendingSeries() || []" overview="overview"></app-slider>
+      <h2 class="text-3xl font-bold mt-8 mb-4">Studios</h2>
+      <app-slider [items]="STUDIOS || []" imageField="logo_path" cardType="studio"></app-slider>
     </section>
-    }
+  }
 
-    <!-- Popular Series Slider -->
-
-    @if(popularSeries().length){
+  @if (trendingSeries().length) {
     <section>
-        <h2 class="text-3xl font-bold mt-8 mb-4">Popular Series</h2>
-        <app-slider [items]="popularSeries() || []" overview="overview"></app-slider>
+      <h2 class="text-3xl font-bold mt-8 mb-4">Trending Series</h2>
+      <app-slider [items]="trendingSeries() || []" overview="overview"></app-slider>
     </section>
-    }
+  }
 
-    @if(SERIES_GENRES){
-        <section>
-            <h2 class="text-3xl font-bold mt-8 mb-4">Series Genres</h2>
-            <app-slider [items]="SERIES_GENRES || []" titleField="name" imageField="posterUrl" cardType="genreStudio"></app-slider>
-        </section>
-        }
+  <!-- Popular Series Slider -->
 
+  @if (popularSeries().length) {
+    <section>
+      <h2 class="text-3xl font-bold mt-8 mb-4">Popular Series</h2>
+      <app-slider [items]="popularSeries() || []" overview="overview"></app-slider>
+    </section>
+  }
+
+  @if (SERIES_GENRES) {
+    <section>
+      <h2 class="text-3xl font-bold mt-8 mb-4">Series Genres</h2>
+      <app-slider [items]="SERIES_GENRES || []" titleField="name" imageField="posterUrl" cardType="genreStudio"></app-slider>
+    </section>
+  }
 </div>

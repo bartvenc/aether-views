@@ -4,20 +4,16 @@
     [spaceBetween]="swiperOptions.spaceBetween"
     [breakpoints]="swiperOptions.breakpoints"
     [freeMode]="swiperOptions.freeMode"
-    class="mySwiper"
-  >
+    class="mySwiper">
     @for (item of items; track item) {
-      <swiper-slide 
-        class="cursor-pointer transition-transform hover:scale-105" 
-      >
+      <swiper-slide class="cursor-pointer transition-transform hover:scale-105">
         <app-card
           [type]="cardType"
           [imageUrl]="item ? tmdbService.getImageUrl(item) : null"
           [title]="item[titleField]"
           [subtitle]="item[subtitleField]"
           [overview]="item[overviewField]"
-          [item]="item"
-        ></app-card>
+          [item]="item"></app-card>
       </swiper-slide>
     }
   </swiper-container>

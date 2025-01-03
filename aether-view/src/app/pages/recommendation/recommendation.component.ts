@@ -6,8 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Series } from '../../interfaces/series';
 import { TmdbService } from '../../services/tmdb.service';
-import { map } from 'rxjs';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -25,7 +24,7 @@ export class RecommendationComponent {
   getRecommendations() {
     // First get recommendations
     this.backendService.getRecommendations(this.userQuery).subscribe(
-      (response) => {
+      response => {
         const seriesNames = response.recommendations;
         this.fetchSeriesDetails(seriesNames, () => {
           // After first batch loaded, get search results
@@ -33,7 +32,7 @@ export class RecommendationComponent {
           this.performSecondarySearch();
         });
       },
-      (error) => {
+      error => {
         console.error('Error fetching recommendations:', error);
       }
     );
@@ -41,10 +40,11 @@ export class RecommendationComponent {
 
   private performSecondarySearch() {
     this.backendService.search(this.userQuery).subscribe(
-      (response) => {
-        const newSeriesNames = response.results.filter((name) =>
-          // Filter out series names that already exist in recommendations
-          !this.recommendations.some((existing) => existing.name.toLowerCase() === name.toLowerCase())
+      response => {
+        const newSeriesNames = response.results.filter(
+          name =>
+            // Filter out series names that already exist in recommendations
+            !this.recommendations.some(existing => existing.name.toLowerCase() === name.toLowerCase())
         );
 
         if (newSeriesNames.length > 0) {
@@ -55,7 +55,7 @@ export class RecommendationComponent {
           });
         }
       },
-      (error) => {
+      error => {
         console.error('Error fetching search results:', error);
       }
     );
@@ -63,11 +63,11 @@ export class RecommendationComponent {
 
   fetchSeriesDetails(seriesNames: string[], callback?: () => void) {
     this.tmdbService.getSeriesDetails(seriesNames).subscribe(
-      (seriesList) => {
+      seriesList => {
         this.recommendations = seriesList;
         if (callback) callback();
       },
-      (error) => {
+      error => {
         console.error('Error fetching series details:', error);
       }
     );
@@ -75,11 +75,11 @@ export class RecommendationComponent {
 
   fetchAdditionalSeriesDetails(seriesNames: string[], callback?: () => void) {
     this.tmdbService.getSeriesDetails(seriesNames).subscribe(
-      (seriesList) => {
+      seriesList => {
         this.recommendations = [...this.recommendations, ...seriesList];
         if (callback) callback();
       },
-      (error) => {
+      error => {
         console.error('Error fetching additional series details:', error);
       }
     );
@@ -87,29 +87,23 @@ export class RecommendationComponent {
 
   fetchRecommendationsForSeries() {
     // Now pass the entire series object instead of just the ID
-    const requests = this.recommendations.map(series =>
-      this.tmdbService.getSeriesRecommendations(series)
-    );
+    const requests = this.recommendations.map(series => this.tmdbService.getSeriesRecommendations(series));
 
     forkJoin(requests).subscribe(
-      (recommendedSeriesArrays) => {
+      recommendedSeriesArrays => {
         // Flatten the array of arrays and filter out empty arrays
-        const newRecommendations = recommendedSeriesArrays
-          .flat()
-          .filter(series => series !== null);
+        const newRecommendations = recommendedSeriesArrays.flat().filter(series => series !== null);
 
         // Filter out duplicates
         const uniqueRecommendations = newRecommendations.filter(
-          newSeries => !this.recommendations.some(
-            existing => existing.name.toLowerCase() === newSeries.name.toLowerCase()
-          )
+          newSeries => !this.recommendations.some(existing => existing.name.toLowerCase() === newSeries.name.toLowerCase())
         );
         console.log('Unique recommendations:', uniqueRecommendations);
         // Add unique recommendations to the existing list
         this.recommendations = [...this.recommendations, ...uniqueRecommendations];
         console.log('Tmbd Recommendations :', this.recommendations);
       },
-      (error) => {
+      error => {
         console.error('Error fetching recommendations for series:', error);
       }
     );

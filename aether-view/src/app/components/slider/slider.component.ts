@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { CardComponent } from '../card/card.component';
 import { TmdbService } from '../../services/tmdb.service';
 
-
 @Component({
   selector: 'app-slider',
   standalone: true,
@@ -13,12 +12,12 @@ import { TmdbService } from '../../services/tmdb.service';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class SliderComponent {
-  @Input() items: any[] = []; 
-  @Input() cardType: 'movieSeries' | 'person' | 'genreStudio' | 'studio' = 'movieSeries'; 
-  @Input() imageField: string = 'poster_path'; 
-  @Input() titleField: string = 'first_air_date'; 
-  @Input() subtitleField: string = 'name'; 
-  @Input() overviewField: string = 'overview';
+  @Input() items: any[] = [];
+  @Input() cardType: 'movieSeries' | 'person' | 'genreStudio' | 'studio' = 'movieSeries';
+  @Input() imageField = 'poster_path';
+  @Input() titleField = 'first_air_date';
+  @Input() subtitleField = 'name';
+  @Input() overviewField = 'overview';
 
   tmdbService = inject(TmdbService);
 
@@ -57,10 +56,8 @@ export class SliderComponent {
       3440: {
         slidesPerView: 20,
         spaceBetween: 10,
-      }
+      },
     },
     freeMode: true,
   };
-
-  
 }

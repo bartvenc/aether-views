@@ -10,28 +10,25 @@ import { Movie } from '../../interfaces/movies';
   standalone: true,
   imports: [CommonModule, SliderComponent, DatePipe],
   templateUrl: './movie-details.component.html',
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class MovieDetailsComponent implements OnInit {
-
-  constructor() { }
-
   tmdbService = inject(TmdbService);
   route = inject(ActivatedRoute);
 
   movie = signal<Movie | undefined>(undefined);
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.subscribe(params => {
       const id = Number(params.get('id'));
       this.getMovieDetails(id);
     });
   }
 
   getMovieDetails(id: number): void {
-    this.tmdbService.getMovieDetailsById(id).subscribe((data) => {
+    this.tmdbService.getMovieDetailsById(id).subscribe(data => {
       console.log(data);
       this.movie.set(data);
     });
   }
-} 
+}
