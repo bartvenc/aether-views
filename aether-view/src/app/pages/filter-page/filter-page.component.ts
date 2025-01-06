@@ -3,8 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { FilterComponent } from '../../components/filter/filter.component';
 import { CardComponent } from '../../components/card/card.component';
 import { TmdbService } from '../../services/tmdb.service';
-import { MOVIE_GENRES } from '../../../../public/assets/genres';
-import { Genre } from '../../interfaces/common-interfaces';
+import { MOVIE_GENRES, SERIES_GENRES } from '../../../../public/assets/genres';
+import { Genre, Keyword } from '../../interfaces/common-interfaces';
 import { Studio, STUDIOS } from '../../../../public/assets/studios';
 import { Network } from '../../interfaces/series';
 
@@ -17,15 +17,20 @@ import { Network } from '../../interfaces/series';
 export class FilterPageComponent implements OnInit, OnDestroy {
   @Input() type: 'movies' | 'series' = 'movies';
   filters = signal({
+    type: this.type,
     category: 'Popular',
     year: null as number | null,
-    genres: [] as Genre[],
-    keywords: [],
-    studiosOrNetworks: [] as Studio[] | Network[],
+    genres: [] as number[],
+    keyword: null as Keyword | null,
+    studiosOrNetworks: null as number | null,
+    person: null as number | null,
   });
 
   movieGenres = MOVIE_GENRES;
+  seriesGenres = SERIES_GENRES;
   studios = STUDIOS;
+
+  selectedGenres = signal<number[]>([]);
 
   currentGenres: Genre[] = [];
   curentStudiosOrNetwork: Studio[] = [];
@@ -47,15 +52,57 @@ export class FilterPageComponent implements OnInit, OnDestroy {
     if (this.type === 'movies') {
       this.currentGenres = this.movieGenres;
       this.curentStudiosOrNetwork = this.studios;
-      this.fetchMovies(true);
+    } else if (this.type === 'series') {
+      this.currentGenres = this.seriesGenres;
+      //this.curentStudiosOrNetwork = this.studios;
     }
 
+    this.route.queryParams.subscribe(params => {
+      if (params['genre']) {
+        this.filters.update(f => ({ ...f, genres: params['genre'].split(',').map((id: number) => +id) }));
+        console.log('Genres:', this.filters().genres);
+        //this.updateFilters(this.filters());
+      }
+      if (params['keyword']) {
+        try {
+          const keyword = JSON.parse(params['keyword']);
+          this.filters.update(f => ({ ...f, keyword }));
+          console.log('Keyword 1:', this.filters().keyword);
+        } catch (e) {
+          console.error('Invalid keyword format:', e);
+        }
+      }
+      if (params['studio']) {
+        try {
+          this.filters.update(f => ({ ...f, studiosOrNetworks: params['studio'] }));
+          console.log('studio 1:', this.filters().studiosOrNetworks);
+        } catch (e) {
+          console.error('Invalid keyword format:', e);
+        }
+      }
+      if (params['person']) {
+        try {
+          this.filters.update(f => ({ ...f, person: params['person'] }));
+          console.log('person 1:', this.filters().person);
+        } catch (e) {
+          console.error('Invalid keyword format:', e);
+        }
+      }
+      if (params['category']) {
+        try {
+          this.filters.update(f => ({ ...f, category: params['category'] }));
+          console.log('category 1:', this.filters().category);
+        } catch (e) {
+          console.error('Invalid keyword format:', e);
+        }
+      }
+    });
     window.addEventListener('scroll', this.onScroll.bind(this));
   }
 
   // Triggered by the filter component
   updateFilters(newFilters: any) {
-    console.log('Updating filters:', newFilters);
+    console.log('Updating filters: 2', newFilters);
     this.filters.update(currentFilters => {
       const updatedYear =
         newFilters.category === 'New' && !newFilters.year
@@ -74,17 +121,17 @@ export class FilterPageComponent implements OnInit, OnDestroy {
     console.log('Updated filters:', this.filters());
     this.currentPage.set(1);
     this.items.set([]);
-    this.fetchMovies(true);
+    this.fetchContent(true);
   }
 
-  fetchMovies(initialLoad = false) {
+  fetchContent(initialLoad = false) {
     if (this.isLoading() || (!initialLoad && this.currentPage() > 500)) return; // TMDB API limit
 
     this.isLoading.set(true);
     const filterValues = this.filters();
     const pagesToFetch = initialLoad ? [1, 2] : [this.currentPage()];
 
-    Promise.all(pagesToFetch.map(page => this.tmdbService.fetchMovies(filterValues, page).toPromise()))
+    Promise.all(pagesToFetch.map(page => this.tmdbService.fetchContent(filterValues, page, this.type === 'movies' ? 'movie' : 'tv').toPromise()))
       .then(responses => {
         responses.forEach(response => {
           this.items.update(existingItems => [...existingItems, ...response.results]);
@@ -106,7 +153,7 @@ export class FilterPageComponent implements OnInit, OnDestroy {
     const clientHeight = document.documentElement.clientHeight || window.innerHeight;
 
     if (scrollTop + clientHeight >= scrollHeight - 100) {
-      this.fetchMovies(); // Load next page on scroll
+      this.fetchContent(); // Load next page on scroll
     }
   }
 
