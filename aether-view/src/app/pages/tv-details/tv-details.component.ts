@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TmdbService } from '../../services/tmdb.service';
 import { Series } from '../../interfaces/series';
 import 'swiper/element/bundle';
@@ -9,7 +9,7 @@ import { SliderComponent } from '../../components/slider/slider.component';
 @Component({
   standalone: true,
   selector: 'app-tv-details',
-  imports: [CommonModule, SliderComponent, DatePipe],
+  imports: [CommonModule, SliderComponent, DatePipe, RouterLink],
   templateUrl: './tv-details.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -31,5 +31,8 @@ export class TvDetailsComponent implements OnInit {
       console.log(data);
       this.series.set(data);
     });
+  }
+  stringifyKeyword(keyword: any): string {
+    return JSON.stringify(keyword);
   }
 }

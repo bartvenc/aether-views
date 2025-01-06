@@ -28,9 +28,16 @@
           <div class="text-lg text-gray-300 mb-4">
             {{ series()?.content_ratings?.results?.[0]?.rating || 'TV-MA' }}
             {{ series()?.number_of_seasons || '1' }} Season |
-            @for (genre of series()?.genres || []; track genre) {
-              {{ genre.name }}<span *ngIf="!$last">, </span>
-            }
+            <span class="genres flex flex-wrap gap-2">
+              @for (genre of series()?.genres || []; track genre) {
+                <span
+                  [routerLink]="['/discover/series']"
+                  [queryParams]="{ genre: genre.id }"
+                  class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+                  {{ genre.name }}
+                </span>
+              }
+            </span>
           </div>
         </div>
 
@@ -88,18 +95,25 @@
       </div>
 
       <!-- Keywords -->
-      <div *ngIf="series()?.keywords?.results?.length" class="flex flex-wrap gap-2 mb-6">
-        @for (keyword of series()?.keywords?.results || []; track keyword) {
-          <span class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
-            {{ keyword.name }}
-          </span>
-        }
-      </div>
+      @if (series()?.keywords?.results?.length) {
+        <div class="flex flex-wrap gap-2 mb-6">
+          @for (keyword of series()?.keywords?.results || []; track keyword) {
+            <span
+              [routerLink]="['/discover/series']"
+              [queryParams]="{ keyword: stringifyKeyword(keyword) }"
+              class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+              {{ keyword.name }}
+            </span>
+          }
+        </div>
+      }
 
       <!-- Seasons -->
-      <h2 *ngIf="series()" class="text-3xl font-bold mt-8 mb-4">
-        Seasons <span class="text-sm text-gray-400">({{ series()?.number_of_episodes }} Episodes)</span>
-      </h2>
+      @if (series()) {
+        <h2 class="text-3xl font-bold mt-8 mb-4">
+          Seasons <span class="text-sm text-gray-400">({{ series()?.number_of_episodes }} Episodes)</span>
+        </h2>
+      }
 
       <!-- Recommendations -->
 
