@@ -1,36 +1,54 @@
 <div class="card-container" [ngClass]="type" (click)="onItemClicked()">
-  <ng-container [ngSwitch]="type">
+  @switch (type || 'movies') {
     <!-- Movie/Series Card -->
-    <div *ngSwitchCase="'movieSeries'" class="movieSeries">
-      <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
-      <div class="overlay">
-        <p class="card-title">{{ title | date: 'YYYY' }}</p>
-        <p class="card-subtitle">{{ subtitle }}</p>
-        <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
+    @case ('movies') {
+      <div class="movieSeries">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
+        <div class="overlay">
+          <p class="card-title">{{ title | date: 'YYYY' }}</p>
+          <p class="card-subtitle">{{ subtitle }}</p>
+          <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
+        </div>
       </div>
-    </div>
+    }
+    @case ('series') {
+      <div class="movieSeries">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
+        <div class="overlay">
+          <p class="card-title">{{ title | date: 'YYYY' }}</p>
+          <p class="card-subtitle">{{ subtitle }}</p>
+          <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
+        </div>
+      </div>
+    }
 
     <!-- Person Card -->
-    <div *ngSwitchCase="'person'" class="person">
-      <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="rounded-full" />
-      <h3 class="title">{{ title }}</h3>
-      <p class="subtitle">{{ subtitle }}</p>
-    </div>
+    @case ('person') {
+      <div class="person">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="rounded-full" />
+        <h3 class="title">{{ title }}</h3>
+        <p class="subtitle">{{ subtitle }}</p>
+      </div>
+    }
 
     <!-- Genre/Studio Card -->
-    <div *ngSwitchCase="'genreStudio'" class="genreStudio">
-      <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="card-image" />
-      <div class="genre-overlay">
-        <h3 class="title">{{ title }}</h3>
+    @case ('genreStudio') {
+      <div class="genreStudio">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="card-image" />
+        <div class="genre-overlay">
+          <h3 class="title">{{ title }}</h3>
+        </div>
       </div>
-    </div>
+    }
 
     <!-- Studio Card -->
-    <div *ngSwitchCase="'studio'" class="studio">
-      <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Studio Logo" class="card-image" />
-      <div class="studio-overlay">
-        <h3 class="title">{{ title }}</h3>
+    @case ('studio') {
+      <div class="studio">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Studio Logo" class="card-image" />
+        <div class="studio-overlay">
+          <h3 class="title">{{ title }}</h3>
+        </div>
       </div>
-    </div>
-  </ng-container>
+    }
+  }
 </div>
