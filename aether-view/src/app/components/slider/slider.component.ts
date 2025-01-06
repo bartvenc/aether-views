@@ -13,7 +13,7 @@ import { TmdbService } from '../../services/tmdb.service';
 })
 export class SliderComponent {
   @Input() items: any[] = [];
-  @Input() cardType: 'movieSeries' | 'person' | 'genreStudio' | 'studio' = 'movieSeries';
+  @Input() cardType: 'movies' | 'series' | 'person' | 'genreStudio' | 'studio' = 'movies';
   @Input() imageField = 'poster_path';
   @Input() titleField = 'first_air_date';
   @Input() subtitleField = 'name';
@@ -26,7 +26,7 @@ export class SliderComponent {
     spaceBetween: 10,
     breakpoints: {
       320: {
-        slidesPerView: 2,
+        slidesPerView: 3,
         spaceBetween: 10,
       },
       480: {
@@ -50,11 +50,11 @@ export class SliderComponent {
         spaceBetween: 10,
       },
       2560: {
-        slidesPerView: 15,
+        slidesPerView: 13,
         spaceBetween: 10,
       },
       3440: {
-        slidesPerView: 20,
+        slidesPerView: 17,
         spaceBetween: 10,
       },
     },
