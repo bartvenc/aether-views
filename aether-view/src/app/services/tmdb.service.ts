@@ -15,73 +15,128 @@ export class TmdbService {
 
   http: HttpClient = inject(HttpClient);
 
-  // Convert the HTTP Observable directly to a Signal
-  readonly popularSeries: Signal<Series[]> = toSignal(
-    this.http.get<{ results: Series[] }>(`${this.baseUrl}/tv/popular?api_key=${this.apiKey}`).pipe(map(response => response.results)),
-    { initialValue: [] }
-  );
+  private popularSeriesSignal: Signal<Series[]> | null = null;
+
+  // Convert the HTTP Observable directly to a Signal/
+  get popularSeries(): Signal<Series[]> {
+    if (!this.popularSeriesSignal) {
+      this.popularSeriesSignal = toSignal(
+        this.http.get<{ results: Series[] }>(`${this.baseUrl}/tv/popular?api_key=${this.apiKey}`).pipe(map(response => response.results)),
+        { initialValue: [] }
+      );
+    }
+    return this.popularSeriesSignal;
+  }
 
   // Convert the HTTP Observable directly to a Signal
-  readonly trendingSeries: Signal<Series[]> = toSignal(
-    this.http.get<{ results: Series[] }>(`${this.baseUrl}/trending/tv/week?api_key=${this.apiKey}`).pipe(map(response => response.results)),
-    { initialValue: [] }
-  );
+  private trendingSeriesSignal: Signal<Series[]> | null = null;
+  get trendingSeries(): Signal<Series[]> {
+    if (!this.trendingSeriesSignal) {
+      this.trendingSeriesSignal = toSignal(
+        this.http.get<{ results: Series[] }>(`${this.baseUrl}/trending/tv/week?api_key=${this.apiKey}`).pipe(map(response => response.results)),
+        { initialValue: [] }
+      );
+    }
+    return this.trendingSeriesSignal;
+  }
 
-  readonly trendingMovies: Signal<Movie[]> = toSignal(
-    this.http.get<{ results: Movie[] }>(`${this.baseUrl}/trending/movie/week?api_key=${this.apiKey}`).pipe(map(response => response.results)),
-    { initialValue: [] }
-  );
+  private trendingMoviesSignal: Signal<Movie[]> | null = null;
+  get trendingMovies(): Signal<Movie[]> {
+    if (!this.trendingMoviesSignal) {
+      this.trendingMoviesSignal = toSignal(
+        this.http.get<{ results: Movie[] }>(`${this.baseUrl}/trending/movie/week?api_key=${this.apiKey}`).pipe(map(response => response.results)),
+        { initialValue: [] }
+      );
+    }
+    return this.trendingMoviesSignal;
+  }
 
-  readonly upcomingMovies: Signal<Movie[]> = toSignal(
-    this.http.get<{ results: Movie[] }>(`${this.baseUrl}/movie/upcoming?api_key=${this.apiKey}`).pipe(map(response => response.results)),
-    { initialValue: [] }
-  );
+  private upcomingMoviesSignal: Signal<Movie[]> | null = null;
+  get upcomingMovies(): Signal<Movie[]> {
+    if (!this.upcomingMoviesSignal) {
+      this.upcomingMoviesSignal = toSignal(
+        this.http.get<{ results: Movie[] }>(`${this.baseUrl}/movie/upcoming?api_key=${this.apiKey}`).pipe(map(response => response.results)),
+        { initialValue: [] }
+      );
+    }
+    return this.upcomingMoviesSignal;
+  }
 
-  readonly movieGenres: Signal<Genre[]> = toSignal(
-    this.http.get<{ genres: Genre[] }>(`${this.baseUrl}/genre/movie/list?api_key=${this.apiKey}`).pipe(map(response => response.genres)),
-    { initialValue: [] }
-  );
+  private movieGenresSignal: Signal<Genre[]> | null = null;
+  get movieGenres(): Signal<Genre[]> {
+    if (!this.movieGenresSignal) {
+      this.movieGenresSignal = toSignal(
+        this.http.get<{ genres: Genre[] }>(`${this.baseUrl}/genre/movie/list?api_key=${this.apiKey}`).pipe(map(response => response.genres)),
+        { initialValue: [] }
+      );
+    }
+    return this.movieGenresSignal;
+  }
 
   fetchMoviesByPopularity(page = 1) {
     const url = `${this.baseUrl}/discover/movie?api_key=${this.apiKey}&sort_by=popularity.desc&page=${page}`;
     return this.http.get<any>(url);
   }
 
-  fetchMovies(filters: any, page = 1) {
+  fetchContent(filters: any, page = 1, type: 'movie' | 'tv' = 'movie'): Observable<any> {
     console.log(filters);
     const params: any = {
       api_key: this.apiKey,
       language: 'en-US',
       page: page.toString(),
       include_adult: false,
-      include_video: false,
     };
 
     switch (filters.category) {
       case 'Popular':
         params.sort_by = 'popularity.desc';
-        if (filters.year > 0) params.primary_release_year = filters.year; // Append release year
+        if (type === 'tv') {
+          params.include_video = false; // TV-specific params
+        }
+        if (filters.year > 0) {
+          if (type === 'movie') {
+            params.primary_release_year = filters.year;
+          }
+          // No direct year filter for TV popular category
+        }
         break;
 
       case 'New':
-        params.sort_by = 'release_date.desc';
+        params.sort_by = type === 'movie' ? 'release_date.desc' : 'first_air_date.desc';
         console.log('Year:', filters.year);
-        if (filters.year > 0) params.primary_release_year = filters.year;
+        if (filters.year > 0) {
+          params.primary_release_year = filters.year; // Movies
+          params.first_air_date_year = filters.year; // TV
+        }
         break;
 
       case 'Top Rated':
         params.sort_by = 'vote_average.desc';
         params['vote_count.gte'] = '200';
-        params.without_genres = '99,10755'; // Exclude genres
-        if (filters.year > 0) params.primary_release_year = filters.year; // Append release year
+        params.without_genres = '99,10755'; // Exclude genres (optional)
+        if (filters.year > 0) {
+          if (type === 'movie') {
+            params.primary_release_year = filters.year;
+          } else {
+            params.first_air_date_year = filters.year;
+          }
+        }
         break;
 
       case 'Now Playing':
         params.sort_by = 'popularity.desc';
-        params.with_release_type = '2|3';
         const today = new Date();
-        params['release_date.gte'] = `${today.getFullYear()}-${today.getMonth() + 1}-01`;
-        params['release_date.lte'] = `${today.getFullYear()}-${today.getMonth() + 1}-28`; // Approx end of month
+        const minDate = `${today.getFullYear()}-${today.getMonth() + 1}-01`;
+        const maxDate = `${today.getFullYear()}-${today.getMonth() + 1}-28`;
+
+        if (type === 'movie') {
+          params.with_release_type = '2|3';
+          params['release_date.gte'] = minDate;
+          params['release_date.lte'] = maxDate;
+        } else {
+          params['air_date.gte'] = minDate;
+          params['air_date.lte'] = maxDate;
+        }
         break;
 
       default:
@@ -89,18 +144,31 @@ export class TmdbService {
     }
 
     // Append additional filters if set
-    if (filters.genres && filters.genres.length != 0) {
+    if (filters.genres && filters.genres.length !== 0) {
       params.with_genres = filters.genres.join(',');
     }
-    if (filters.studioOrNetwork && filters.studioOrNetwork != 0) {
+    if (filters.studioOrNetwork && filters.studioOrNetwork !== 0) {
       params.with_companies = filters.studioOrNetwork;
     }
-    if (filters.keywords && filters.keywords.length != 0) {
+    if (filters.keywords && filters.keywords.length !== 0) {
       params.with_keywords = filters.keywords;
+    }
+    if (filters.person && filters.person !== 0) {
+      params.with_cast = filters.person;
     }
 
     const queryString = new URLSearchParams(params).toString();
-    return this.http.get<any>(`${this.baseUrl}/discover/movie?${queryString}`);
+    return this.http.get<any>(`${this.baseUrl}/discover/${type}?${queryString}`);
+  }
+
+  getPersonDetails(personId: number): Observable<Person> {
+    const url = `${this.baseUrl}/person/${personId}?append_to_response=images&language=en-US&api_key=${this.apiKey}`;
+    return this.http.get<Person>(url);
+  }
+
+  getPersonCombinedCredits(personId: number): Observable<(Movie | Series)[]> {
+    const url = `${this.baseUrl}/person/${personId}/combined_credits?api_key=${this.apiKey}`;
+    return this.http.get<{ cast: (Movie | Series)[] }>(url).pipe(map(response => response.cast));
   }
 
   searchKeyword(query: string) {
