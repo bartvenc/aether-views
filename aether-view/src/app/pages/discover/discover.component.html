@@ -1,15 +1,22 @@
 <div class="p-8 space-y-12">
   @if (trendingMovies().length) {
     <section>
-      <h2 class="text-3xl font-bold mt-8 mb-4">Trending Movies</h2>
-      <app-slider [items]="trendingMovies() || []" overview="overview" titleField="release_date" subtitleField="title"></app-slider>
+      <h2 class="text-3xl font-bold mt-8 mb-4 transition-colors duration-300 hover:text-slate-500 cursor-pointer" [routerLink]="['/discover/movies']">
+        Popular Movies
+      </h2>
+      <app-slider cardType="movies" [items]="trendingMovies() || []" overview="overview" titleField="release_date" subtitleField="title"></app-slider>
     </section>
   }
 
   @if (upcomingMovies().length) {
     <section>
-      <h2 class="text-3xl font-bold mt-8 mb-4">Upcoming Movies</h2>
-      <app-slider [items]="upcomingMovies() || []" overview="overview" titleField="release_date" subtitleField="title"></app-slider>
+      <h2
+        class="text-3xl font-bold mt-8 mb-4 transition-colors duration-300 hover:text-slate-500 cursor-pointer"
+        [routerLink]="['/discover/movies']"
+        [queryParams]="{ category: 'Now Playing' }">
+        Upcoming Movies
+      </h2>
+      <app-slider cardType="movies" [items]="upcomingMovies() || []" overview="overview" titleField="release_date" subtitleField="title"></app-slider>
     </section>
   }
 
@@ -30,7 +37,7 @@
   @if (trendingSeries().length) {
     <section>
       <h2 class="text-3xl font-bold mt-8 mb-4">Trending Series</h2>
-      <app-slider [items]="trendingSeries() || []" overview="overview"></app-slider>
+      <app-slider cardType="series" [items]="trendingSeries() || []" overview="overview"></app-slider>
     </section>
   }
 
@@ -39,7 +46,7 @@
   @if (popularSeries().length) {
     <section>
       <h2 class="text-3xl font-bold mt-8 mb-4">Popular Series</h2>
-      <app-slider [items]="popularSeries() || []" overview="overview"></app-slider>
+      <app-slider cardType="series" [items]="popularSeries() || []" overview="overview"></app-slider>
     </section>
   }
 

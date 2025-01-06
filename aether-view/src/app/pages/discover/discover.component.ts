@@ -1,15 +1,14 @@
 import { Component, inject, Signal, signal, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
-import { Series } from '../../interfaces/series';
-import { Movie } from '../../interfaces/movies';
 import { TmdbService } from '../../services/tmdb.service';
 import { SliderComponent } from '../../components/slider/slider.component';
 import { MOVIE_GENRES, SERIES_GENRES } from '../../../../public/assets/genres';
 import { STUDIOS } from '../../../../public/assets/studios';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-discover',
   standalone: true,
-  imports: [SliderComponent],
+  imports: [SliderComponent, RouterLink],
   templateUrl: './discover.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
@@ -20,21 +19,16 @@ export class DiscoverComponent implements OnInit {
 
   tmdbService = inject(TmdbService);
 
-  popularSeries: Signal<Series[]> = signal<Series[]>([]);
-  trendingSeries: Signal<Series[]> = signal<Series[]>([]);
+  popularSeries = this.tmdbService.popularSeries;
+  trendingSeries = this.tmdbService.trendingSeries;
 
-  trendingMovies: Signal<Movie[]> = signal<Movie[]>([]);
-  upcomingMovies: Signal<Movie[]> = signal<Movie[]>([]);
+  trendingMovies = this.tmdbService.trendingMovies;
+  upcomingMovies = this.tmdbService.upcomingMovies;
 
   currentPopularSeriesPage = signal(1);
 
   // Using existing service function for popular series
   ngOnInit() {
-    this.popularSeries = this.tmdbService.popularSeries;
-    this.trendingSeries = this.tmdbService.trendingSeries;
-
-    this.trendingMovies = this.tmdbService.trendingMovies;
-    this.upcomingMovies = this.tmdbService.upcomingMovies;
     console.log(this.popularSeries());
   }
 }
