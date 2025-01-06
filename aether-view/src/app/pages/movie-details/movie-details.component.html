@@ -1,12 +1,12 @@
 @if (movie()) {
-  <div class="relative text-white bg-black">
+  <div class="relative text-white">
     <!-- Backdrop Section -->
     <div class="relative w-full h-[600px] overflow-hidden">
       @if (tmdbService.getBackDrop(movie()?.backdrop_path)) {
         <img [src]="tmdbService.getBackDrop(movie()?.backdrop_path)" [alt]="movie()?.title" class="absolute w-full h-full object-cover" />
       }
-      <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black"></div>
-      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#201a23]"></div>
+      <div class="absolute inset-0 bg-[#201a23] bg-opacity-40"></div>
 
       <!-- Poster, Title, Tagline, and Trailer -->
       <div class="relative z-10 w-full mx-auto px-8 h-full flex items-center justify-between">
@@ -27,9 +27,16 @@
           </h1>
           <div class="text-lg text-gray-300 mb-4">
             {{ movie()?.runtime || '' }} minutes |
-            @for (genre of movie()?.genres || []; track genre) {
-              {{ genre.name }}<span *ngIf="!$last">, </span>
-            }
+            <span class="genres flex flex-wrap gap-2">
+              @for (genre of movie()?.genres || []; track genre) {
+                <span
+                  [routerLink]="['/discover/movies']"
+                  [queryParams]="{ genre: genre.id }"
+                  class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+                  {{ genre.name }}
+                </span>
+              }
+            </span>
           </div>
         </div>
 
@@ -91,7 +98,10 @@
       <!-- Keywords -->
       <div *ngIf="movie()?.keywords?.keywords?.length" class="flex flex-wrap gap-2 mb-6">
         @for (keyword of movie()?.keywords?.keywords || []; track keyword) {
-          <span class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+          <span
+            [routerLink]="['/discover/movies']"
+            [queryParams]="{ keyword: stringifyKeyword(keyword) }"
+            class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
             {{ keyword.name }}
           </span>
         }
