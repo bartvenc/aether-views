@@ -36,6 +36,7 @@ export interface Genre {
   id: number;
   name: string;
   posterUrl?: string;
+  type?: 'movie' | 'series';
 }
 
 export interface Images {
@@ -75,6 +76,7 @@ export interface Person {
   gender: number;
   profile_path: string | null;
   character: string;
+  biography?: string;
 }
 
 export interface ContentRating {
