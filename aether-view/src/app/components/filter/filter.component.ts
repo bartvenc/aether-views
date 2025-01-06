@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, inject, Input, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, signal, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Network } from '../../interfaces/series';
 import { Studio } from '../../../../public/assets/studios';
@@ -12,11 +12,12 @@ import { TmdbService } from '../../services/tmdb.service';
   imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './filter.component.html',
 })
-export class FilterComponent {
+export class FilterComponent implements OnInit {
   @Input() type: 'movies' | 'series' = 'movies'; // Default type
   @Input() genres: Genre[] = [];
   @Input() years: number[] = [];
   @Input() studiosOrNetworks: Studio[] | Network[] = [];
+  @Input() filters: Record<string, any> = {};
   @Output() filterChange = new EventEmitter<any>();
 
   tmdbService = inject(TmdbService);
@@ -29,6 +30,27 @@ export class FilterComponent {
   keywordResults = signal<{ id: number; name: string }[]>([]);
   selectedKeywords = signal<{ id: number; name: string }[]>([]);
   genreDropdownOpen = signal<boolean>(false);
+  selectedType = signal('movies');
+
+  ngOnInit() {
+    console.log(' 5 Filter component initialized with:', this.filters);
+    this.selectedType.set(this.type);
+    this.selectedCategory.set(this.filters['category'] || 'Popular');
+    this.selectedYear.set(this.filters['year'] || 0);
+    this.selectedGenres.set(this.filters['genres'] || []);
+    this.selectedStudiosOrNetworks.set(this.filters['studiosOrNetworks'] || 0);
+    const keywordParam = this.filters['keyword'] ? [this.filters['keyword']] : [];
+    this.selectedKeywords.set(keywordParam);
+    console.log('  6 Filter component initialized after with:', {
+      category: this.selectedCategory(),
+      year: this.selectedYear(),
+      genres: this.selectedGenres(),
+      keyword: this.selectedKeywords(),
+      studioOrNetwork: this.selectedStudiosOrNetworks(),
+    });
+
+    this.updateFilter();
+  }
 
   updateFilter() {
     if (this.selectedCategory() === 'New' && this.selectedYear() === 0) {
@@ -41,13 +63,14 @@ export class FilterComponent {
       genres: this.selectedGenres(),
       studioOrNetwork: this.selectedStudiosOrNetworks(),
       keywords: this.selectedKeywords().map(kw => kw.id),
+      type: this.selectedType(),
     });
     console.log('Filter from filter component updated:', {
       type: this.type,
       category: this.selectedCategory(),
       year: this.selectedYear(),
       genres: this.selectedGenres(),
-      keyword: this.selectedKeywords().map(kw => kw.id),
+      keyword: this.selectedKeywords(),
       studioOrNetwork: this.selectedStudiosOrNetworks(),
     });
   }
