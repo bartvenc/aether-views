@@ -1,0 +1,67 @@
+@if (person()) {
+  <div class="relative text-white">
+    <!-- Backdrop -->
+    <div class="relative w-full h-[600px] overflow-hidden">
+      @if (backdropImage) {
+        <img [src]="backdropImage" alt="{{ person()?.name }}" class="absolute w-full h-full object-cover" />
+      }
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#201a23]"></div>
+      <div class="absolute inset-0 bg-[#201a23] bg-opacity-40"></div>
+    </div>
+
+    <!-- Profile and Basic Info -->
+    <div class="relative z-10 w-full mx-auto px-8 py-12">
+      <div class="flex items-start gap-8">
+        <!-- Profile Picture -->
+        <div>
+          <img
+            [src]="tmdbService.getPosterUrl(person()?.profile_path)"
+            alt="{{ person()?.name }}"
+            class="rounded-lg shadow-lg w-48 h-64 object-cover" />
+        </div>
+        <!-- Info -->
+        <div class="flex-1">
+          <h1 class="text-5xl font-extrabold">{{ person()?.name }}</h1>
+          <p class="text-gray-400 text-lg mt-4">{{ person()?.biography }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Combined Credits -->
+    <div class="relative z-10 w-full mx-auto px-8 py-12">
+      <h2 class="text-3xl font-bold mb-6">Filmography</h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        @if (hasMovies) {
+          <div>
+            <h3 class="text-2xl font-bold mb-4">Movies</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              @for (movie of movies(); track movie) {
+                <app-card
+                  [type]="'movies'"
+                  [subtitle]="movie.title"
+                  [imageUrl]="movie ? tmdbService.getImageUrl(movie) : null"
+                  [overview]="movie.overview"></app-card>
+              }
+            </div>
+          </div>
+        }
+
+        @if (hasSeries) {
+          <div>
+            <h3 class="text-2xl font-bold mb-4">Series</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              @for (show of series(); track show) {
+                <app-card
+                  [type]="'series'"
+                  [subtitle]="show.name"
+                  [imageUrl]="show ? tmdbService.getImageUrl(show) : null"
+                  [overview]="show.overview"></app-card>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+}
