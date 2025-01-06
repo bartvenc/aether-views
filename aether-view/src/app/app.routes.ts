@@ -15,4 +15,8 @@ export const routes: Routes = [
   }, // Filter series
   { path: 'tv/:id', loadComponent: () => import('./pages/tv-details/tv-details.component').then(m => m.TvDetailsComponent) },
   { path: 'movie/:id', loadComponent: () => import('./pages/movie-details/movie-details.component').then(m => m.MovieDetailsComponent) },
+  {
+    path: 'person/:id',
+    loadComponent: () => import('./pages/person-details/person-details.component').then(m => m.PersonDetailsComponent),
+  },
 ];
