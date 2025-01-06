@@ -100,4 +100,6 @@ export interface Series {
   content_ratings?: {
     results?: ContentRating[];
   };
+
+  media_type?: 'tv';
 }
