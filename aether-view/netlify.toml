@@ -1,0 +1,9 @@
+[build]
+  base = "aether-view"
+  command = "ng build --prod"
+  publish = "dist/aether-view"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
