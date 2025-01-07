@@ -18,12 +18,17 @@ export class SliderComponent {
   @Input() titleField = 'first_air_date';
   @Input() subtitleField = 'name';
   @Input() overviewField = 'overview';
+  isMobile = false;
 
   tmdbService = inject(TmdbService);
 
+  ngOnInit(): void {
+    this.isMobile = window.matchMedia('(max-width: 768px)').matches;
+  }
+
   swiperOptions = {
-    slidesPerView: 1,
-    spaceBetween: 10,
+    slidesPerView: 5,
+    spaceBetween: 20,
     breakpoints: {
       320: {
         slidesPerView: 3,
