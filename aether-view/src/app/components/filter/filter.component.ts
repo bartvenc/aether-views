@@ -5,11 +5,12 @@ import { Network } from '../../interfaces/series';
 import { Studio } from '../../../../public/assets/studios';
 import { Genre } from '../../interfaces/common-interfaces';
 import { TmdbService } from '../../services/tmdb.service';
+import { ClickOutsideDirective } from '../../directives/click-outside.directive';
 
 @Component({
   selector: 'app-filter',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, ClickOutsideDirective],
   templateUrl: './filter.component.html',
 })
 export class FilterComponent implements OnInit {
@@ -30,7 +31,10 @@ export class FilterComponent implements OnInit {
   keywordResults = signal<{ id: number; name: string }[]>([]);
   selectedKeywords = signal<{ id: number; name: string }[]>([]);
   genreDropdownOpen = signal<boolean>(false);
+  desktopGenreDropdownOpen = signal<boolean>(false);
+  mobileGenreDropdownOpen = signal<boolean>(false);
   selectedType = signal('movies');
+  mobileFiltersOpen: boolean = false; 
 
   ngOnInit() {
     console.log(' 5 Filter component initialized with:', this.filters);
@@ -75,8 +79,34 @@ export class FilterComponent implements OnInit {
     });
   }
 
-  toggleGenreDropdown() {
-    this.genreDropdownOpen.update(state => !state);
+
+  toggleMobileFilters() {
+    this.mobileFiltersOpen = !this.mobileFiltersOpen;
+  }
+
+  toggleGenreDropdown(type: string) {
+    if (type === 'desktop') {
+      this.desktopGenreDropdownOpen.update(state => !state);
+    } else if (type === 'mobile') {
+      this.mobileGenreDropdownOpen.update(state => !state);
+    }
+  }
+
+  closeGenreDropdown(type: string) {
+    if(this.genreDropdownOpen() === true){
+      this.genreDropdownOpen.update(() => false);
+      console.log('Genre ', type, 'dropdown close:', this.genreDropdownOpen());
+    }
+  
+  }
+
+  handleOutsideClick(event: { context: string }): void {
+    console.log('Outside click event:', event);
+    if (event.context === 'desktop') {
+      this.desktopGenreDropdownOpen.update(() => false);
+    } else if (event.context === 'mobile') {
+      this.mobileGenreDropdownOpen.update(() => false);
+    }
   }
 
   updateSelectedGenres(genreId: number, isChecked: boolean) {
