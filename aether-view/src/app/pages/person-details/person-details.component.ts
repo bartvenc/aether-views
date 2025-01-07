@@ -5,11 +5,12 @@ import { Person } from '../../interfaces/common-interfaces';
 import { Movie } from '../../interfaces/movies';
 import { Series } from '../../interfaces/series';
 import { CardComponent } from '../../components/card/card.component';
+import { SlicePipe } from '@angular/common';
 
 @Component({
   selector: 'app-person-details',
   standalone: true,
-  imports: [CardComponent],
+  imports: [CardComponent, SlicePipe],
   templateUrl: './person-details.component.html',
 })
 export class PersonDetailsComponent implements OnInit {
