@@ -1,54 +1,66 @@
 <div class="card-container" [ngClass]="type" (click)="onItemClicked()">
   @switch (type || 'movies') {
-    <!-- Movie/Series Card -->
-    @case ('movies') {
-      <div class="movieSeries">
-        <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
-        <div class="overlay">
-          <p class="card-title">{{ title | date: 'YYYY' }}</p>
-          <p class="card-subtitle">{{ subtitle }}</p>
-          <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
-        </div>
+  <!-- Movie/Series Card -->
+  @case ('movies') {
+  <div class="movieSeries">
+    <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
+    <div class="overlay">
+      <div class="hidden md:block">
+        <p class="card-title">{{ title | date: 'YYYY' }}</p>
+        <p class="card-subtitle">{{ subtitle }}</p>
+        <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
       </div>
-    }
-    @case ('series') {
-      <div class="movieSeries">
-        <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
-        <div class="overlay">
-          <p class="card-title">{{ title | date: 'YYYY' }}</p>
-          <p class="card-subtitle">{{ subtitle }}</p>
-          <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
-        </div>
+      <div class="block md:hidden">
+        <p class="card-title text-lg font-bold">{{ title | date: 'YYYY' }}</p>
+        <p class="card-subtitle text-sm text-gray-400">{{ subtitle }}</p>
       </div>
-    }
+    </div>
+  </div>
+  }
+  @case ('series') {
+  <div class="movieSeries">
+    <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
+    <div class="overlay">
+      <div class="hidden md:block">
+        <p class="card-title">{{ title | date: 'YYYY' }}</p>
+        <p class="card-subtitle">{{ subtitle }}</p>
+        <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
+      </div>
+      <div class="block md:hidden">
+        <p class="card-title text-lg font-bold">{{ title | date: 'YYYY' }}</p>
+        <p class="card-subtitle text-sm text-gray-400">{{ subtitle }}</p>
+      </div>
+    </div>
+  </div>
+  }
 
-    <!-- Person Card -->
-    @case ('person') {
-      <div class="person">
-        <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="rounded-full" />
-        <h3 class="title">{{ title }}</h3>
-        <p class="subtitle">{{ subtitle }}</p>
-      </div>
-    }
+  <!-- Person Card -->
+  @case ('person') {
+  <div class="person">
+    <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="rounded-full" />
+    <h3 class="title">{{ title }}</h3>
+    <p class="subtitle">{{ subtitle }}</p>
+  </div>
+  }
 
-    <!-- Genre/Studio Card -->
-    @case ('genreStudio') {
-      <div class="genreStudio">
-        <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="card-image" />
-        <div class="genre-overlay">
-          <h3 class="title">{{ title }}</h3>
-        </div>
-      </div>
-    }
+  <!-- Genre/Studio Card -->
+  @case ('genreStudio') {
+  <div class="genreStudio">
+    <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="card-image" />
+    <div class="genre-overlay">
+      <h3 class="title">{{ title }}</h3>
+    </div>
+  </div>
+  }
 
-    <!-- Studio Card -->
-    @case ('studio') {
-      <div class="studio">
-        <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Studio Logo" class="card-image" />
-        <div class="studio-overlay">
-          <h3 class="title">{{ title }}</h3>
-        </div>
-      </div>
-    }
+  <!-- Studio Card -->
+  @case ('studio') {
+  <div class="studio">
+    <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Studio Logo" class="card-image" />
+    <div class="studio-overlay">
+      <h3 class="title">{{ title }}</h3>
+    </div>
+  </div>
+  }
   }
 </div>
