@@ -1,42 +1,109 @@
-<div class="fixed top-0 left-0 w-full z-30 flex items-center px-6 py-4 bg-[#201a23] shadow-md">
-  <!-- Logo -->
-  <img src="assets/AetherLogo.png" alt="Logo" class="h-8 cursor-pointer transition-transform duration-300 hover:scale-110" routerLink="/" />
+<div class="fixed top-0 left-0 w-full z-30 bg-[#201a23] shadow-md px-6 py-4">
+  <!-- Top bar: Logo + Desktop Nav + Mobile Toggle -->
+  <div class="flex items-center justify-between">
+    <!-- Logo -->
+    <img
+      src="assets/AetherLogo.png"
+      alt="Logo"
+      class="h-8 cursor-pointer transition-transform duration-300 hover:scale-110"
+      routerLink="/"
+    />
 
-  <!-- Navigation -->
-  <div class="flex ml-6 space-x-6 text-lg">
-    <a routerLink="/" class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500 cursor-pointer">
-      Discover
-    </a>
-    <a
-      routerLink="/recommendation"
-      class="flex items-center text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500 cursor-pointer">
-      <span class="mr-2 text-gray-400 material-icons"> auto_awesome </span>
-      Recommendation
-    </a>
-    <a
-      routerLink="/discover/movies"
-      class="flex items-center text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500 cursor-pointer">
-      Movies
-    </a>
+    <!-- Desktop Nav (shown on md and above) -->
+    <nav class="hidden md:flex items-center space-x-6 ml-auto">
+      <a
+        routerLink="/"
+        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
+      >
+        Discover
+      </a>
+      <a
+        routerLink="/recommendation"
+        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500 flex items-center"
+      >
+        <span class="mr-2 text-gray-400 material-icons">auto_awesome</span>
+        Recommendation
+      </a>
+      <a
+        routerLink="/discover/movies"
+        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
+      >
+        Movies
+      </a>
+      <a
+        routerLink="/discover/series"
+        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
+      >
+        Series
+      </a>
+      <button
+        class="text-gray-300 transition-transform duration-300 focus:outline-none flex items-center pr-2"
+      >
+        <span class="material-icons"> search </span>
+      </button>
+    </nav>
 
-    <a
-      routerLink="/discover/series"
-      class="flex items-center text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500 cursor-pointer">
-      Series
-    </a>
-  </div>
-
-  <!-- Search Button -->
-  <div class="ml-auto flex items-center relative group">
-    <!-- Search Icon -->
-    <button class="text-gray-300 transition-transform duration-300 focus:outline-none flex items-center group-hover:hidden">
-      <span class="material-icons">search</span>
+    <!-- Mobile menu button (shown below md breakpoint) -->
+    <button
+      class="text-gray-300 md:hidden"
+      (click)="isMenuOpen = !isMenuOpen"
+      aria-label="Toggle Menu"
+    >
+      <span class="material-icons">menu</span>
     </button>
-
-    <!-- Search Input -->
-    <input
-      type="text"
-      placeholder="Search..."
-      class="hidden group-hover:flex w-32 md:w-64 bg-gray-800 text-gray-300 border border-gray-600 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500 transition-all duration-300" />
   </div>
+
+  <!-- Mobile Nav (only shown below md breakpoint) -->
+  <nav
+    class="mt-2 md:hidden"
+    [ngClass]="{ 'hidden': !isMenuOpen, 'block': isMenuOpen }"
+  >
+    <ul class="flex flex-col space-y-2">
+      <li>
+        <a
+          routerLink="/"
+          class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
+          (click)="isMenuOpen = false"
+        >
+          Discover
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/recommendation"
+          class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500 flex items-center"
+          (click)="isMenuOpen = false"
+        >
+          <span class="mr-2 text-gray-400 material-icons">auto_awesome</span>
+          Recommendation
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/discover/movies"
+          class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
+          (click)="isMenuOpen = false"
+        >
+          Movies
+        </a>
+      </li>
+      <li>
+        <a
+          routerLink="/discover/series"
+          class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
+          (click)="isMenuOpen = false"
+        >
+          Series
+        </a>
+      </li>
+      <li>
+        <button
+          class="text-gray-300 transition-transform duration-300 focus:outline-none flex items-center pr-2"
+          (click)="isMenuOpen = false"
+        >
+          <span class="material-icons"> search </span>
+        </button>
+      </li>
+    </ul>
+  </nav>
 </div>
