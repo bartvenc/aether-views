@@ -1,143 +1,137 @@
 @if (series()) {
-  <div class="relative text-white">
-    <!-- Backdrop Section -->
-    <div class="relative w-full h-[600px] overflow-hidden">
-      @if (tmdbService.getBackDrop(series()?.backdrop_path)) {
-        <img [src]="tmdbService.getBackDrop(series()?.backdrop_path)" [alt]="series()?.name" class="absolute w-full h-full object-cover" />
-      }
-      <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#201a23]"></div>
-      <div class="absolute inset-0 bg-[#201a23] bg-opacity-40"></div>
+<div class="relative text-white">
+  <!-- Backdrop (reduced height on mobile) -->
+  <div class="relative w-full h-[450px] md:h-[600px] overflow-hidden">
+    @if (tmdbService.getBackDrop(series()?.backdrop_path)) {
+    <img [src]="tmdbService.getBackDrop(series()?.backdrop_path)" [alt]="series()?.name"
+      class="absolute w-full h-full object-cover" />
+    }
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#201a23]"></div>
+    <div class="absolute inset-0 bg-[#201a23] bg-opacity-40"></div>
 
-      <!-- Poster, Title, Tagline, and Trailer -->
-      <div class="relative z-10 w-full mx-auto px-8 h-full flex items-center justify-between">
-        <!-- Poster -->
-        <div class="w-64 flex-shrink-0">
-          <img
-            *ngIf="series()?.poster_path"
-            [src]="tmdbService.getPosterUrl(series()?.poster_path)"
-            [alt]="series()?.name"
-            class="rounded-lg shadow-lg" />
+    <!-- Center everything in a row for desktop -->
+    <div
+      class="relative z-20 w-full h-full flex flex-col md:flex-row items-center md:items-center justify-center md:justify-start px-4 md:px-16 space-y-8 md:space-y-0 md:space-x-12">
+
+      <!-- Poster -->
+      <div class="w-32 md:w-64 flex-shrink-0">
+        <img *ngIf="series()?.poster_path" [src]="tmdbService.getPosterUrl(series()?.poster_path)"
+          [alt]="series()?.name" class="rounded-lg shadow-lg w-full" />
+      </div>
+
+      <!-- Main Info (title, year + trailer icon, rating, seasons, genres, tagline) -->
+      <div class="flex flex-col text-center md:text-left items-center md:items-start space-y-4 max-w-lg">
+        <!-- Title, Year, and Trailer Icon -->
+        <h1 class="text-2xl md:text-5xl font-extrabold">
+          {{ series()?.name }}
+          <span *ngIf="series()?.first_air_date" class="text-gray-400 text-xl md:text-3xl">
+            ({{ series()?.first_air_date | date: 'yyyy' }})
+          </span>
+
+          <!-- Trailer icon (tooltip on hover), only if there's a trailer link -->
+          <a *ngIf="tmdbService.getTrailerUrl(series())" [href]="tmdbService.getTrailerUrl(series())" target="_blank"
+            title="Watch Trailer"
+            class="inline-flex ml-2 align-middle text-gray-300 hover:text-slate-200 transition-colors duration-300">
+            <span class="material-icons text-2xl md:text-3xl">play_circle</span>
+          </a>
+        </h1>
+
+        <!-- Rating and Seasons -->
+        <div class="text-base md:text-lg text-gray-300">
+          {{ series()?.content_ratings?.results?.[0]?.rating || 'TV-MA' }} &bullet;
+          {{ series()?.number_of_seasons || '1' }} Season
         </div>
 
-        <!-- Title and Info -->
-        <div class="flex-1 px-8">
-          <h1 class="text-5xl font-extrabold mb-2">
-            {{ series()?.name }}
-            <span *ngIf="series()?.first_air_date" class="text-gray-400 text-3xl"> ({{ series()?.first_air_date | date: 'yyyy' }}) </span>
-          </h1>
-          <div class="text-lg text-gray-300 mb-4">
-            {{ series()?.content_ratings?.results?.[0]?.rating || 'TV-MA' }}
-            {{ series()?.number_of_seasons || '1' }} Season |
-            <span class="genres flex flex-wrap gap-2">
-              @for (genre of series()?.genres || []; track genre) {
-                <span
-                  [routerLink]="['/discover/series']"
-                  [queryParams]="{ genre: genre.id }"
-                  class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
-                  {{ genre.name }}
-                </span>
-              }
-            </span>
-          </div>
+        <!-- Genres -->
+        <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+          @for (genre of series()?.genres || []; track genre) {
+          <span [routerLink]="['/discover/series']" [queryParams]="{ genre: genre.id }"
+            class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+            {{ genre.name }}
+          </span>
+          }
         </div>
 
         <!-- Tagline -->
-        <p *ngIf="series()?.tagline" class="absolute bottom-8 text-3xl italic text-gray-200">
+        <p *ngIf="series()?.tagline" class="text-xl md:text-2xl italic text-gray-200">
           {{ series()?.tagline }}
         </p>
+      </div>
+    </div>
+  </div>
 
-        <!-- Trailer Button -->
-        @if (tmdbService.getTrailerUrl(series())) {
-          <a
-            [href]="tmdbService.getTrailerUrl(series())"
-            target="_blank"
-            class="absolute bottom-8 right-8 inline-block bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-bold py-2 px-4 rounded">
-            Watch Trailer
-          </a>
+  <!-- Overview Section & More Details -->
+  <div class="relative z-20 w-full mx-auto px-4 md:px-8 py-4 md:py-8">
+    <div class="mb-8">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4">Overview</h2>
+      <p *ngIf="series()?.overview" class="text-gray-300 mb-6 leading-relaxed">
+        {{ series()?.overview }}
+      </p>
+    </div>
+
+    <!-- Creators & Producers -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-300 text-sm mb-8">
+      <div>
+        <strong class="text-white">Creator:</strong>
+        @for (creator of series()?.created_by || []; track creator) {
+        <div>{{ creator.name }}</div>
+        }
+      </div>
+      <div>
+        <strong class="text-white">Producer:</strong>
+        <div>Robert Lloyd Lewis</div>
+      </div>
+      <div>
+        <strong class="text-white">Executive Producers:</strong>
+        @for (producer of series()?.production_companies || []; track producer) {
+        <div>{{ producer.name }}</div>
+        }
+      </div>
+      <div>
+        <strong class="text-white">Network:</strong>
+        @for (network of series()?.networks || []; track network) {
+        <div>{{ network.name }}</div>
         }
       </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="relative z-20 w-full mx-auto px-8 py-12">
-      <!-- Overview Section -->
-      <div class="mb-8">
-        <h2 class="text-3xl font-bold mb-4">Overview</h2>
-        <p *ngIf="series()?.overview" class="text-gray-300 mb-6 leading-relaxed">
-          {{ series()?.overview }}
-        </p>
-      </div>
-
-      <!-- Creators and Producers -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-300 text-sm mb-8">
-        <div>
-          <strong class="text-white">Creator:</strong>
-          @for (creator of series()?.created_by || []; track creator) {
-            <div>{{ creator.name }}</div>
-          }
-        </div>
-        <div>
-          <strong class="text-white">Producer:</strong>
-          <div>Robert Lloyd Lewis</div>
-        </div>
-        <div>
-          <strong class="text-white">Executive Producers:</strong>
-          @for (producer of series()?.production_companies || []; track producer) {
-            <div>{{ producer.name }}</div>
-          }
-        </div>
-        <div>
-          <strong class="text-white">Network:</strong>
-          @for (network of series()?.networks || []; track network) {
-            <div>{{ network.name }}</div>
-          }
-        </div>
-      </div>
-
-      <!-- Keywords -->
-      @if (series()?.keywords?.results?.length) {
-        <div class="flex flex-wrap gap-2 mb-6">
-          @for (keyword of series()?.keywords?.results || []; track keyword) {
-            <span
-              [routerLink]="['/discover/series']"
-              [queryParams]="{ keyword: stringifyKeyword(keyword) }"
-              class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
-              {{ keyword.name }}
-            </span>
-          }
-        </div>
-      }
-
-      <!-- Seasons -->
-      @if (series()) {
-        <h2 class="text-3xl font-bold mt-8 mb-4">
-          Seasons <span class="text-sm text-gray-400">({{ series()?.number_of_episodes }} Episodes)</span>
-        </h2>
-      }
-
-      <!-- Recommendations -->
-
-      @if (series()?.recommendations?.results?.length) {
-        <h2 class="text-3xl font-bold mt-8 mb-4">Recommendations</h2>
-        <app-slider [items]="series()?.recommendations?.results || []" overview="overview"></app-slider>
-      }
-
-      @if (series()?.recommendations?.results?.length) {
-        <!-- Similar Series -->
-        <h2 class="text-3xl font-bold mt-12 mb-4">Similar Series</h2>
-        <app-slider [items]="series()?.similar?.results || []" overview="overview"></app-slider>
-      }
-
-      @if (series()?.credits?.cast?.length) {
-        <!-- Cast -->
-        <h2 class="text-3xl font-bold mt-12 mb-4">Cast</h2>
-        <app-slider
-          [items]="series()?.credits?.cast || []"
-          cardType="person"
-          imageField="profile_path"
-          titleField="character"
-          subtitleField="name"></app-slider>
+    <!-- Keywords -->
+    @if (series()?.keywords?.results?.length) {
+    <div class="flex flex-wrap gap-2 mb-6">
+      @for (keyword of series()?.keywords?.results || []; track keyword) {
+      <span [routerLink]="['/discover/series']" [queryParams]="{ keyword: stringifyKeyword(keyword) }"
+        class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+        {{ keyword.name }}
+      </span>
       }
     </div>
+    }
+
+    <!-- Seasons -->
+    @if (series()) {
+    <h2 class="text-2xl md:text-3xl font-bold mt-8 mb-4">
+      Seasons <span class="text-sm text-gray-400">({{ series()?.number_of_episodes }} Episodes)</span>
+    </h2>
+    }
+
+    <!-- Recommendations -->
+    @if (series()?.recommendations?.results?.length) {
+    <h2 class="text-2xl md:text-3xl font-bold mt-8 mb-4">Recommendations</h2>
+    <app-slider [items]="series()?.recommendations?.results || []" overview="overview"></app-slider>
+    }
+
+    <!-- Similar Series -->
+    @if (series()?.similar?.results?.length) {
+    <h2 class="text-2xl md:text-3xl font-bold mt-12 mb-4">Similar Series</h2>
+    <app-slider [items]="series()?.similar?.results || []" overview="overview"></app-slider>
+    }
+
+    <!-- Cast -->
+    @if (series()?.credits?.cast?.length) {
+    <h2 class="text-2xl md:text-3xl font-bold mt-12 mb-4">Cast</h2>
+    <app-slider [items]="series()?.credits?.cast || []" cardType="person" imageField="profile_path"
+      titleField="character" subtitleField="name"></app-slider>
+    }
   </div>
+</div>
 }
