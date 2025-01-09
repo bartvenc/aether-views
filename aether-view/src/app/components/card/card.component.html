@@ -48,7 +48,12 @@
   <div class="genreStudio">
     <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="card-image" />
     <div class="genre-overlay">
-      <h3 class="title">{{ title }}</h3>
+      <div class="hidden md:block">
+        <p class="title font-bold">{{ title }}</p>
+      </div>
+      <div class="block md:hidden">
+        <p class="card-title font-bold">{{ title }}</p>
+      </div>
     </div>
   </div>
   }
