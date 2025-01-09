@@ -47,6 +47,7 @@ export class FilterPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.type = this.route.snapshot.data['type'];
+    this.filters.update(f => ({ ...f, type: this.type }));
 
     console.log('Type:', this.type);
     if (this.type === 'movies') {
