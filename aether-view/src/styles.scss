@@ -2,9 +2,11 @@
 @use 'swiper/css/navigation';
 @use 'swiper/css/pagination';
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @font-face {
   font-family: 'Bruno Ace SC';
@@ -18,3 +20,6 @@
   font-weight: 800;
   font-style: normal;
 }
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
