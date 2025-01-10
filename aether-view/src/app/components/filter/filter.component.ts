@@ -133,7 +133,7 @@ export class FilterComponent implements OnInit {
   }
 
   private checkViewport(): void {
-    this.isMobile = window.innerWidth < 768; // Tailwind's `md` breakpoint
+    this.isMobile = window.innerWidth < 768; 
   }
   
 }
