@@ -1,28 +1,21 @@
 <div class="w-full p-4 bg-[#201a23] ">
   <!-- Mobile toggle button (left-aligned) -->
   <div class="flex justify-start md:hidden">
-    <button
-      class="bg-[#4e444b] px-4 py-2 flex items-center"
-      (click)="showFilters = !showFilters"
-    >
+    <button class="bg-[#4e444b] px-4 py-2 flex items-center" (click)="showFilters = !showFilters">
       <mat-icon>filter_list</mat-icon>
       <span>Filters</span>
     </button>
   </div>
-  
+
 
   <!-- Filter row -->
-  <div
-    class="flex flex-col md:flex-row flex-wrap md:gap-4 p-2 sm:w-full"
-    [class.hidden]="!showFilters && isMobile"
-    
-  >
+  <div class="flex flex-col md:flex-row flex-wrap md:gap-4 p-2 sm:w-full" [class.hidden]="!showFilters && isMobile">
     <!-- Type -->
     <mat-form-field class="sm:w-[10%]" appearance="fill">
       <mat-label>Type</mat-label>
       <mat-select [(ngModel)]="selectedTypeSignal" (selectionChange)="updateFilter()">
         @for (type of ['movies', 'series']; track type) {
-          <mat-option [value]="type">{{ type | titlecase }}</mat-option>
+        <mat-option [value]="type">{{ type | titlecase }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -32,7 +25,7 @@
       <mat-label>Category</mat-label>
       <mat-select [(ngModel)]="selectedCategory" (selectionChange)="updateFilter()">
         @for (category of ['Popular', 'New', 'Top Rated', 'Now Playing']; track category) {
-          <mat-option [value]="category">{{ category }}</mat-option>
+        <mat-option [value]="category">{{ category }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -41,8 +34,9 @@
     <mat-form-field class="sm:w-[8%]" appearance="fill">
       <mat-label>Year</mat-label>
       <mat-select [(ngModel)]="selectedYear" (selectionChange)="updateFilter()">
+        <mat-option>None</mat-option>
         @for (year of years; track year) {
-          <mat-option [value]="year">{{ year }}</mat-option>
+        <mat-option [value]="year">{{ year }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -51,8 +45,9 @@
     <mat-form-field class=" sm:w-[15%]" appearance="fill">
       <mat-label>Genres</mat-label>
       <mat-select [multiple]="true" [(ngModel)]="selectedGenres" (selectionChange)="onGenreChange($event)">
+        <mat-option>None</mat-option>
         @for (genre of genres; track genre) {
-          <mat-option [value]="genre.id">{{ genre.name }}</mat-option>
+        <mat-option [value]="genre.id">{{ genre.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -61,52 +56,41 @@
     <mat-form-field class="sm:w-[18%]" appearance="fill">
       <mat-label>{{ selectedTypeSignal() === 'movies' ? 'Studios' : 'Networks' }}</mat-label>
       <mat-select [(ngModel)]="selectedStudiosOrNetworks" (selectionChange)="updateFilter()">
+        <mat-option>None</mat-option>
         @for (studioNetwork of studiosOrNetworks; track studioNetwork) {
-          <mat-option [value]="studioNetwork.id">{{ studioNetwork.name }}</mat-option>
+        <mat-option [value]="studioNetwork.id">{{ studioNetwork.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
 
     <!-- Keyword Input -->
     <div class="sm:w-[20%]">
-      <mat-form-field >
+      <mat-form-field>
         <mat-label>Keyword</mat-label>
-        <input
-          matInput
-          [(ngModel)]="keywordInput"
-          (input)="onKeywordInput($any($event.target).value)"
-          autocomplete="off"
-        />
+        <input matInput [(ngModel)]="keywordInput" (input)="onKeywordInput($any($event.target).value)"
+          autocomplete="off" />
       </mat-form-field>
       @if (keywordResults().length > 0) {
-        <ul 
-          class="absolute bg-[#231e22] z-50 w-full sm:w-[17%] max-h-[200px] overflow-y-auto"
-        >
-          @for (keyword of keywordResults(); track keyword) {
-            <li
-              class="p-2 text-base hover:bg-[#4e444b] cursor-pointer"
-              (click)="addKeyword(keyword);"
-              
-            >
-              {{ keyword.name }}
-            </li>
-          }
-        </ul>
+      <ul class="absolute bg-[#231e22] z-50 w-full sm:w-[17%] max-h-[200px] overflow-y-auto">
+        @for (keyword of keywordResults(); track keyword) {
+        <li class="p-2 text-base hover:bg-[#4e444b] cursor-pointer" (click)="addKeyword(keyword);">
+          {{ keyword.name }}
+        </li>
+        }
+      </ul>
       }
     </div>
-    
-  
-  </div>
-
-  <!-- Selected Keywords -->
-  <div class="ml-2 gap-2">
-    @for (keyword of selectedKeywords(); track keyword) {
-      <span
-        class="bg-[#4e444b] text-white px-2 py-1 rounded inline-flex items-center"
-      >
+    <!-- Selected Keywords -->
+    <div class="gap-2">
+      @for (keyword of selectedKeywords(); track keyword) {
+      <span class="bg-[#4e444b] text-white px-2 py-1 rounded inline-flex items-center">
         {{ keyword.name }}
         <button class="ml-2" (click)="removeKeyword(keyword.id)">x</button>
       </span>
-    }
+      }
+    </div>
+
   </div>
+
+
 </div>

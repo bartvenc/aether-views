@@ -7,6 +7,7 @@ import { MOVIE_GENRES, SERIES_GENRES } from '../../../../public/assets/genres';
 import { Genre, Keyword } from '../../interfaces/common-interfaces';
 import { Studio, STUDIOS } from '../../../../public/assets/studios';
 import { Network } from '../../interfaces/series';
+import { debounceTime, firstValueFrom, fromEvent, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-filter-page',
@@ -37,6 +38,8 @@ export class FilterPageComponent implements OnInit, OnDestroy {
 
   items = signal<any[]>([]); // This will hold the fetched data
   isLoading = signal(false);
+  private scrollSubscription?: Subscription;
+  private isLoadingMore = false;
   currentPage = signal(1);
   totalPages = signal(0);
 
@@ -98,7 +101,7 @@ export class FilterPageComponent implements OnInit, OnDestroy {
         }
       }
     });
-    window.addEventListener('scroll', this.onScroll.bind(this));
+    this.setupScrollListener();
   }
 
   // Triggered by the filter component
@@ -125,70 +128,75 @@ export class FilterPageComponent implements OnInit, OnDestroy {
     this.fetchContent(true);
   }
 
-  fetchContent(initialLoad = false) {
-    if (this.isLoading() || (!initialLoad && this.currentPage() > 500)) return; // TMDB API limit
+  async fetchContent(initialLoad = false) {
+    if (this.isLoading() || (!initialLoad && this.currentPage() > 500)) return;
 
     this.isLoading.set(true);
     const filterValues = this.filters();
     const pagesToFetch = initialLoad ? [1, 2] : [this.currentPage()];
 
-    Promise.all(pagesToFetch.map(page => this.tmdbService.fetchContent(filterValues, page, this.type === 'movies' ? 'movie' : 'tv').toPromise()))
-      .then(responses => {
-        responses.forEach(response => {
-          this.items.update(existingItems => [...existingItems, ...response.results]);
-        });
-        if (!initialLoad) {
-          this.currentPage.update(page => page + 1);
+    try {
+      const responses = await Promise.all(
+        pagesToFetch.map(page =>
+          firstValueFrom(
+            this.tmdbService.fetchContent(filterValues, page, this.type === 'movies' ? 'movie' : 'tv')
+          )
+        )
+      );
+
+      responses.forEach(response => {
+        if (response) {  // Add null check
+          if (initialLoad) {
+            this.items.set(response.results || []); // Add fallback
+          } else {
+            this.items.update(existingItems => [...existingItems, ...(response.results || [])]);
+          }
         }
-        this.isLoading.set(false);
-      })
-      .catch(err => {
-        console.error('Error fetching movies:', err);
-        this.isLoading.set(false);
+      });
+
+      if (!initialLoad) {
+        this.currentPage.update(page => page + 1);
+      }
+    } catch (err) {
+      console.error('Error fetching content:', err);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  private setupScrollListener(): void {
+    // Clean up any existing subscription first
+    this.scrollSubscription?.unsubscribe();
+    
+    this.scrollSubscription = fromEvent(window, 'scroll')
+      .pipe(
+        debounceTime(200)
+      )
+      .subscribe(() => {
+        if (!this.isLoadingMore && this.route.snapshot.url[0]?.path.includes('discover')) {
+          this.onScroll();
+        }
       });
   }
 
   onScroll(): void {
+    if (this.isLoading()) return; // Don't trigger if already loading
+
     const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
     const clientHeight = document.documentElement.clientHeight || window.innerHeight;
 
     if (scrollTop + clientHeight >= scrollHeight - 100) {
-      this.fetchContent(); // Load next page on scroll
+      this.isLoadingMore = true;
+      this.fetchContent().finally(() => {
+        this.isLoadingMore = false;
+      });
     }
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('scroll', this.onScroll.bind(this));
+    if (this.scrollSubscription) {
+      this.scrollSubscription.unsubscribe();
+    }
   }
-
-  /*
-  this.route.queryParams.subscribe((params) => {
-    if (params['releaseYear']) {
-      this.filters.update((f) => ({ ...f, year: +params['releaseYear'] }));
-    }
-    if (params['genres']) {
-      this.filters.update((f) => ({ ...f, genres: params['genres'].split(',') }));
-    }
-    if (params['keyword']) {
-      this.filters.update((f) => ({ ...f, keyword: params['keyword'] }));
-    }
-    
-  });
-  fetchItems() {
-    this.isLoading.set(true);
-    const filterValues = this.filters();
-    console.log('Fetching items with filters:', filterValues);
-
-    // Mock API call
-    setTimeout(() => {
-      // Replace this with actual data fetch
-      this.items.set([
-        // Mock data structure
-        { id: 1, title: 'Sample Movie 1', subtitle: '2024', imageUrl: '...' },
-        { id: 2, title: 'Sample Movie 2', subtitle: '2023', imageUrl: '...' },
-      ]);
-      this.isLoading.set(false);
-    }, 1000);
-  }*/
 }
