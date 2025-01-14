@@ -10,9 +10,7 @@ import { Studio } from '../../../../public/assets/studios';
 import { Genre } from '../../interfaces/common-interfaces';
 import { TmdbService } from '../../services/tmdb.service';
 import { Router } from '@angular/router';
-
 import { MatChipsModule } from '@angular/material/chips';
-import { MatChipInputEvent, MatChipListbox } from '@angular/material/chips';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 @Component({
@@ -25,8 +23,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatChipsModule,
-  MatChipListbox],
+    MatChipsModule],
   templateUrl: './filter.component.html',
 })
 export class FilterComponent implements OnInit {
@@ -169,4 +166,7 @@ export class FilterComponent implements OnInit {
     this.isMobile = window.innerWidth < 768;
   }
 
+  getFirstSelectedGenre(): Genre | null {
+    return this.genres.find((genre) => this.selectedGenres().includes(genre.id)) || null;
+  }
 }

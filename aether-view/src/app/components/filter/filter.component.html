@@ -33,7 +33,9 @@
     <mat-form-field class="sm:w-[8%]" appearance="fill">
       <mat-label>Year</mat-label>
       <mat-select [(ngModel)]="selectedYear" (selectionChange)="updateFilter()">
+        @if(selectedYear() !== 0){
         <mat-option><mat-icon>replay</mat-icon></mat-option>
+        }
         @for (year of years; track year) {
           <mat-option [value]="year">{{ year }}</mat-option>
         }
@@ -44,18 +46,32 @@
     <mat-form-field class="sm:w-[15%]" appearance="fill">
       <mat-label>Genres</mat-label>
       <mat-select [multiple]="true" [(ngModel)]="selectedGenres" (selectionChange)="onGenreChange($event)">
-        <mat-option class="no-checkbox"><mat-icon>replay</mat-icon></mat-option>
+        <mat-select-trigger>
+          {{ getFirstSelectedGenre()?.name }}
+          @if ((selectedGenres().length || 0) > 1) {
+            <span class="example-additional-selection">
+              (+{{(selectedGenres().length || 0) - 1}} 
+              {{ selectedGenres().length === 2 ? 'other' : 'others' }})
+            </span>
+          }
+        </mat-select-trigger>
+        @if (selectedGenres().length > 0) {
+          <mat-option class="no-checkbox" (click)="selectedGenres.set([])">
+            <mat-icon>replay</mat-icon>
+          </mat-option>
+        }
         @for (genre of genres; track genre) {
           <mat-option [value]="genre.id">{{ genre.name }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
-
     <!-- Studios/Networks -->
     <mat-form-field class="sm:w-[18%]" appearance="fill">
       <mat-label>{{ selectedTypeSignal() === 'movies' ? 'Studios' : 'Networks' }}</mat-label>
       <mat-select [(ngModel)]="selectedStudiosOrNetworks" (selectionChange)="updateFilter()">
+        @if(selectedStudiosOrNetworks() !== 0){
         <mat-option><mat-icon>replay</mat-icon></mat-option>
+        }
         @for (studioNetwork of studiosOrNetworks; track studioNetwork) {
           <mat-option [value]="studioNetwork.id">{{ studioNetwork.name }}</mat-option>
         }
