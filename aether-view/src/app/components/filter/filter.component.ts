@@ -11,17 +11,22 @@ import { Genre } from '../../interfaces/common-interfaces';
 import { TmdbService } from '../../services/tmdb.service';
 import { Router } from '@angular/router';
 
+import { MatChipsModule } from '@angular/material/chips';
+import { MatChipInputEvent, MatChipListbox } from '@angular/material/chips';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'app-filter',
   standalone: true,
-  imports: [   CommonModule,
+  imports: [CommonModule,
     FormsModule,
     ReactiveFormsModule,
     MatSelectModule,
     MatFormFieldModule,
     MatInputModule,
-    MatIconModule],
+    MatIconModule,
+    MatChipsModule,
+  MatChipListbox],
   templateUrl: './filter.component.html',
 })
 export class FilterComponent implements OnInit {
@@ -46,6 +51,8 @@ export class FilterComponent implements OnInit {
   keywordInput = signal('');
   keywordResults = signal<{ id: number; name: string }[]>([]);
   selectedKeywords = signal<{ id: number; name: string }[]>([]);
+  separatorKeysCodes = [ENTER, COMMA] as const;
+  
   selectedTypeSignal = signal<'movies' | 'series' | null>(this.type);
   showFilters = false;
   isMobile = false;
@@ -72,11 +79,16 @@ export class FilterComponent implements OnInit {
     this.updateFilter();
   }
 
-  updateFilter() {
+  updateFilter(test?: number) {
     if (this.selectedCategory() === 'New' && this.selectedYear() === 0) {
       this.selectedYear.set(new Date().getFullYear());
     }
-  
+    if (this.selectedYear() === test) {
+      console.log('Year is the same');
+      this.selectedYear.set(0);
+      console.log('Year is now:', this.selectedYear());
+
+    }
     const newType = this.selectedTypeSignal();
     if (newType !== this.type) {
       this.router.navigate([`/discover/${newType}`], { queryParams: this.filters });
@@ -102,14 +114,33 @@ export class FilterComponent implements OnInit {
 
   onGenreChange(event: any) {
     // event.value is an array of selected IDs
-    this.selectedGenres.set(event.value);
+    console.log('Genres changed:', event.value);
+    if (event.value.some((genre: number) => genre === undefined)) {
+      console.log('Deselecting all genres');
+      this.selectedGenres.set([]);
+    } else {
+      this.selectedGenres.set(event.value);
+    }
+    this.updateFilter();
+  }
+
+  onYearChange(year: number) {
+    console.log('Year changed:', year);
+    if (this.selectedYear() === year) {
+      // Deselect if the same year is clicked
+      console.log('Deselecting year', year, this.selectedYear());
+      this.selectedYear.set(0); // or null if you want no value
+    } else {
+      // Set the new year
+      this.selectedYear.set(year);
+    }
     this.updateFilter();
   }
 
   onKeywordInput(query: string) {
     this.keywordInput.set(query);
     if (query.length >= 3) {
-      this.tmdbService.searchKeyword(query).subscribe(response => {
+      this.tmdbService.searchKeyword(query).subscribe((response) => {
         this.keywordResults.set(response.results);
       });
     } else {
@@ -117,23 +148,25 @@ export class FilterComponent implements OnInit {
     }
   }
 
-  addKeyword(keyword: { id: number; name: string }) {
-    const exists = this.selectedKeywords().some(kw => kw.id === keyword.id);
+  addKeywordFromSuggestion(keyword: { id: number; name: string }) {
+    const exists = this.selectedKeywords().some((kw) => kw.id === keyword.id);
     if (!exists) {
-      this.selectedKeywords.update(current => [...current, keyword]);
-      this.keywordInput.set('');
-      this.keywordResults.set([]);
-      this.updateFilter();
+      this.selectedKeywords.update((current) => [...current, keyword]);
     }
-  }
 
-  removeKeyword(keywordId: number) {
-    this.selectedKeywords.update(keywords => keywords.filter(kw => kw.id !== keywordId));
+    this.keywordInput.set('');
+    this.keywordResults.set([]); // Clear the results menu
     this.updateFilter();
   }
 
-  private checkViewport(): void {
-    this.isMobile = window.innerWidth < 768; 
+  removeKeyword(keywordId: number) {
+    this.selectedKeywords.update((keywords) => keywords.filter((kw) => kw.id !== keywordId));
+    this.updateFilter();
   }
-  
+
+
+  private checkViewport(): void {
+    this.isMobile = window.innerWidth < 768;
+  }
+
 }
