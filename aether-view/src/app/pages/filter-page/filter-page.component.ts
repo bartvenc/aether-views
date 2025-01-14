@@ -6,7 +6,7 @@ import { TmdbService } from '../../services/tmdb.service';
 import { MOVIE_GENRES, SERIES_GENRES } from '../../../../public/assets/genres';
 import { Genre, Keyword } from '../../interfaces/common-interfaces';
 import { Studio, STUDIOS } from '../../../../public/assets/studios';
-import { Network } from '../../interfaces/series';
+import { Network, NETWORKS } from '../../../../public/assets/networks';
 import { debounceTime, firstValueFrom, fromEvent, Subscription } from 'rxjs';
 
 @Component({
@@ -30,7 +30,12 @@ export class FilterPageComponent implements OnInit, OnDestroy {
   movieGenres = MOVIE_GENRES;
   seriesGenres = SERIES_GENRES;
   studios = STUDIOS;
+  networks = NETWORKS;
 
+  years = Array.from({length: new Date().getFullYear() - 1979},
+   (_, i) => new Date().getFullYear() - i);
+
+  
   selectedGenres = signal<number[]>([]);
 
   currentGenres: Genre[] = [];
@@ -58,7 +63,7 @@ export class FilterPageComponent implements OnInit, OnDestroy {
       this.curentStudiosOrNetwork = this.studios;
     } else if (this.type === 'series') {
       this.currentGenres = this.seriesGenres;
-      //this.curentStudiosOrNetwork = this.studios;
+      this.curentStudiosOrNetwork = this.networks;
     }
 
     this.route.queryParams.subscribe(params => {

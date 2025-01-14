@@ -148,7 +148,11 @@ export class TmdbService {
       params.with_genres = filters.genres.join(',');
     }
     if (filters.studioOrNetwork && filters.studioOrNetwork !== 0) {
+      if(type === 'movie') {
       params.with_companies = filters.studioOrNetwork;
+      }else if(type === 'tv') {
+        params.with_networks = filters.studioOrNetwork;
+      }
     }
     if (filters.keywords && filters.keywords.length !== 0) {
       params.with_keywords = filters.keywords;
