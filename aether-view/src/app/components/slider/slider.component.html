@@ -4,6 +4,8 @@
     [spaceBetween]="swiperOptions.spaceBetween"
     [breakpoints]="swiperOptions.breakpoints"
     [freeMode]="swiperOptions.freeMode"
+    [navigation]="true"
+    style="--swiper-navigation-color: #5e4869;"
     class="mySwiper">
     @for (item of items; track item) {
       <swiper-slide class="cursor-pointer" [ngClass]="{ 'pb-1': isMobile }">
