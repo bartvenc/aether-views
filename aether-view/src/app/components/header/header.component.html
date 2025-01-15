@@ -33,7 +33,7 @@
         </button>
 
         <!-- Search Input -->
-        <input type="text" placeholder="Search..."
+        <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"
           class="hidden group-hover:flex w-32 md:w-64 bg-[#201a23] shadow-md  text-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500 transition-all duration-300" />
       </div>
     </nav>
@@ -66,4 +66,33 @@
       </button>
     </mat-menu>
   </div>
+  <!-- Search Results -->
+  <!-- Search Results -->
+  @if (searchResults.length > 0) {
+  <div
+    class="absolute top-full left-0 w-full max-h-96 bg-[#201a23] shadow-lg z-20 overflow-y-auto rounded-md border border-gray-700 px-4 py-6"
+    (appClickOutside)="clearResults()" tabindex="-1">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+      @for (result of searchResults; track result.id) {
+      <div (click)="navigateTo(result)"
+        class="bg-[#28202b] rounded-md p-2 hover:bg-[#3a2e3d] transition duration-200 cursor-pointer relative">
+        <!-- Media Poster/Profile -->
+        @if (result.poster_path || result.profile_path) {
+        <img [src]="tmdbService.getPosterUrl(result.poster_path || result.profile_path)"
+          [alt]="result.title || result.name" class="w-full h-64 object-cover rounded-md" />
+        }
+        <!-- Media Details -->
+        <div class="mt-4 text-center">
+          <h3 class="text-lg font-semibold text-gray-200 truncate">{{ result.title || result.name }}</h3>
+          <p class="text-sm text-gray-400">{{ getMediaType(result.media_type) }}</p>
+        </div>
+        <!-- Media-Type Icon -->
+        <span class="absolute top-2 right-2 rounded-full">
+          <span class="material-icons text-white text-4xl">{{ getMediaIcon(result.media_type) }}</span>
+        </span>
+      </div>
+      }
+    </div>
+  </div>
+  }
 </div>
