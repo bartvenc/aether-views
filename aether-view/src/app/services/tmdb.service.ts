@@ -1,6 +1,6 @@
 import { Injectable, inject, Signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Series } from '../interfaces/series';
+import { Season, Series } from '../interfaces/series';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { forkJoin, Observable, switchMap, tap } from 'rxjs';
@@ -299,6 +299,12 @@ export class TmdbService {
     );
   }
 
+  getSeasonDetails(seriesId: number, seasonNumber: number): Observable<Season> {
+    return this.http.get<Season>(`${this.baseUrl}/tv/${seriesId}/season/${seasonNumber}`, {
+      params: { api_key: this.apiKey }
+    });
+  }
+  
   getSeriesRecommendations(series: Series): Observable<Series[]> {
     console.log('Getting recommendations for:', series.name, 'ID:', series.id);
 
