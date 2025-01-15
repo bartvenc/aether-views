@@ -136,12 +136,13 @@
                     class="w-full flex justify-between items-center bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all">
                     <div class="text-left">
                       <h3 class="text-lg font-semibold text-gray-200 flex items-center">
-                        {{ season.name }}
+                        
                         @if (season.air_date && isSeasonFinished(season)) {
-                          <span class="material-icons ml-2">check_circle</span>
+                          <span class="material-icons mr-2">check_circle</span>
                         }@else if(season.air_date){
-                          <span class="material-icons ml-2">schedule</span>
+                          <span class="material-icons mr-2">schedule</span>
                         }
+                        {{ season.name }}
                       </h3>
                       <p class="text-sm text-gray-400">
                         {{ season.air_date | date: 'longDate' }} - {{ season.episode_count }} Episodes
@@ -160,12 +161,13 @@
                             [alt]="episode.name" class="w-24 h-16 rounded-lg object-cover">
                           <div>
                             <h4 class="text-gray-200 font-medium flex items-center">
-                              {{ episode.name }}
+                        
                               @if (episode.air_date && isEpisodeAired(episode.air_date)) {
-                                <span class="material-icons ml-2">check</span>
+                                <span class="material-icons mr-2">check</span>
                               }@else if(episode.air_date){
-                                <span class="material-icons ml-2">schedule</span>
+                                <span class="material-icons mr-2">schedule</span>
                               }
+                              {{ episode.name }}
                             </h4>
                             <p class="text-sm text-gray-400">{{ episode.air_date | date: 'longDate' }}</p>
                             <p class="text-sm text-gray-300 leading-relaxed" *ngIf="episode.overview">
