@@ -46,7 +46,7 @@
         <div class="flex flex-wrap gap-2 justify-center md:justify-start">
           @for (genre of series()?.genres || []; track genre) {
           <span [routerLink]="['/discover/series']" [queryParams]="{ genre: genre.id }"
-            class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
+            class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm  hover:bg-[#3b3539] cursor-pointer">
             {{ genre.name }}
           </span>
           }
@@ -99,10 +99,14 @@
     @if (series()?.keywords?.results?.length) {
     <div class="flex flex-wrap gap-2 mb-6">
       @for (keyword of series()?.keywords?.results || []; track keyword) {
-      <span [routerLink]="['/discover/series']" [queryParams]="{ keyword: stringifyKeyword(keyword) }"
-        class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm cursor-pointer">
-        {{ keyword.name }}
-      </span>
+        <button [routerLink]="['/discover/series']" [queryParams]="{ keyword: stringifyKeyword(keyword) }"
+        class=" flex justify-center  bg-gray-800  px-3 py-1 rounded-full cursor-pointer hover:bg-[#3b3539]">
+        <span class="material-icons text-sm mr-1 ">
+          sell
+          </span>
+        <span class="text-gray-200 text-sm ">{{keyword.name}}</span>
+      </button>
+      
       }
     </div>
     }
