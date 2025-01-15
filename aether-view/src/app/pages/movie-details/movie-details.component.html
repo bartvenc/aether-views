@@ -115,13 +115,15 @@
 
     @if (movie()?.recommendations?.results?.length) {
       <h2 class="text-2xl md:text-3xl font-bold mt-8 mb-4">Recommendations</h2>
-    <app-slider [items]="movie()?.recommendations?.results || []" overview="overview"></app-slider>
+    <app-slider titleField="release_date"
+    subtitleField="title" [items]="movie()?.recommendations?.results || []" overview="overview"></app-slider>
     }
 
     @if (movie()?.recommendations?.results?.length) {
     <!-- Similar Series -->
     <h2 class="text-2xl md:text-3xl font-bold mt-12 mb-4">Similar Movies</h2>
-    <app-slider [items]="movie()?.similar?.results || []" overview="overview"></app-slider>
+    <app-slider overview="overview" titleField="release_date"
+    subtitleField="title" [items]="movie()?.similar?.results || []"></app-slider>
     }
 
     @if (movie()?.credits?.cast?.length) {
