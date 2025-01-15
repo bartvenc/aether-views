@@ -44,6 +44,7 @@ export interface Season {
   poster_path: string | null;
   season_number: number;
   vote_average: number;
+  episodes?: Episode[];
 }
 
 export interface Series {
