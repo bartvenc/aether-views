@@ -23,3 +23,12 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.no-checkbox.mat-option {
+  display: flex;
+  align-items: center;
+}
+
+.no-checkbox .mat-pseudo-checkbox {
+  display: none;
+}

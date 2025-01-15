@@ -77,16 +77,12 @@ export class FilterComponent implements OnInit {
   }
 
   updateFilter(test?: number) {
+    const newType = this.selectedTypeSignal();
+
     if (this.selectedCategory() === 'New' && this.selectedYear() === 0) {
       this.selectedYear.set(new Date().getFullYear());
     }
-    if (this.selectedYear() === test) {
-      console.log('Year is the same');
-      this.selectedYear.set(0);
-      console.log('Year is now:', this.selectedYear());
-
-    }
-    const newType = this.selectedTypeSignal();
+    
     if (newType !== this.type) {
       this.router.navigate([`/discover/${newType}`], { queryParams: this.filters });
     } else {
@@ -109,6 +105,15 @@ export class FilterComponent implements OnInit {
     }
   }
 
+  filterReset() {
+    this.selectedCategory.set('Popular');
+    this.selectedYear.set(0);
+    this.selectedGenres.set([]);
+    this.selectedStudiosOrNetworks.set(0);
+    this.selectedKeywords.set([]);
+    this.updateFilter();
+  }
+
   onGenreChange(event: any) {
     // event.value is an array of selected IDs
     console.log('Genres changed:', event.value);
@@ -117,19 +122,6 @@ export class FilterComponent implements OnInit {
       this.selectedGenres.set([]);
     } else {
       this.selectedGenres.set(event.value);
-    }
-    this.updateFilter();
-  }
-
-  onYearChange(year: number) {
-    console.log('Year changed:', year);
-    if (this.selectedYear() === year) {
-      // Deselect if the same year is clicked
-      console.log('Deselecting year', year, this.selectedYear());
-      this.selectedYear.set(0); // or null if you want no value
-    } else {
-      // Set the new year
-      this.selectedYear.set(year);
     }
     this.updateFilter();
   }

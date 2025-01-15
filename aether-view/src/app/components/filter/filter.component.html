@@ -1,14 +1,17 @@
-<div class="w-full p-4 bg-[#201a23]">
+<div class="w-full bg-[#201a23]">
+
   <!-- Mobile toggle button (left-aligned) -->
-  <div class="flex justify-start md:hidden">
-    <button class="bg-[#4e444b] px-4 py-2 flex items-center" (click)="showFilters = !showFilters">
+  <div class="flex justify-start md:hidden ">
+    <button class="bg-[#4e444b] px-4 py-2 flex items-center rounded-md" (click)="showFilters = !showFilters">
       <mat-icon>filter_list</mat-icon>
       <span>Filters</span>
     </button>
   </div>
 
   <!-- Filter row -->
-  <div class="flex flex-col md:flex-row flex-wrap md:gap-4 p-2 sm:w-full" [class.hidden]="!showFilters && isMobile">
+  <div class="flex flex-col md:flex-row md:align-middle flex-wrap md:gap-4 p-2 sm:w-full" [class.hidden]="!showFilters && isMobile">
+
+    <button class="mb-4" (click)="filterReset()" title="Reset Filters"><mat-icon class="cursor-pointer">replay</mat-icon></button>
     <!-- Type -->
     <mat-form-field class="sm:w-[10%]" appearance="fill">
       <mat-label>Type</mat-label>
@@ -65,6 +68,7 @@
         }
       </mat-select>
     </mat-form-field>
+
     <!-- Studios/Networks -->
     <mat-form-field class="sm:w-[18%]" appearance="fill">
       <mat-label>{{ selectedTypeSignal() === 'movies' ? 'Studios' : 'Networks' }}</mat-label>
@@ -92,11 +96,11 @@
 
       <!-- Keyword suggestions dropdown -->
       @if (keywordResults().length > 0) {
-        <ul class="absolute bg-[#231e22] z-50 w-full max-h-56 overflow-y-auto rounded-md mt-2">
+        <ul class="absolute bg-[#231e22] z-50 w-[63%] sm:w-[18%] max-h-56 overflow-y-auto rounded-md -mt-4">
           @for (keyword of keywordResults(); track keyword.id) {
             <li
               (click)="addKeywordFromSuggestion(keyword)"
-              class="p-2 text-white hover:bg-gray-700 cursor-pointer"
+              class="p-2 px-6 text-white text-base hover:bg-[#3b3539] cursor-pointer"
             >
               {{ keyword.name }}
             </li>
