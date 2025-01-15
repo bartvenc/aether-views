@@ -83,6 +83,15 @@
 
 /* Person styling */
 .person {
+
+  @media (max-width: 768px) {
+    max-width: 150px;
+  }
+  @media (max-width: 480px) {
+    max-width: 100px;
+    max-height: 130px;
+  }
+
   position: relative;
   width: 150px; // Card width
   height: 200px; // Full card height
