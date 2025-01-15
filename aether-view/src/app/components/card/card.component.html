@@ -35,13 +35,17 @@
   }
 
   <!-- Person Card -->
-  @case ('person') {
+@case ('person') {
   <div class="person">
-    <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="rounded-full" />
-    <h3 class="title">{{ title }}</h3>
-    <p class="subtitle">{{ subtitle }}</p>
+    <div class="person-image-container">
+      <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="person-image" />
+    </div>
+    <div class="person-details">
+      <h3 class="person-title">{{ title }}</h3>
+      <p class="person-subtitle">{{ subtitle }}</p>
+    </div>
   </div>
-  }
+}
 
   <!-- Genre/Studio Card -->
   @case ('genreStudio') {

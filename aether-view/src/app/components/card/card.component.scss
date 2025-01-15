@@ -1,11 +1,14 @@
 .card-container {
   // Parent-level declarations first:
   width: 100%;
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 
   // Nested rules follow:
-  &:hover img {
-    transform: scale(1.05);
+  &:hover {
+    transform: translateY(-5px); // Slight lift on hover
+    opacity: 1; // Ensure the card remains visible
   }
 
   img {
@@ -14,7 +17,8 @@
   }
 
   &:hover .overlay {
-    opacity: 1;
+    opacity: 1; // Fade in
+    transform: translateY(0); // Slide up into view
   }
 
   .overlay {
@@ -22,30 +26,41 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
+    height: 50%;
+    background: rgba(0, 0, 0, 0.7); // Optional: Add a semi-transparent background for readability.
+    color: #fff; // Text color for visibility.
     padding: 0.5rem;
-    transition: opacity 0.3s ease-in-out;
+    transform: translateY(100%); // Start outside the card
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    overflow: hidden;
 
     .card-title {
-      font-weight: bold;
-      font-size: 1rem;
-      margin-bottom: 0.25rem;
+      font-size: 0.875rem;
+      margin-bottom: 0.1rem;
+    
     }
 
     .card-subtitle {
-      font-size: 0.875rem;
+      font-weight: bold;
+      font-size: 1rem;
       color: lightgray;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.1rem;
+    
     }
 
     .card-overview {
+      display: -webkit-box;
+      -webkit-line-clamp: 3; // Number of lines to display.
+      -webkit-box-orient: vertical;
       font-size: 0.75rem;
       line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis; // Add ellipsis for overflowing text.
+    
     }
   }
 }
@@ -68,42 +83,73 @@
 
 /* Person styling */
 .person {
-  // Moved these to the top
   position: relative;
-  max-width: 150px;
+  width: 150px; // Card width
+  height: 200px; // Full card height
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 0 1rem 1rem 0; // Spacing between cards
+  overflow: hidden;
 
-  // Then the @media queries:
-  @media (max-width: 768px) {
-    max-width: 120px;
-  }
-  @media (max-width: 480px) {
-    max-width: 100px;
+  .person-image-container {
+    position: relative;
+    width: 90%;
+    height: 100%; // Utilize full card height
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .person-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%; // Oval by default
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
   }
 
-  img {
-    width: 80%;
-    height: auto;
-    border-radius: 50%;
-    margin-bottom: 0.5rem;
-  }
+  .person-details {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 0.5rem;
 
-  .title {
-    font-weight: bold;
     color: white;
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
+    text-align: center;
+    opacity: 0; // Hidden by default
+    transform: translateY(10px); // Slight offset for animation
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .person-title {
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .person-subtitle {
+      font-size: 0.875rem;
+      color: lightgray;
+    }
   }
 
-  .subtitle {
-    font-size: 0.875rem;
-    color: lightgray;
+  &:hover {
+    .person-image-container {
+      height: 45%; // Shrink image height
+      width: 55%;
+      margin-left: 25%;
+      margin-top: 10%; // Align image at the top
+    }
+
+    .person-image {
+      border-radius: 70%; // Circular shape on hover
+    }
+
+    .person-details {
+      opacity: 1; // Fade in text
+      transform: translateY(0); // Align at the bottom
+    }
   }
 }
-
 /* Genre/Studio styling */
 .genreStudio {
   position: relative;
