@@ -2,89 +2,66 @@
   <!-- Top bar: Logo + Desktop Nav + Mobile Menu -->
   <div class="flex items-center justify-between">
     <!-- Logo -->
-    <img
-      src="assets/AetherLogo.png"
-      alt="Logo"
-      class="h-8 cursor-pointer transition-transform duration-300 hover:scale-110"
-      routerLink="/"
-    />
+    <img src="assets/AetherLogo.png" alt="Logo"
+      class="h-8 cursor-pointer transition-transform duration-300 hover:scale-110" routerLink="/" />
 
     <!-- Desktop Nav (shown on md and above) -->
     <nav class="hidden md:flex items-center space-x-6 ml-auto">
-      <a
-        routerLink="/"
-        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
-      >
+      <a routerLink="/"
+        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500">
         Discover
       </a>
-      <a
-        routerLink="/recommendation"
-        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500 flex items-center"
-      >
+      <a routerLink="/recommendation"
+        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500 flex items-center">
         <span class="mr-2 text-gray-400 material-icons">auto_awesome</span>
         AI
       </a>
-      <a
-        routerLink="/discover/movies"
-        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
-      >
+      <a routerLink="/discover/movies"
+        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500">
         Movies
       </a>
-      <a
-        routerLink="/discover/series"
-        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500"
-      >
+      <a routerLink="/discover/series"
+        class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500">
         Series
       </a>
-      <button
-        class="text-gray-300 transition-transform duration-300 focus:outline-none flex items-center pr-2"
-      >
-        <span class="material-icons">search</span>
-      </button>
+      <!-- Search Button -->
+      <div class="ml-auto flex items-center relative group">
+        <!-- Search Icon -->
+        <button
+          class="text-gray-300 transition-transform duration-300 focus:outline-none flex items-center group-hover:hidden">
+          <span class="material-icons">search</span>
+        </button>
+
+        <!-- Search Input -->
+        <input type="text" placeholder="Search..."
+          class="hidden group-hover:flex w-32 md:w-64 bg-[#201a23] shadow-md  text-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500 transition-all duration-300" />
+      </div>
     </nav>
 
     <!-- Mobile Menu -->
-    <button
-      [matMenuTriggerFor]="mobileMenu"
-      class="text-gray-300 md:hidden"
-      aria-label="Toggle Menu"
-    >
+    <button [matMenuTriggerFor]="mobileMenu" class="text-gray-300 md:hidden" aria-label="Toggle Menu">
       <span class="material-icons">menu</span>
     </button>
     <mat-menu #mobileMenu="matMenu" class="bg-[#201a23]">
-      <button
-        mat-menu-item
-        routerLink="/"
-        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500"
-      >
+      <button mat-menu-item routerLink="/"
+        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500">
         Discover
       </button>
-      <button
-        mat-menu-item
-        routerLink="/recommendation"
-        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500 flex items-center"
-      >
+      <button mat-menu-item routerLink="/recommendation"
+        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500 flex items-center">
         AI
         <span class="ml-1 text-gray-400 material-icons">auto_awesome</span>
       </button>
-      <button
-        mat-menu-item
-        routerLink="/discover/movies"
-        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500"
-      >
+      <button mat-menu-item routerLink="/discover/movies"
+        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500">
         Movies
       </button>
-      <button
-        mat-menu-item
-        routerLink="/discover/series"
-        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500"
-      >
+      <button mat-menu-item routerLink="/discover/series"
+        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500">
         Series
       </button>
-      <button
-        mat-menu-item
-        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500 flex items-center"
-      >
+      <button mat-menu-item
+        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500 flex items-center">
         <span class="material-icons">search</span>
       </button>
     </mat-menu>
