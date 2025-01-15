@@ -6,7 +6,7 @@
     [freeMode]="swiperOptions.freeMode"
     class="mySwiper">
     @for (item of items; track item) {
-      <swiper-slide class="cursor-pointer transition-transform hover:scale-105" [ngClass]="{ 'pb-1': isMobile }">
+      <swiper-slide class="cursor-pointer" [ngClass]="{ 'pb-1': isMobile }">
         <app-card
           [type]="cardType"
           [imageUrl]="item ? tmdbService.getImageUrl(item) : null"
