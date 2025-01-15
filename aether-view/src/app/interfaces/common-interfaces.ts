@@ -77,6 +77,7 @@ export interface Person {
   profile_path: string | null;
   character: string;
   biography?: string;
+  media_type?: 'person';
 }
 
 export interface ContentRating {

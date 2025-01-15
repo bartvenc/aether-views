@@ -305,6 +305,11 @@ export class TmdbService {
     });
   }
   
+  searchMulti(query: string): Observable<any[]> {
+    const url = `${this.baseUrl}/search/multi?api_key=${this.apiKey}&query=${encodeURIComponent(query)}&include_adult=false&language=en-US&page=1`;
+    return this.http.get<{ results: Series[] | Movie [] | Person [] }>(url).pipe(map(response => response.results));
+  }
+
   getSeriesRecommendations(series: Series): Observable<Series[]> {
     console.log('Getting recommendations for:', series.name, 'ID:', series.id);
 
