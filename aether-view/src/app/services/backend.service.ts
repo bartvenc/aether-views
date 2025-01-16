@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
+import { RecommendationResponse, SearchResponse } from '../interfaces/common-interfaces';
 
 
 @Injectable({ providedIn: 'root' })
@@ -10,10 +11,10 @@ export class BackendService {
   constructor(private http: HttpClient) {}
 
   getRecommendations(query: string) {
-    return this.http.post<{ recommendations: string[] }>(`${this.backEndBaseUrl}/recommend`, { query });
+    return this.http.post<RecommendationResponse>(`${this.backEndBaseUrl}/recommend`, { query });
   }
 
   search(query: string) {
-    return this.http.post<{ results: string[] }>(`${this.backEndBaseUrl}/search`, { query });
+    return this.http.post<SearchResponse>(`${this.backEndBaseUrl}/search`, { query });
   }
 }
