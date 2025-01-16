@@ -6,7 +6,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Series } from '../../interfaces/series';
 import { TmdbService } from '../../services/tmdb.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, map, Observable } from 'rxjs';
+import { Movie } from '../../interfaces/movies';
 
 @Component({
   standalone: true,
@@ -16,7 +17,7 @@ import { forkJoin } from 'rxjs';
 })
 export class RecommendationComponent {
   userQuery = '';
-  recommendations: Series[] = [];
+  recommendations: any[]= [];
   isLoading: boolean = false;
   isSecondStage: boolean = false;
   currentQuote: string = '';
@@ -58,64 +59,82 @@ export class RecommendationComponent {
   backendService = inject(BackendService);
   tmdbService = inject(TmdbService);
 
+  
+  private searchSingleTitle(title: string): Observable<Series | Movie | null> {
+    return this.tmdbService.searchMulti(title).pipe(
+      map(results => results.find(item => 
+        item.media_type === 'movie' || item.media_type === 'tv'
+      ) || null)
+    );
+  }
+
   getRecommendations() {
     this.isLoading = true;
     this.isSecondStage = false;
     this.rotateQuotes();
-  
-    console.log('Fetching offline recommendations...');
-    this.backendService.getRecommendations(this.userQuery).subscribe(
-      response => {
-        const seriesNames = response.recommendations;
-        console.log('Offline LLM recommendations received:', seriesNames);
-  
-        this.fetchSeriesDetails(seriesNames, () => {
-          console.log('Offline recommendations processed. Starting secondary search...');
-          this.performSecondarySearch();
+    this.recommendations = [];
+
+    this.backendService.getRecommendations(this.userQuery).subscribe({
+      next: response => {
+        const searches = response.recommendations.map(title => 
+          this.searchSingleTitle(title)
+        );
+
+        forkJoin(searches).subscribe({
+          next: results => {
+            this.recommendations = results.filter((result): result is (Series | Movie) => 
+              result !== null
+            );
+            this.performSecondarySearch();
+          },
+          error: error => {
+            console.error('Error in initial searches:', error);
+            this.isLoading = false;
+          }
         });
       },
-      error => {
+      error: error => {
         console.error('Error fetching recommendations:', error);
-        this.isLoading = false; // Ensure loading ends even on error
-        this.isSecondStage= false;
+        this.isLoading = false;
       }
-    );
+    });
   }
 
   private performSecondarySearch() {
-    console.log('performSecondarySearch called...');
     this.isSecondStage = true;
-  
-    this.backendService.search(this.userQuery).subscribe(
-      response => {
-        const newSeriesNames = response.results.filter(
-          name =>
-            !this.recommendations.some(existing => existing.name.toLowerCase() === name.toLowerCase())
+
+    this.backendService.search(this.userQuery).subscribe({
+      next: response => {
+        const searches = response.results.map(title =>
+          this.searchSingleTitle(title)
         );
-  
-        console.log('Online LLM search results received:', newSeriesNames);
-  
-        if (newSeriesNames.length > 0) {
-          this.fetchAdditionalSeriesDetails(newSeriesNames, () => {
-            console.log('Additional series details fetched. Fetching recommendations for series...');
-            this.fetchRecommendationsForSeries(() => {
-              console.log('Second stage complete.');
-              this.isLoading = false;
-              this.isSecondStage = false;
-            });
-          });
-        } else {
-          console.log('No new series found in second stage.');
-          this.isLoading = false;
-          this.isSecondStage = false;
-        }
+
+        forkJoin(searches).subscribe({
+          next: results => {
+            const newResults = results.filter((result): result is (Series | Movie) => 
+              result !== null && 
+              !this.recommendations.some(existing => existing.id === result.id)
+            );
+            
+            if (newResults.length > 0) {
+              this.recommendations = [...this.recommendations, ...newResults];
+            }
+            this.isLoading = false;
+            this.isSecondStage = false;
+          },
+          error: error => {
+            console.error('Error in secondary searches:', error);
+            this.isLoading = false;
+            this.isSecondStage = false;
+          }
+        });
       },
-      error => {
-        console.error('Error fetching search results:', error);
+      error: error => {
+        console.error('Error in backend search:', error);
         this.isLoading = false;
         this.isSecondStage = false;
       }
-    );
+    });
   }
 
   rotateQuotes() {
@@ -149,7 +168,7 @@ export class RecommendationComponent {
       }
     );
   }
-
+/*
   fetchAdditionalSeriesDetails(seriesNames: string[], callback?: () => void) {
     this.tmdbService.getSeriesDetails(seriesNames).subscribe(
       seriesList => {
@@ -187,7 +206,7 @@ export class RecommendationComponent {
         if (callback) callback(); // Ensure callback is called even on error
       }
     );
-  }
+  }*/
 
   getPosterUrl(posterPath: string | null | undefined): string {
     return posterPath ? `https://image.tmdb.org/t/p/w500${posterPath}` : 'assets/placeholder-image.jpg';
