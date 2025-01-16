@@ -133,3 +133,16 @@ export interface SimilarResponse {
   total_pages: number;
   total_results: number;
 }
+
+export interface RecommendationItem {
+  title: string;
+  media_type: 'movie' | 'tv';
+}
+
+export interface RecommendationResponse {
+  recommendations: RecommendationItem[];
+}
+
+export interface SearchResponse {
+  results: RecommendationItem[];
+}
