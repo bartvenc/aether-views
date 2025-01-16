@@ -37,18 +37,21 @@
   <!-- Recommendations Grid -->
   <div *ngIf="!isLoading || isSecondStage" class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-4">
     <div
-      *ngFor="let series of recommendations"
+      *ngFor="let item of recommendations"
       class="relative group bg-gray-800 rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition duration-300">
-      <img [src]="getPosterUrl(series?.poster_path)" [alt]="series.name" 
+      <img [src]="getPosterUrl(item?.poster_path)" [alt]="item.title || item.name" 
         class="w-full h-full object-cover" />
-
+  
       <!-- Overlay displayed on hover -->
       <div class="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 p-4 text-white">
         <div class="h-full flex flex-col justify-center items-center">
-          <h3 class="text-xl font-bold text-center">{{ series.name }}</h3>
+          <span class="material-icons text-2xl mb-2">
+            {{ item.media_type === 'movie' ? 'theaters' : 'live_tv' }}
+          </span>
+          <h3 class="text-xl font-bold text-center">{{ item.title || item.name }}</h3>
         </div>
         <div class="absolute bottom-4 left-0 right-0 text-center">
-          <p class="text-sm">Rating: {{ series.vote_average }}</p>
+          <p class="text-sm">Rating: {{ item.vote_average }}</p>
         </div>
       </div>
     </div>
