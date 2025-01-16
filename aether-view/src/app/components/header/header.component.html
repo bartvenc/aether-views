@@ -72,7 +72,7 @@
   <div
     class="absolute top-full left-0 w-full max-h-96 bg-[#201a23] shadow-lg z-20 overflow-y-auto rounded-md border border-gray-700 px-4 py-6"
     (appClickOutside)="clearResults()" tabindex="-1">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-4">
       @for (result of searchResults; track result.id) {
       <div (click)="navigateTo(result)"
         class="bg-[#28202b] rounded-md p-2 hover:bg-[#3a2e3d] transition duration-200 cursor-pointer relative">
