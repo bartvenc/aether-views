@@ -184,11 +184,11 @@ export class TmdbService {
     if (!item) return null;
 
     if (this.isSeries(item)) {
-      return this.getPosterUrl(item.poster_path);
+      return this.getPosterUrl(item.poster_path) ;
     }
 
     if (this.isMovie(item)) {
-      return this.getPosterUrl(item.poster_path);
+      return this.getPosterUrl(item.poster_path) ?? 'assets/poster.png';
     }
 
     if (this.isStudio(item)) {
@@ -200,7 +200,7 @@ export class TmdbService {
     }
 
     if (this.isPerson(item)) {
-      return this.getPosterUrl(item.profile_path);
+      return this.getPosterUrl(item.profile_path) ?? 'assets/person.png';
     }
 
     console.warn('Unknown item type:', item);
@@ -236,7 +236,7 @@ export class TmdbService {
   }
 
   getPosterUrl(path: string | null | undefined): string {
-    return path ? `https://image.tmdb.org/t/p/w500${path}` : '';
+    return path ? `https://image.tmdb.org/t/p/w500${path}` : 'assets/poster.png';
   }
 
   getBackDrop(path: string | null | undefined): string | null {
