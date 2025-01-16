@@ -10,9 +10,38 @@ import requests
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all domains on all routes
+from flask_cors import CORS
 
+CORS(app, origins=[
+    "https://677d09487a267300089d7d67--aetherview.netlify.app",
+    "http://localhost:4200",
+    "https://*.ngrok-free.app",
+    "https://aetherview.netlify.app",
+    "https://www.aether-view.com/",
+     "https://aether-view.com"
+], supports_credentials=True, allow_headers=["*"], methods=["GET", "POST", "OPTIONS"])
 
+ # Enable CORS for all domains on all routes
+
+@app.before_request
+def log_request_info():
+    print(f"Request Origin: {request.headers.get('Origin')}")
+
+def extract_json(response: str) -> list:
+    """Extract and validate JSON array from the LLM response."""
+    pattern = r'```json\s*(\[\s*.*?\])\s*```'
+    match = re.search(pattern, response, re.DOTALL)
+    if match:
+        try:
+            data = json.loads(match.group(1))
+            if isinstance(data, list) and all(
+                isinstance(item, dict) and 'title' in item and 'media_type' in item for item in data
+            ):
+                return data
+        except json.JSONDecodeError:
+            pass
+    print(f"Invalid JSON response: {response}")
+    return []
 
 # Define the OllamaChat class
 class OllamaChat:
@@ -46,13 +75,18 @@ class SearchQueryAgent:
         self.llm = llm
         self.temperature = temperature
 
+    TRUSTED_SITES = "site:imdb.com OR site:rottentomatoes.com OR site:themoviedb.org OR site:metacritic.com OR site:letterboxd.com"
+
+
     def generate_query(self, question):
         """Generates a search query using the LLM."""
         system_prompt = {
             "role": "system",
             "content": (
-                "You are an expert at generating concise and effective search queries. "
-                "Given a user question, create the best possible search query to find relevant information. "
+                "You are an expert in crafting concise and effective search queries for movies and TV series. "
+                "If the user question explicitly mentions 'movies' or 'series', tailor the query to include only the specified type. "
+                "If no specific type is mentioned, include both movies and TV series in the search. "
+                "Ensure the search query is optimized for finding the most relevant results. "
                 "Do not include explanations or additional text. Output the search query as plain text."
             )
         }
@@ -61,7 +95,7 @@ class SearchQueryAgent:
             [system_prompt, user_prompt],
             temperature=self.temperature
         )
-        search_query = response.strip()
+        search_query = f"{response.strip()} {self.TRUSTED_SITES}"
         return search_query
 
 # Define the ContentFetcherAgent class
@@ -106,15 +140,19 @@ class ResultParserAgent:
         system_prompt = {
             "role": "system",
             "content": (
-                "You are an AI assistant that recommends TV series or movies based on provided content and query."
-                "Provide exactly 20 unique titles that match the user's query. "
-                "Your response must be a valid JSON array of strings. "
-                "Do not include any additional text. "
+                "You are an AI that recommends movies or TV series based on input content and a query. "
+                "Provide exactly 20 unique titles in JSON format. Each title must have 'title' and 'media_type' keys. "
+                "Respond only with the JSON array, no additional text."
             )
         }
+
         user_prompt = {
             "role": "user",
-            "content": f"{content}\n query: {question} \n Provide the the response as a valid JSON array of strings enclosed in a code block starting with ```json"
+            "content": (
+                f"Content: {content}. Query: '{question}'. Provide a JSON array of 20 unique objects. "
+                "Each object must have 'title' (string) and 'media_type' ('movie' or 'tv') (string) keys. "
+                "Enclose the array in a code block starting with ```json."
+            )
         }
         response = self.llm.ask(
             [system_prompt, user_prompt],
@@ -155,25 +193,9 @@ class OnlineAgent:
 
             # Step 4: Parse results
             response = self.parser_agent.parse_results(aggregated_content, prompt)
+            return extract_json(response)
 
-            # Extract the JSON array from the code block in the response
-            import re
-            pattern = r'```json\s*(\[\s*.*?\])\s*```'
-            match = re.search(pattern, response, re.DOTALL)
-            if match:
-                json_str = match.group(1)
-                try:
-                    results_list = json.loads(json_str)
-                    if isinstance(results_list, list):
-                        return results_list
-                    else:
-                        raise ValueError("Invalid response format")
-                except (json.JSONDecodeError, ValueError):
-                    print(f"Failed to parse results: {json_str}")
-                    return []
-            else:
-                print(f"Failed to extract JSON from response: {response}")
-                return []
+            
 
     
     def recommend_series_or_movies(self, user_input):
@@ -181,42 +203,33 @@ class OnlineAgent:
         system_prompt = {
             "role": "system",
             "content": (
-                "You are an AI assistant that recommends TV series or movies based on user input. "
-                "Provide exactly 10 unique titles that match the user's query. "
-                "Your response must be a valid JSON array of strings. "
-                "Do not include any additional text. "
-                ""
+                "You are an AI that recommends movies or TV series. "
+                "Provide exactly 20 unique recommendations in JSON format. "
+                "Each object must include a 'title' and 'media_type' ('movie' or 'tv'). "
+                "Respond only with the JSON array, no additional text."
             )
         }
 
         user_prompt = {
             "role": "user",
-            "content": f"User Query: '{user_input}'\n Provide the recommendations. Provide the response as a valid JSON array of strings enclosed in a code block starting with ```json"
+            "content": (
+                f"Query: '{user_input}'. Provide a JSON array of 20 unique objects. "
+                "Each object must have 'title' (string) and 'media_type' (string) keys. "
+                "Enclose the array in a code block starting with ```json."
+            )
         }
 
         response = self.llm.ask(
             [system_prompt, user_prompt],
             temperature=self.temperature
         )
-
+        print('----------------------------------------------------------')
+        print(response)
+        print('----------------------------------------------------------')
         # Extract the JSON array from the code block in the response
-        import re
-        pattern = r'```json\s*(\[\s*.*?\])\s*```'
-        match = re.search(pattern, response, re.DOTALL)
-        if match:
-            json_str = match.group(1)
-            try:
-                titles_list = json.loads(json_str)
-                if isinstance(titles_list, list) and len(titles_list) == 10:
-                    return titles_list
-                else:
-                    raise ValueError("Invalid response format")
-            except (json.JSONDecodeError, ValueError):
-                print(f"Failed to parse titles: {json_str}")
-                return []
-        else:
-            print(f"Failed to extract JSON from response: {response}")
-            return []
+        return extract_json(response)
+        
+
 
 llm = OllamaChat(model="llama3.1:latest")
 searcher = OnlineAgent(llm)    
@@ -245,17 +258,3 @@ def searchOnline():
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000,debug=True )
 
-
-# Example usage
-#if __name__ == "__main__":
-#    prompt = (
-#        "Provide one list of 10 series titles based on search query: dark sci-fi series "
-#        "Provide the response as a valid JSON array of strings enclosed in a code block starting with ```json."
-#    )
-
-#    llm = OllamaChat(model="llama3.1:latest")
-#    searcher = OnlineAgent(llm)
-#    resp = searcher.search(prompt)
-#    print(resp)
-    #resp1 = searcher.recommend_series_or_movies("dark sci-fi series")
-    #print(resp1)
