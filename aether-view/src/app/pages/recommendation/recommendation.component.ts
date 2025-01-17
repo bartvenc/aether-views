@@ -12,20 +12,24 @@ import { prompts, quotes, secondStageMessages } from '../../../../public/assets/
 import { RecommendationItem } from '../../interfaces/common-interfaces';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { Router } from '@angular/router';
+import { SliderComponent } from '../../components/slider/slider.component';
 
 @Component({
   standalone: true,
   selector: 'app-recommendation',
   templateUrl: './recommendation.component.html',
-  imports: [CommonModule, FormsModule, MatButtonToggleModule],
+  imports: [CommonModule, FormsModule, MatButtonToggleModule, SliderComponent],
 })
 export class RecommendationComponent {
   userQuery = '';
-  recommendations: any[]= [];
+  currentRecommendations = signal<{
+    query: string;
+    movies: Movie[];
+    series: Series[];
+  }[]>([]);
   isLoading: boolean = false;
   isSecondStage: boolean = false;
   currentQuote = signal('');
-  secondStageMessage: string = '';
   currentPromt = signal('');
   private hasUserInput = false;
   private promptInterval: any;
@@ -34,7 +38,6 @@ export class RecommendationComponent {
   readonly quotes = quotes;
   readonly secondStageMessages = secondStageMessages;
 
-  
   ngOnInit(): void {
     this.rotateQuotes();
   }
@@ -69,21 +72,27 @@ export class RecommendationComponent {
   getRecommendations() {
     this.isLoading = true;
     this.isSecondStage = false;
-    this.recommendations = [];
     clearInterval(this.quoteInterval);
     this.rotateQuotes();
-
+  
     this.backendService.getRecommendations(this.userQuery).subscribe({
       next: response => {
         const searches = response.recommendations.map(item => 
           this.searchSingleTitle(item)
         );
-
+  
         forkJoin(searches).subscribe({
           next: results => {
-            this.recommendations = results.filter((result): result is (Series | Movie) => 
-              result !== null
-            );
+            const validResults = results.filter((result): result is (Series | Movie) => result !== null);
+            const movies = validResults.filter(item => item.media_type === 'movie') as Movie[];
+            const series = validResults.filter(item => item.media_type === 'tv') as Series[];
+            
+            this.currentRecommendations.update(current => [{
+              query: this.userQuery,
+              movies,
+              series
+            }, ...current]);
+            
             this.performSecondarySearch();
           },
           error: error => {
@@ -91,34 +100,36 @@ export class RecommendationComponent {
             this.isLoading = false;
           }
         });
-      },
-      error: error => {
-        console.error('Error fetching recommendations:', error);
-        this.isLoading = false;
       }
     });
   }
 
   private performSecondarySearch() {
     this.isSecondStage = true;
-
     
     this.backendService.search(this.userQuery).subscribe({
       next: response => {
         const searches = response.results.map(item =>
           this.searchSingleTitle(item)
         );
-
+  
         forkJoin(searches).subscribe({
           next: results => {
-            const newResults = results.filter((result): result is (Series | Movie) => 
+            const validResults = results.filter((result): result is (Series | Movie) => 
               result !== null && 
-              !this.recommendations.some(existing => existing.id === result.id)
+              !this.currentRecommendations()[0].movies.some(m => m.id === result.id) &&
+              !this.currentRecommendations()[0].series.some(s => s.id === result.id)
             );
             
-            if (newResults.length > 0) {
-              this.recommendations = [...this.recommendations, ...newResults];
-            }
+            const movies = validResults.filter(item => item.media_type === 'movie') as Movie[];
+            const series = validResults.filter(item => item.media_type === 'tv') as Series[];
+            
+            this.currentRecommendations.update(current => [{
+              query: current[0].query,
+              movies: [...current[0].movies, ...movies],
+              series: [...current[0].series, ...series]
+            }, ...current.slice(1)]);
+            
             this.isLoading = false;
             this.isSecondStage = false;
             this.resetState();
@@ -127,13 +138,9 @@ export class RecommendationComponent {
             console.error('Error in secondary searches:', error);
             this.isLoading = false;
             this.isSecondStage = false;
+            this.resetState();
           }
         });
-      },
-      error: error => {
-        console.error('Error in backend search:', error);
-        this.isLoading = false;
-        this.isSecondStage = false;
       }
     });
   }
@@ -145,7 +152,7 @@ export class RecommendationComponent {
     // Initial values
     this.currentPromt.set(this.prompts[promptIndex]);
     this.currentQuote.set(this.quotes[quoteIndex]);
-
+  
     // Rotate prompts continuously until user input
     this.promptInterval = setInterval(() => {
       if (this.hasUserInput) {
@@ -155,7 +162,7 @@ export class RecommendationComponent {
       promptIndex = (promptIndex + 1) % this.prompts.length;
       this.currentPromt.set(this.prompts[promptIndex]);
     }, 2500);
-
+  
     // Rotate quotes only during loading
     const updateQuote = () => {
       if (!this.isLoading) {
@@ -165,15 +172,50 @@ export class RecommendationComponent {
       const source = this.isSecondStage ? this.secondStageMessages : this.quotes;
       this.currentQuote.set(source[quoteIndex]);
       quoteIndex = (quoteIndex + 1) % source.length;
-     // console.log('Current quote:', this.currentQuote()); // Debug log
     };
-
+  
     // Start quote rotation when loading begins
     if (this.isLoading) {
       this.quoteInterval = setInterval(updateQuote, 2500);
       updateQuote(); // Initial update
     }
-}
+  }
+  // Apply sorting
+  getDateOrType(item: Movie | Series, option: 'date' | 'type'): string {
+    if (option === 'date') {
+      return item.media_type === 'movie' ? item.release_date ?? '' : item.first_air_date ?? '';
+    } else {
+      return item.media_type === 'movie' ? 'movies' : 'series';
+    }
+  }
+
+  get filteredCurations() {
+    return this.currentRecommendations().map(curation => {
+      let allItems = [...curation.movies, ...curation.series];
+      
+      // Apply media type filter
+      if (this.mediaFilter !== 'all') {
+        allItems = allItems.filter(item => 
+          this.mediaFilter === 'movies' ? 
+            item.media_type === 'movie' : 
+            item.media_type === 'tv'
+        );
+      }
+
+      // Sort items using the extracted date
+      allItems.sort((a, b) => {
+        const dateA = new Date(this.getDateOrType(a, 'date'));
+        const dateB = new Date(this.getDateOrType(b, 'date'));
+        return this.sortOrder === 'newest' ? 
+          dateB.getTime() - dateA.getTime() : 
+          dateA.getTime() - dateB.getTime();
+      });
+      return {
+        query: curation.query,
+        items: allItems
+      };
+    });
+  }
 
   // Update input handling
   onUserInput() {
@@ -193,30 +235,6 @@ export class RecommendationComponent {
   ngOnDestroy() {
     clearInterval(this.promptInterval);
     clearInterval(this.quoteInterval);
-  }
-
-  get filteredRecommendations() {
-    let filtered = [...this.recommendations];
-    
-    // Apply media type filter
-    if (this.mediaFilter !== 'all') {
-      filtered = filtered.filter(item => 
-        this.mediaFilter === 'movies' ? 
-          item.media_type === 'movie' : 
-          item.media_type === 'tv'
-      );
-    }
-
-    // Apply sorting
-    filtered.sort((a, b) => {
-      const dateA = new Date(a.release_date || a.first_air_date);
-      const dateB = new Date(b.release_date || b.first_air_date);
-      return this.sortOrder === 'newest' ? 
-        dateB.getTime() - dateA.getTime() : 
-        dateA.getTime() - dateB.getTime();
-    });
-
-    return filtered;
   }
 
   navigateToDetails(item: Movie | Series) {

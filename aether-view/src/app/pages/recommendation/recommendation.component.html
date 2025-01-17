@@ -24,38 +24,6 @@
     </div>
   </div>
 
-  <!-- Filter Controls Container -->
-  @if (!isLoading && !isSecondStage && recommendations.length > 0) {
-    <div class="w-full flex justify-center px-4 md:px-16 py-4">
-      <div class="w-full max-w-3xl flex flex-col md:flex-row justify-center items-center gap-4">
-        <div class="flex flex-wrap gap-4 justify-center items-center">
-          <mat-button-toggle-group [(ngModel)]="mediaFilter" class="bg-[#28202b]">
-            <mat-button-toggle value="all" class="text-gray-300">
-              All
-            </mat-button-toggle>
-            <mat-button-toggle value="movies" class="text-gray-300">
-              <span class="material-icons mr-1">theaters</span>
-              Movies
-            </mat-button-toggle>
-            <mat-button-toggle value="series" class="text-gray-300">
-              <span class="material-icons mr-1">live_tv</span>
-              Series
-            </mat-button-toggle>
-          </mat-button-toggle-group>
-
-          <mat-button-toggle-group [(ngModel)]="sortOrder" class="bg-[#28202b]">
-            <mat-button-toggle value="newest" class="text-gray-300">
-              Newest First
-            </mat-button-toggle>
-            <mat-button-toggle value="oldest" class="text-gray-300">
-              Oldest First
-            </mat-button-toggle>
-          </mat-button-toggle-group>
-        </div>
-      </div>
-    </div>
-  }
-
   <!-- Main Content Section -->
   <div class="px-4 md:px-8 py-2 md:py-1">
     <!-- Loading State -->
@@ -75,38 +43,46 @@
       </div>
     }
 
-    <!-- Results Grid -->
-    @if (!isLoading || isSecondStage) {
-      <div class="py-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2 md:gap-4 px-2 md:px-4">
-        @for (item of filteredRecommendations; track item.id) {
-          <div (click)="navigateToDetails(item)"
-            class="relative group cursor-pointer rounded-lg overflow-hidden transition-transform duration-300 hover:scale-105">
-            <!-- Media Type Icon -->
-            <span class="material-icons absolute top-1 md:top-2 right-1 md:right-2 z-10 text-white 
-                         text-3xl md:text-5xl p-1 md:p-2">
-              {{ item.media_type === 'movie' ? 'theaters' : 'live_tv' }}
-            </span>
-    
-            <!-- Poster Image -->
-            <img [src]="tmdbService.getPosterUrl(item?.poster_path)" [alt]="item.title || item.name"
-              class="w-full aspect-[2/3] object-cover rounded-lg" />
-    
-            <!-- Info Overlay -->
-            <div class="absolute inset-0 bg-black bg-opacity-70 opacity-0 group-hover:opacity-100 active:opacity-100
-                         transition-opacity duration-300 p-2 md:p-4 flex flex-col justify-between">
-              <div class="text-center">
-                <h3 class="text-sm md:text-lg font-bold line-clamp-2">{{ item.title || item.name }}</h3>
-              </div>
-    
-              <div class="mt-auto">
-                <p class="text-xs md:text-sm text-gray-300 text-center bg-black bg-opacity-50 rounded-full py-1">
-                  Rating: {{ item.vote_average | number:'1.1-1' }}
-                </p>
-              </div>
-            </div>
+    <!-- Toggle Buttons -->
+    @if (currentRecommendations().length > 0) {
+      <div class="w-full flex justify-center px-4 md:px-16 py-4">
+        <div class="w-full max-w-3xl flex flex-col md:flex-row justify-center items-center gap-4">
+          <div class="flex flex-wrap gap-4 justify-center items-center">
+            <mat-button-toggle-group [(ngModel)]="mediaFilter" class="bg-[#28202b]">
+              <mat-button-toggle value="all" class="text-gray-300">All</mat-button-toggle>
+              <mat-button-toggle value="movies" class="text-gray-300">
+                <span class="material-icons mr-1">theaters</span>Movies
+              </mat-button-toggle>
+              <mat-button-toggle value="series" class="text-gray-300">
+                <span class="material-icons mr-1">live_tv</span>Series
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+  
+            <mat-button-toggle-group [(ngModel)]="sortOrder" class="bg-[#28202b]">
+              <mat-button-toggle value="newest" class="text-gray-300">Newest First</mat-button-toggle>
+              <mat-button-toggle value="oldest" class="text-gray-300">Oldest First</mat-button-toggle>
+            </mat-button-toggle-group>
           </div>
-        }
+        </div>
       </div>
     }
+
+  <!-- Results Sliders -->
+  @for (curation of filteredCurations; track curation.query) {
+    <div class="space-y-8 mb-12">
+      @if (curation.items.length > 0) {
+        <section>
+          <h2 class="text-2xl md:text-3xl font-bold mb-4">Curation: "{{ curation.query }}":</h2>
+          <app-slider 
+            cardType="movies" 
+            [items]="curation.items" 
+            overview="overview"
+            [titleField]="'a' "
+            [subtitleField]="'a' ">
+          </app-slider>
+        </section>
+      }
+    </div>
+  }
   </div>
 </div>
