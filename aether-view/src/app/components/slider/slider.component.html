@@ -12,10 +12,12 @@
         <app-card
           [type]="cardType"
           [imageUrl]="item ? tmdbService.getImageUrl(item) : null"
-          [title]="item[titleField]"
-          [subtitle]="item[subtitleField]"
+          [title]="item.media_type ? getItemValue(item, 'release_date') :item[titleField]"
+          [subtitle]="item.media_type ? getItemValue(item, 'displayTitle') : item[subtitleField]"
           [overview]="item[overviewField]"
-          [item]="item"></app-card>
+          [item]="item"
+          [icon]="item.media_type ? item.media_type : null"
+          ></app-card>
       </swiper-slide>
     }
   </swiper-container>

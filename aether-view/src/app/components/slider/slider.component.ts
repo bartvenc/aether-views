@@ -26,6 +26,16 @@ export class SliderComponent {
     this.isMobile = window.matchMedia('(max-width: 768px)').matches;
   }
 
+  getItemValue(item: any, field: string): string {
+    if (field === 'releaseDate') {
+      return item.media_type === 'movie' || this.cardType==='movies' ? item.release_date : item.first_air_date;
+    }
+    if (field === 'displayTitle') {
+      return item.media_type === 'movie' || this.cardType==='movies' ? item.title : item.name;
+    }
+    return item[field] || '';
+  }
+
   swiperOptions = {
     slidesPerView: 5,
     spaceBetween: 20,
