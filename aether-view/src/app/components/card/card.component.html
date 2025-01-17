@@ -4,6 +4,11 @@
   @case ('movies') {
   <div class="movieSeries">
     <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
+    @if (icon) {
+      <span class="material-icons absolute top-2 right-2 z-10 text-yellow-400 text-xl">
+        {{ icon === 'movie' ? 'theaters' : 'live_tv' }}
+      </span>
+    }
     <div class="overlay">
       <div class="hidden md:block">
         <p class="card-title">{{ title | date: 'YYYY' }}</p>
@@ -20,6 +25,11 @@
   @case ('series') {
   <div class="movieSeries">
     <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
+    @if (icon) {
+      <span class="material-icons absolute top-2 right-2 z-10 text-yellow-400 text-xl">
+        {{ icon === 'movie' ? 'theaters' : 'live_tv' }}
+      </span>
+    }
     <div class="overlay">
       <div class="hidden md:block">
         <p class="card-title">{{ title | date: 'YYYY' }}</p>

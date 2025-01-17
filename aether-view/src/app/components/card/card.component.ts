@@ -18,6 +18,7 @@ export class CardComponent {
   @Input() overview?: string | null = null; // Overview/Summary
   @Input() maxOverviewLength?: number = 100;
   @Input() item?: number | null = null; // ID of the item
+  @Input() icon?: string | null = null; // Icon to display on the card
 
   tmdbService = inject(TmdbService);
   router = inject(Router);
