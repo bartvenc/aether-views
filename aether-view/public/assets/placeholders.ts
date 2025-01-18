@@ -27,7 +27,8 @@ export const prompts: string[] = [
     "Sci-fi",
     "Horror",
     "Documentary",
-    "Family-friendly"
+    "Family-friendly",
+    "Dark sci-fi future"
 ];
 
 export const quotes: string[] = [
