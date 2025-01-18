@@ -7,15 +7,39 @@ import { forkJoin, Observable, switchMap, tap } from 'rxjs';
 import { Movie } from '../interfaces/movies';
 import { Genre, Person } from '../interfaces/common-interfaces';
 import { Studio } from '../../../public/assets/studios';
+import { ContentItem } from '../pages/filter-page/filter-page.component';
 
 @Injectable({ providedIn: 'root' })
 export class TmdbService {
   private readonly apiKey = '4692df374a198e0172ac98003b5cdab3';
   private readonly baseUrl = 'https://api.themoviedb.org/3';
+  private userRegion: string = 'US';
 
   http: HttpClient = inject(HttpClient);
 
   private popularSeriesSignal: Signal<Series[]> | null = null;
+
+  async initializeRegion(): Promise<void> {
+    try {
+      const browserLang = navigator.language;
+      if (browserLang) {
+        const region = browserLang.split('-')[1] || browserLang.toUpperCase();
+        console.log('Detected region:', region);
+        this.userRegion = region;
+      }
+
+      const response = await fetch('https://ipapi.co/json/');
+      const data = await response.json();
+      if (data.country) {
+        this.userRegion = data.country;
+        console.log('Detected ipapi region:', this.userRegion);
+      }
+    } catch (error) {
+      console.warn('Could not detect region, using default:', this.userRegion);
+    }
+  }
+
+
 
   // Convert the HTTP Observable directly to a Signal/
   get popularSeries(): Signal<Series[]> {
@@ -34,10 +58,10 @@ export class TmdbService {
     if (!this.trendingSeriesSignal) {
       this.trendingSeriesSignal = toSignal(
         this.http.get<{ results: Series[] }>(`${this.baseUrl}/trending/tv/week?api_key=${this.apiKey}`)
-        .pipe(
-        map(response => response.results),
-        map(series => series.map(({ media_type, ...seriesWithoutMediaType }) => seriesWithoutMediaType))
-        ),
+          .pipe(
+            map(response => response.results),
+            map(series => series.map(({ media_type, ...seriesWithoutMediaType }) => seriesWithoutMediaType))
+          ),
         { initialValue: [] }
       );
     }
@@ -88,11 +112,14 @@ export class TmdbService {
 
   fetchContent(filters: any, page = 1, type: 'movie' | 'tv' = 'movie'): Observable<any> {
     console.log(filters);
+    console.log(this.userRegion);
     const params: any = {
       api_key: this.apiKey,
       language: 'en-US',
       page: page.toString(),
       include_adult: false,
+      watch_region: this.userRegion,
+      with_origin_country: filters.country
     };
 
     switch (filters.category) {
@@ -156,9 +183,9 @@ export class TmdbService {
       params.with_genres = filters.genres.join(',');
     }
     if (filters.studioOrNetwork && filters.studioOrNetwork !== 0) {
-      if(type === 'movie') {
-      params.with_companies = filters.studioOrNetwork;
-      }else if(type === 'tv') {
+      if (type === 'movie') {
+        params.with_companies = filters.studioOrNetwork;
+      } else if (type === 'tv') {
         params.with_networks = filters.studioOrNetwork;
       }
     }
@@ -167,6 +194,13 @@ export class TmdbService {
     }
     if (filters.person && filters.person !== 0) {
       params.with_cast = filters.person;
+    }
+
+    if (filters.country === 'KR') {
+      // Exclude romance and drama (10749, 18) for Korean content to filter adult movies
+      params.without_genres = params.without_genres 
+        ? `${params.without_genres},10749,18` 
+        : '10749,18';
     }
 
     const queryString = new URLSearchParams(params).toString();
@@ -188,11 +222,11 @@ export class TmdbService {
     return this.http.get<{ results: { id: number; name: string }[] }>(url);
   }
 
-  getImageUrl(item: Series | Movie | Studio | Genre | Person | null | undefined): string | null {
+  getImageUrl(item: Series | Movie | Studio | Genre | Person | null | ContentItem |undefined): string | null {
     if (!item) return null;
 
     if (this.isSeries(item)) {
-      return this.getPosterUrl(item.poster_path) ;
+      return this.getPosterUrl(item.poster_path);
     }
 
     if (this.isMovie(item)) {
@@ -312,54 +346,18 @@ export class TmdbService {
       params: { api_key: this.apiKey }
     });
   }
-  
+
   searchMulti(query: string): Observable<any[]> {
     const url = `${this.baseUrl}/search/multi?api_key=${this.apiKey}&query=${encodeURIComponent(query)}&include_adult=false&language=en-US&page=1`;
-    return this.http.get<{ results: Series[] | Movie [] | Person [] }>(url).pipe(map(response => response.results));
+    return this.http.get<{ results: Series[] | Movie[] | Person[] }>(url).pipe(map(response => response.results));
+  }
+  // Add method to manually set region
+  setRegion(region: string) {
+    this.userRegion = region.toUpperCase();
   }
 
-  getSeriesRecommendations(series: Series): Observable<Series[]> {
-    console.log('Getting recommendations for:', series.name, 'ID:', series.id);
-
-    return this.http
-      .get<Series>(`${this.baseUrl}/tv/${series.id}`, {
-        params: { api_key: this.apiKey },
-      })
-      .pipe(
-        tap(originalSeries => {
-          console.log('Original series genres:', originalSeries.genres);
-        }),
-        switchMap(originalSeries =>
-          this.http
-            .get<{ results: Series[] }>(`${this.baseUrl}/tv/${series.id}/recommendations`, {
-              params: { api_key: this.apiKey },
-            })
-            .pipe(
-              tap(response => {
-                console.log('Found', response.results.length, 'recommendations for', series.name);
-              }),
-              map(response => {
-                const matchingRecs = response.results.filter(rec => {
-                  const hasMatchingGenre = rec.genre_ids?.some(genreId => originalSeries.genres?.some(genre => genre.id === genreId));
-                  console.log('Checking recommendation:', rec.name, 'genres:', rec.genre_ids, 'matches:', hasMatchingGenre);
-                  return hasMatchingGenre;
-                });
-                console.log(
-                  'Matching recommendations:',
-                  matchingRecs.map(r => r.name)
-                );
-                return matchingRecs;
-              }),
-              map(matchingRecs => {
-                const selected = matchingRecs.length > 0 ? [matchingRecs[0]] : [];
-                console.log(
-                  'Selected recommendation:',
-                  selected.map(s => s.name)
-                );
-                return selected;
-              })
-            )
-        )
-      );
+  // Add method to get current region
+  getRegion(): string {
+    return this.userRegion;
   }
 }
