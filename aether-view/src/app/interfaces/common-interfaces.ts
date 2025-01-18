@@ -146,3 +146,9 @@ export interface RecommendationResponse {
 export interface SearchResponse {
   results: RecommendationItem[];
 }
+
+export interface Curation {
+  query: string;
+  movies: any[];
+  series: any[];
+}
