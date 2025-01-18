@@ -23,7 +23,7 @@
     </mat-form-field>
 
     <!-- Category -->
-    <mat-form-field class="sm:w-[12%]" appearance="fill">
+    <mat-form-field class="sm:w-[10%]" appearance="fill">
       <mat-label>Category</mat-label>
       <mat-select [(ngModel)]="selectedCategory" (selectionChange)="updateFilter()">
         @for (category of ['Popular', 'New', 'Top Rated', 'Now Playing']; track category) {
@@ -82,8 +82,24 @@
       </mat-select>
     </mat-form-field>
 
+    <mat-form-field class="sm:w-[12%]" appearance="fill">
+      <mat-label>Country</mat-label>
+      <mat-select [(ngModel)]="selectedCountry" (selectionChange)="updateFilter()">
+        @if(selectedCountry()){
+          <mat-option [value]="null">
+            <mat-icon>replay</mat-icon>
+          </mat-option>
+        }
+        @for (country of countries; track country.code) {
+          <mat-option [value]="country.code">
+            {{ country.name }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
     <!-- Keyword Input -->
-    <div class="sm:w-[20%]">
+    <div class="sm:w-[15%]">
       <mat-form-field class="w-full">
         <mat-label>Keywords</mat-label>
         <input
@@ -96,7 +112,7 @@
 
       <!-- Keyword suggestions dropdown -->
       @if (keywordResults().length > 0) {
-        <ul class="absolute bg-[#231e22] z-50 w-[63%] sm:w-[18%] max-h-56 overflow-y-auto rounded-md -mt-4">
+        <ul class="absolute bg-[#231e22] z-50 w-[63%] sm:w-[14%] max-h-56 overflow-y-auto rounded-md -mt-4">
           @for (keyword of keywordResults(); track keyword.id) {
             <li
               (click)="addKeywordFromSuggestion(keyword)"
@@ -111,7 +127,7 @@
   </div>
 
   <!-- Selected Keywords Row -->
-  <div class="flex gap-2 justify-end w-full sm:w-[90%]">
+  <div class="flex gap-2 justify-end w-full sm:w-[99%]">
     @for (keyword of selectedKeywords(); track keyword.id) {
       <mat-chip
         [removable]="true"

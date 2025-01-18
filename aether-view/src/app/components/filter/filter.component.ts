@@ -38,8 +38,19 @@ export class FilterComponent implements OnInit {
     this.checkViewport();
   }
 
+  countries = [
+    { code: 'US', name: 'USA' },
+    { code: 'GB', name: 'UK' },
+    { code: 'JP', name: 'Japan' },
+    { code: 'KR', name: 'South Korea' },
+    { code: 'FR', name: 'France' }
+  ];
+
+
+
   tmdbService = inject(TmdbService);
   router = inject(Router);
+
 
   selectedCategory = signal('Popular');
   selectedYear = signal(0);
@@ -49,7 +60,9 @@ export class FilterComponent implements OnInit {
   keywordResults = signal<{ id: number; name: string }[]>([]);
   selectedKeywords = signal<{ id: number; name: string }[]>([]);
   separatorKeysCodes = [ENTER, COMMA] as const;
-  
+
+  selectedCountry = signal<string | null>('');
+
   selectedTypeSignal = signal<'movies' | 'series' | null>(this.type);
   showFilters = false;
   isMobile = false;
@@ -72,37 +85,46 @@ export class FilterComponent implements OnInit {
       keyword: this.selectedKeywords(),
       studioOrNetwork: this.selectedStudiosOrNetworks(),
     });
+    const userRegion = this.tmdbService.getRegion();
+    if (userRegion && !this.countries.some(c => c.code === userRegion)) {
+      this.countries = [{ code: userRegion, name: new Intl.DisplayNames(['en'], { type: 'region' }).of(userRegion) || userRegion }, ...this.countries,];
+    }
+
 
     this.updateFilter();
   }
 
-  updateFilter(test?: number) {
+  updateFilter() {
     const newType = this.selectedTypeSignal();
+
+    if (newType !== this.type) {
+      this.router.navigate([`/discover/${newType}`]);
+      return;
+    }
 
     if (this.selectedCategory() === 'New' && this.selectedYear() === 0) {
       this.selectedYear.set(new Date().getFullYear());
     }
-    
-    if (newType !== this.type) {
-      this.router.navigate([`/discover/${newType}`], { queryParams: this.filters });
-    } else {
-      this.filterChange.emit({
-        type: this.selectedTypeSignal(),
-        category: this.selectedCategory(),
-        year: this.selectedYear(),
-        genres: this.selectedGenres(),
-        studioOrNetwork: this.selectedStudiosOrNetworks(),
-        keywords: this.selectedKeywords().map(kw => kw.id),
-      });
-      console.log('Filter from filter component updated:', {
-        type: this.selectedTypeSignal(),
-        category: this.selectedCategory(),
-        year: this.selectedYear(),
-        genres: this.selectedGenres(),
-        keyword: this.selectedKeywords(),
-        studioOrNetwork: this.selectedStudiosOrNetworks(),
-      });
-    }
+
+    this.filterChange.emit({
+      type: this.selectedTypeSignal(),
+      category: this.selectedCategory(),
+      year: this.selectedYear(),
+      genres: this.selectedGenres(),
+      studioOrNetwork: this.selectedStudiosOrNetworks(),
+      keywords: this.selectedKeywords().map(kw => kw.id),
+      country: this.selectedCountry()
+    });
+    console.log('Filter from filter component updated:', {
+      type: this.selectedTypeSignal(),
+      category: this.selectedCategory(),
+      year: this.selectedYear(),
+      genres: this.selectedGenres(),
+      keyword: this.selectedKeywords(),
+      studioOrNetwork: this.selectedStudiosOrNetworks(),
+      country: this.selectedCountry()
+    });
+
   }
 
   filterReset() {
@@ -111,6 +133,7 @@ export class FilterComponent implements OnInit {
     this.selectedGenres.set([]);
     this.selectedStudiosOrNetworks.set(0);
     this.selectedKeywords.set([]);
+    this.selectedCountry.set('');
     this.updateFilter();
   }
 
