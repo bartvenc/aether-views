@@ -6,16 +6,40 @@ import { TmdbService } from '../../services/tmdb.service';
 import { MOVIE_GENRES, SERIES_GENRES } from '../../../../public/assets/genres';
 import { Genre, Keyword } from '../../interfaces/common-interfaces';
 import { Studio, STUDIOS } from '../../../../public/assets/studios';
-import { Network, NETWORKS } from '../../../../public/assets/networks';
-import { debounceTime, firstValueFrom, fromEvent, Subscription } from 'rxjs';
+import {  NETWORKS } from '../../../../public/assets/networks';
+import { firstValueFrom, Subscription } from 'rxjs';
+import { InfiniteScrollDirective  } from 'ngx-infinite-scroll';
+
+export interface FilterState {
+  type: 'movies' | 'series';
+  category: string;
+  year: number | null;
+  genres: number[];
+  keyword: Keyword | null;
+  studiosOrNetworks: number | null;
+  person: number | null;
+}
+
+export interface ContentItem {
+  id: number;
+  title?: string;
+  name?: string;
+  release_date?: string;
+  first_air_date?: string;
+  overview: string;
+  poster_path: string;
+  media_type: 'movie' | 'tv';
+}
+
+
 
 @Component({
   selector: 'app-filter-page',
   standalone: true,
-  imports: [FilterComponent, CardComponent],
+  imports: [FilterComponent, CardComponent, InfiniteScrollDirective],
   templateUrl: './filter-page.component.html',
 })
-export class FilterPageComponent implements OnInit, OnDestroy {
+export class FilterPageComponent implements OnInit {
   @Input() type: 'movies' | 'series' = 'movies';
   filters = signal({
     type: this.type,
@@ -43,6 +67,7 @@ export class FilterPageComponent implements OnInit, OnDestroy {
 
   items = signal<any[]>([]); // This will hold the fetched data
   isLoading = signal(false);
+  page = signal(1);
   private scrollSubscription?: Subscription;
   private isLoadingMore = false;
   currentPage = signal(1);
@@ -106,11 +131,14 @@ export class FilterPageComponent implements OnInit, OnDestroy {
         }
       }
     });
-    this.setupScrollListener();
   }
 
   // Triggered by the filter component
   updateFilters(newFilters: any) {
+    if (this.isLoading()) {
+      console.log('Skipping new fetch because one is already in progress.');
+      return;
+    }
     console.log('Updating filters: 2', newFilters);
     this.filters.update(currentFilters => {
       const updatedYear =
@@ -130,16 +158,20 @@ export class FilterPageComponent implements OnInit, OnDestroy {
     console.log('Updated filters:', this.filters());
     this.currentPage.set(1);
     this.items.set([]);
-    this.fetchContent(true);
+    setTimeout(() => {
+      if (!this.isLoading()) {
+        this.fetchContent(true);
+      }
+    }, 300);
   }
 
   async fetchContent(initialLoad = false) {
-    if (this.isLoading() || (!initialLoad && this.currentPage() > 500)) return;
-
+    if (this.isLoading()) return;
+    
     this.isLoading.set(true);
     const filterValues = this.filters();
     const pagesToFetch = initialLoad ? [1, 2] : [this.currentPage()];
-
+  
     try {
       const responses = await Promise.all(
         pagesToFetch.map(page =>
@@ -149,18 +181,26 @@ export class FilterPageComponent implements OnInit, OnDestroy {
         )
       );
 
-      responses.forEach(response => {
-        if (response) {  // Add null check
-          if (initialLoad) {
-            this.items.set(response.results || []); // Add fallback
-          } else {
-            this.items.update(existingItems => [...existingItems, ...(response.results || [])]);
+      if (initialLoad) {
+        const combinedResults = responses.reduce((acc, response) => {
+          if (response?.results) {
+            return [...acc, ...response.results];
           }
+          return acc;
+        }, [] as any[]);
+        
+        this.items.set(combinedResults);
+        this.currentPage.set(3);
+        
+        if (responses[0]?.total_pages) {
+          this.totalPages.set(responses[0].total_pages);
         }
-      });
-
-      if (!initialLoad) {
-        this.currentPage.update(page => page + 1);
+      } else {
+        const response = responses[0];
+        if (response?.results) {
+          this.items.update(existingItems => [...existingItems, ...response.results]);
+          this.currentPage.update(page => page + 1);
+        }
       }
     } catch (err) {
       console.error('Error fetching content:', err);
@@ -169,39 +209,11 @@ export class FilterPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setupScrollListener(): void {
-    // Clean up any existing subscription first
-    this.scrollSubscription?.unsubscribe();
-    
-    this.scrollSubscription = fromEvent(window, 'scroll')
-      .pipe(
-        debounceTime(200)
-      )
-      .subscribe(() => {
-        if (!this.isLoadingMore && this.route.snapshot.url[0]?.path.includes('discover')) {
-          this.onScroll();
-        }
-      });
-  }
-
   onScroll(): void {
-    if (this.isLoading()) return; // Don't trigger if already loading
-
-    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
-    const clientHeight = document.documentElement.clientHeight || window.innerHeight;
-
-    if (scrollTop + clientHeight >= scrollHeight - 100) {
-      this.isLoadingMore = true;
-      this.fetchContent().finally(() => {
-        this.isLoadingMore = false;
-      });
+    if (this.isLoading() || (this.totalPages() && this.currentPage() >= this.totalPages())) {
+      return;
     }
+    this.fetchContent(false);
   }
 
-  ngOnDestroy(): void {
-    if (this.scrollSubscription) {
-      this.scrollSubscription.unsubscribe();
-    }
-  }
 }
