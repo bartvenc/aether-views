@@ -53,5 +53,6 @@ export interface Movie {
   credits: Credits;
   recommendations?: RecommendationResponse;
   similar?: SimilarResponse;
-  media_type: 'movie';
+  media_type?: 'movie';
+  genre_ids?: number[];
 }
