@@ -33,7 +33,11 @@ export class TmdbService {
   get trendingSeries(): Signal<Series[]> {
     if (!this.trendingSeriesSignal) {
       this.trendingSeriesSignal = toSignal(
-        this.http.get<{ results: Series[] }>(`${this.baseUrl}/trending/tv/week?api_key=${this.apiKey}`).pipe(map(response => response.results)),
+        this.http.get<{ results: Series[] }>(`${this.baseUrl}/trending/tv/week?api_key=${this.apiKey}`)
+        .pipe(
+        map(response => response.results),
+        map(series => series.map(({ media_type, ...seriesWithoutMediaType }) => seriesWithoutMediaType))
+        ),
         { initialValue: [] }
       );
     }
@@ -44,7 +48,11 @@ export class TmdbService {
   get trendingMovies(): Signal<Movie[]> {
     if (!this.trendingMoviesSignal) {
       this.trendingMoviesSignal = toSignal(
-        this.http.get<{ results: Movie[] }>(`${this.baseUrl}/trending/movie/week?api_key=${this.apiKey}`).pipe(map(response => response.results)),
+        this.http.get<{ results: Movie[] }>(`${this.baseUrl}/trending/movie/week?api_key=${this.apiKey}`)
+          .pipe(
+            map(response => response.results),
+            map(movies => movies.map(({ media_type, ...movieWithoutMediaType }) => movieWithoutMediaType))
+          ),
         { initialValue: [] }
       );
     }
