@@ -82,7 +82,7 @@ export class FilterPageComponent implements OnInit {
     this.type = this.route.snapshot.data['type'];
     this.filters.update(f => ({ ...f, type: this.type }));
 
-    console.log('Type:', this.type);
+   
     if (this.type === 'movies') {
       this.currentGenres = this.movieGenres;
       this.curentStudiosOrNetwork = this.studios;
@@ -94,14 +94,12 @@ export class FilterPageComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['genre']) {
         this.filters.update(f => ({ ...f, genres: params['genre'].split(',').map((id: number) => +id) }));
-        console.log('Genres:', this.filters().genres);
-        //this.updateFilters(this.filters());
+
       }
       if (params['keyword']) {
         try {
           const keyword = JSON.parse(params['keyword']);
           this.filters.update(f => ({ ...f, keyword }));
-          console.log('Keyword 1:', this.filters().keyword);
         } catch (e) {
           console.error('Invalid keyword format:', e);
         }
@@ -109,7 +107,6 @@ export class FilterPageComponent implements OnInit {
       if (params['studio']) {
         try {
           this.filters.update(f => ({ ...f, studiosOrNetworks: params['studio'] }));
-          console.log('studio 1:', this.filters().studiosOrNetworks);
         } catch (e) {
           console.error('Invalid keyword format:', e);
         }
@@ -117,7 +114,6 @@ export class FilterPageComponent implements OnInit {
       if (params['person']) {
         try {
           this.filters.update(f => ({ ...f, person: params['person'] }));
-          console.log('person 1:', this.filters().person);
         } catch (e) {
           console.error('Invalid keyword format:', e);
         }
@@ -125,7 +121,6 @@ export class FilterPageComponent implements OnInit {
       if (params['category']) {
         try {
           this.filters.update(f => ({ ...f, category: params['category'] }));
-          console.log('category 1:', this.filters().category);
         } catch (e) {
           console.error('Invalid keyword format:', e);
         }
@@ -136,10 +131,8 @@ export class FilterPageComponent implements OnInit {
   // Triggered by the filter component
   updateFilters(newFilters: any) {
     if (this.isLoading()) {
-      console.log('Skipping new fetch because one is already in progress.');
       return;
     }
-    console.log('Updating filters: 2', newFilters);
     this.filters.update(currentFilters => {
       const updatedYear =
         newFilters.category === 'New' && !newFilters.year
@@ -155,7 +148,7 @@ export class FilterPageComponent implements OnInit {
         year: updatedYear,
       };
     });
-    console.log('Updated filters:', this.filters());
+
     this.currentPage.set(1);
     this.items.set([]);
     setTimeout(() => {

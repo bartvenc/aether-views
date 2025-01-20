@@ -77,14 +77,6 @@ export class FilterComponent implements OnInit {
     this.selectedStudiosOrNetworks.set(this.filters['studiosOrNetworks'] || 0);
     const keywordParam = this.filters['keyword'] ? [this.filters['keyword']] : [];
     this.selectedKeywords.set(keywordParam);
-    console.log('  6 Filter component initialized after with:', {
-      type: this.selectedTypeSignal(),
-      category: this.selectedCategory(),
-      year: this.selectedYear(),
-      genres: this.selectedGenres(),
-      keyword: this.selectedKeywords(),
-      studioOrNetwork: this.selectedStudiosOrNetworks(),
-    });
     const userRegion = this.tmdbService.getRegion();
     if (userRegion && !this.countries.some(c => c.code === userRegion)) {
       this.countries = [{ code: userRegion, name: new Intl.DisplayNames(['en'], { type: 'region' }).of(userRegion) || userRegion }, ...this.countries,];
