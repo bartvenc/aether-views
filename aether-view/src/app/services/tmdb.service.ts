@@ -222,32 +222,63 @@ export class TmdbService {
     return this.http.get<{ results: { id: number; name: string }[] }>(url);
   }
 
-  getImageUrl(item: Series | Movie | Studio | Genre | Person | null | ContentItem |undefined): string | null {
-    if (!item) return null;
-
-    if (this.isSeries(item)) {
-      return this.getPosterUrl(item.poster_path);
+  private getOptimizedImageSize(type: 'poster' | 'profile' | 'logo' | 'backdrop'): string {
+    const isMobile = window.innerWidth < 768;
+    switch (type) {
+      case 'poster':
+        return isMobile ? 'w92' : 'w154';
+      case 'profile':
+        return isMobile ? 'w185' : 'w300';
+      case 'logo':
+        return 'w300'; // Logos need clarity, keep size
+      case 'backdrop':
+        return isMobile ? 'w780' : 'w1280';
+      default:
+        return 'original';
     }
-
-    if (this.isMovie(item)) {
-      return this.getPosterUrl(item.poster_path) ?? 'assets/poster.png';
-    }
-
-    if (this.isStudio(item)) {
-      return this.getStudioLogoUrl(item);
-    }
-
-    if (this.isGenre(item)) {
-      return this.getPosterUrl(item.posterUrl);
-    }
-
-    if (this.isPerson(item)) {
-      return this.getPosterUrl(item.profile_path) ?? 'assets/person.png';
-    }
-
-    console.warn('Unknown item type:', item);
-    return null;
   }
+
+  getImageUrl(item: Series | Movie | Studio | Genre | Person | null | ContentItem | undefined, isPriority = false): string {
+    if (!item) return 'assets/no-image.jpg';
+
+    let path: string | undefined | null = null;
+    let type: 'poster' | 'profile' | 'logo' | 'backdrop' = 'poster';
+    let fallback = 'assets/no-image.jpg';
+
+    if (this.isSeries(item) || this.isMovie(item)) {
+      path = item.poster_path;
+      fallback = 'assets/poster.png';
+    } else if (this.isStudio(item)) {
+      path = `_filter(duotone,ffffff,bababa)/${item.logo_path}`;
+      type = 'logo';
+      fallback = 'assets/studio.png';
+    } else if (this.isGenre(item)) {
+      path = item.posterUrl;
+      type = 'backdrop';
+      fallback = 'assets/genre.png';
+    } else if (this.isPerson(item)) {
+      path = item.profile_path;
+      type = 'profile';
+      fallback = 'assets/person.png';
+    }
+
+    if (!path) return fallback;
+
+    const size = this.getOptimizedImageSize(type);
+    const format = type === 'logo' ? '' : '?format=webp'; // Keep logos in original format for transparency
+    
+    // Add loading priority hints
+    const priority = isPriority ? '#priority=true' : '';
+    
+    return `https://image.tmdb.org/t/p/${size}${path}${format}${priority}`;
+  }
+
+  getLargeImageUrl(path: string | null, type: 'backdrop' | 'poster' = 'backdrop'): string {
+    if (!path) return 'assets/no-image.jpg';
+    const size = type === 'backdrop' ? 'w1280' : 'w780';
+    return `https://image.tmdb.org/t/p/${size}${path}?format=webp`;
+  }
+
 
   // Type guards
   isSeries(item: any): item is Series {
@@ -277,8 +308,9 @@ export class TmdbService {
     return obj?.[key] !== undefined && typeof obj[key] === type;
   }
 
-  getPosterUrl(path: string | null | undefined): string {
-    return path ? `https://image.tmdb.org/t/p/w500${path}` : 'assets/poster.png';
+  getPosterUrl(path: string | null | undefined, size: 'w200' | 'w300' | 'w500' = 'w500'): string {
+    if (!path) return 'assets/poster.png';
+    return `https://image.tmdb.org/t/p/${size}${path}`;
   }
 
   getBackDrop(path: string | null | undefined): string | null {
@@ -286,7 +318,7 @@ export class TmdbService {
   }
 
   getStudioLogoUrl(studio: Studio | undefined): string | null {
-    return studio ? `https://image.tmdb.org/t/p/w780_filter(duotone,ffffff,bababa)/${studio.logo_path}` : null;
+    return studio ? `https://image.tmdb.org/t/p/w300_filter(duotone,ffffff,bababa)/${studio.logo_path}` : null;
   }
 
   getTrailerUrl(series: Series | Movie | undefined): string | null {
@@ -303,9 +335,15 @@ export class TmdbService {
         },
       })
       .pipe(
-        tap(response => {
-          console.log('Full series details:', response);
-        })
+        map(response => ({
+          ...response,
+          recommendations: response.recommendations ? {
+            ...response.recommendations,
+            results: response.recommendations.results
+              .filter(item => item.media_type === 'tv')
+              .map(({ media_type, ...rest }) => rest as Series)
+          } : undefined
+        }))
       );
   }
 
@@ -318,8 +356,18 @@ export class TmdbService {
         },
       })
       .pipe(
+        map(response => ({
+          ...response,
+          recommendations: response.recommendations ? {
+            ...response.recommendations,
+            results: response.recommendations.results.map(item => {
+              const { media_type, ...rest } = item;
+              return rest as Movie;
+            })
+          } : undefined,
+        })),
         tap(response => {
-          console.log('Full series details:', response);
+          console.log('Full movie details:', response);
         })
       );
   }
