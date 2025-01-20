@@ -2,18 +2,19 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, OnInit, signal } from '@angular/core';
 import { SliderComponent } from '../../components/slider/slider.component';
 import { TmdbService } from '../../services/tmdb.service';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Movie } from '../../interfaces/movies';
 
 @Component({
   selector: 'app-movie-details',
   standalone: true,
-  imports: [CommonModule, SliderComponent, DatePipe, RouterLink],
+  imports: [CommonModule, SliderComponent, DatePipe],
   templateUrl: './movie-details.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class MovieDetailsComponent implements OnInit {
   tmdbService = inject(TmdbService);
+  router = inject(Router);
   route = inject(ActivatedRoute);
 
   movie = signal<Movie | undefined>(undefined);
@@ -33,5 +34,20 @@ export class MovieDetailsComponent implements OnInit {
   }
   stringifyKeyword(keyword: any): string {
     return JSON.stringify(keyword);
+  }
+
+  handleClick(event: MouseEvent, type: 'genre' | 'keyword', item: any) {
+    event.preventDefault();
+    const route = ['/discover', 'movies'];
+    const queryParams = type === 'genre' ? { genre: item.id } : { keyword: this.stringifyKeyword(item) };
+    
+    if (event.ctrlKey || event.metaKey) {
+      const url = this.router.serializeUrl(
+        this.router.createUrlTree(route, { queryParams })
+      );
+      window.open(url, '_blank');
+    } else {
+      this.router.navigate(route, { queryParams });
+    }
   }
 }
