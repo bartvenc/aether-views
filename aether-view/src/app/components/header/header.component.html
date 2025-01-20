@@ -1,12 +1,12 @@
-<div class="fixed top-0 left-0 w-full z-30 bg-[#201a23] shadow-md px-6 py-4">
+<div class="fixed top-0 left-0 w-full z-30 bg-[#201a23] shadow-md" (clickOutside)="onClickOutside()">
   <!-- Top bar: Logo + Desktop Nav + Mobile Menu -->
-  <div class="flex items-center justify-between">
+  <div class="px-6 py-4 flex items-center justify-between">
     <!-- Logo -->
     <img src="assets/AetherLogo.png" alt="Logo"
       class="h-8 cursor-pointer transition-transform duration-300 hover:scale-110" routerLink="/" />
 
     <!-- Desktop Nav (shown on md and above) -->
-    <nav class="hidden md:flex items-center space-x-6 ml-auto">
+    <nav class="hidden md:flex items-center space-x-6">
       <a routerLink="/"
         class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500">
         Discover
@@ -24,24 +24,42 @@
         class="text-gray-300 uppercase tracking-wide font-medium transition-colors duration-300 hover:text-slate-500">
         Series
       </a>
-      <!-- Search Button -->
-      <div class="ml-auto flex items-center relative group">
-        <!-- Search Icon -->
-        <button
-          class="text-gray-300 transition-transform duration-300 focus:outline-none flex items-center group-hover:hidden">
-          <span class="material-icons">search</span>
-        </button>
-
-        <!-- Search Input -->
-        <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"
-          class="hidden group-hover:flex w-32 md:w-64 bg-[#201a23] shadow-md  text-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-slate-500 transition-all duration-300" />
+      <!-- Search Button - Desktop -->
+      <div class="relative group hidden md:block" (mouseenter)="isHovered = true" (mouseleave)="isHovered = false">
+        <div class="flex items-center">
+          <div class="overflow-hidden transition-all duration-300 relative"
+               [class.w-0]="!shouldShowSearchInput()"
+               [class.w-64]="shouldShowSearchInput()">
+            <input type="text" 
+                   [(ngModel)]="searchQuery" 
+                   (ngModelChange)="onSearchChange($event)"
+                   (focus)="onInputFocus()"
+                   (blur)="onInputBlur()"
+                   placeholder="Search..." 
+                   class="search-input mr-2"
+                   role="searchbox"
+                   [attr.aria-expanded]="searchResults.length > 0"
+                   [attr.aria-activedescendant]="selectedIndex >= 0 ? 'result-' + selectedIndex : null" />
+            @if (searchQuery) {
+            <button (click)="clearSearch()" 
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors duration-200"
+                    aria-label="Clear search">
+              <span class="material-icons text-sm">close</span>
+            </button>
+            }
+          </div>
+          <span class="text-gray-300 hover:text-slate-500 transition-colors duration-300">
+            <span class="material-icons" aria-hidden="true">search</span>
+          </span>
+        </div>
       </div>
     </nav>
 
     <!-- Mobile Menu -->
-    <button [matMenuTriggerFor]="mobileMenu" class="text-gray-300 md:hidden" aria-label="Toggle Menu">
+    <button [matMenuTriggerFor]="mobileMenu" class="text-gray-300 md:hidden">
       <span class="material-icons">menu</span>
     </button>
+
     <mat-menu #mobileMenu="matMenu" class="bg-[#201a23]">
       <button mat-menu-item routerLink="/"
         class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500">
@@ -60,38 +78,62 @@
         class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500">
         Series
       </button>
-      <button mat-menu-item
-        class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500 flex items-center">
-        <span class="material-icons">search</span>
+      <button (click)="toggleSearch()" class="md:hidden ml-2 text-gray-300">
+        <span class="material-icons">{{ isSearchOpen ? 'close' : 'search' }}</span>
       </button>
     </mat-menu>
   </div>
-  <!-- Search Results -->
-  <!-- Search Results -->
-  @if (searchResults.length > 0) {
-  <div
-    class="absolute top-full left-0 w-full max-h-96 bg-[#201a23] shadow-lg z-20 overflow-y-auto rounded-md border border-gray-700 px-4 py-6"
-    (appClickOutside)="clearResults()" tabindex="-1">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-4">
-      @for (result of searchResults; track result.id) {
-      <div (click)="navigateTo(result)"
-        class="bg-[#28202b] rounded-md p-2 hover:bg-[#3a2e3d] transition duration-200 cursor-pointer relative">
-        <!-- Media Poster/Profile -->
-        @if (result.poster_path || result.profile_path) {
-        <img [src]="tmdbService.getPosterUrl(result.poster_path || result.profile_path)"
-          [alt]="result.title || result.name" class="w-full h-64 object-cover rounded-md" />
-        }
-        <!-- Media Details -->
-        <div class="mt-4 text-center">
-          <h3 class="text-lg font-semibold text-gray-200 truncate">{{ result.title || result.name }}</h3>
-          <p class="text-sm text-gray-400">{{ getMediaType(result.media_type) }}</p>
-        </div>
-        <!-- Media-Type Icon -->
-        <span class="absolute top-2 right-2 rounded-full">
-          <span class="material-icons text-white text-4xl">{{ getMediaIcon(result.media_type) }}</span>
-        </span>
-      </div>
+
+  <!-- Mobile Search Input and Results Container -->
+  @if (isSearchOpen && isMobile) {
+  <div class="w-full bg-[#28202b] p-4 border-t border-gray-700 fixed top-[72px] left-0 right-0 z-40">
+    <div class="max-w-3xl mx-auto relative">
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)"
+        placeholder="Search movies, TV shows, or people..." class="w-full bg-[#201a23] text-gray-300 px-4 py-3 pr-10 rounded-lg
+                      focus:outline-none focus:ring-2 focus:ring-slate-500
+                      placeholder-gray-500" />
+      @if (searchQuery) {
+      <button (click)="clearSearch()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400
+                         hover:text-gray-200 transition-colors duration-200">
+        <span class="material-icons">close</span>
+      </button>
       }
+    </div>
+  </div>
+  }
+
+  <!-- Search Results - Both Desktop and Mobile -->
+  @if (searchResults.length > 0 && (isSearchOpen || isInputFocused || isHovered)) {
+  <div class="fixed left-0 right-0 top-[120px] bg-black/50 backdrop-blur-sm z-30" 
+       role="dialog"
+       aria-label="Search results">
+    <div class="bg-[#201a23] border-t border-gray-700">
+      <div class="max-w-7xl mx-auto p-6 overflow-y-auto" style="max-height: calc(100vh - 120px);">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          @for (result of searchResults; track trackByResultId) {
+          <div (click)="navigateTo(result)" 
+               [id]="'result-' + $index"
+               [class.ring-2]="selectedIndex === $index"
+               [class.ring-slate-500]="selectedIndex === $index"
+               class="result-card group"
+               role="option"
+               [attr.aria-selected]="selectedIndex === $index">
+            <img [src]="tmdbService.getPosterUrl(result.poster_path || result.profile_path)"
+                 [alt]="result.title || result.name"
+                 class="w-full h-full object-cover"
+                 loading="lazy" />
+            
+            <span class="media-icon material-icons">{{ getMediaIcon(result.media_type) }}</span>
+            
+            <div class="result-title">
+              <h3 class="text-sm font-semibold text-white truncate">
+                {{ result.title || result.name }}
+              </h3>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
     </div>
   </div>
   }
