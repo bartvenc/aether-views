@@ -1,96 +1,107 @@
 @if (person()) {
   <div class="relative text-white">
-
     <!-- Backdrop -->
     <div class="relative w-full h-[400px] md:h-[600px] overflow-hidden">
-      @if (backdropImage) {
-        <img [src]="backdropImage" alt="{{ person()?.name }}" class="absolute w-full h-full object-cover" />
+      @if (currentBackdrop) {
+        <div class="absolute inset-0 transition-opacity duration-1000">
+          <img [src]="currentBackdrop" alt="Backdrop" class="absolute w-full h-full object-cover" />
+        </div>
       }
       <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#201a23]"></div>
       <div class="absolute inset-0 bg-[#201a23] bg-opacity-40"></div>
 
-      <!-- Profile and Basic Info on Backdrop -->
-      <div class="absolute inset-0 flex flex-col md:flex-row items-center md:items-start justify-center md:justify-start px-4 md:px-8">
+      <!-- Profile and Basic Info -->
+      <div class="absolute inset-0 flex flex-col md:flex-row items-center md:items-start justify-center md:justify-start p-4 md:p-8">
         <!-- Profile Picture -->
-        <div class="w-32 md:w-48 mb-4 md:mb-0 md:mr-8">
-          <img
-            [src]="tmdbService.getPosterUrl(person()?.profile_path)"
-            alt="{{ person()?.name }}"
-            class="rounded-lg shadow-lg w-full h-auto object-cover" />
+        <div class="w-32 md:w-48 mb-4 md:mb-0 md:mr-8 flex-shrink-0">
+          <img [src]="tmdbService.getPosterUrl(person()?.profile_path)"
+               alt="{{ person()?.name }}"
+               class="rounded-lg shadow-lg w-full h-auto object-cover" />
         </div>
+
         <!-- Info -->
-        <div class="flex-1 text-center md:text-left">
+        <div class="flex-1 text-center md:text-left max-w-3xl">
           <h1 class="text-2xl md:text-5xl font-extrabold">{{ person()?.name }}</h1>
-          <p class="text-gray-400 text-sm md:text-lg mt-4">
-            {{ person()?.biography | slice:0:150 }}...
-          </p>
+          
+          @if (person()?.birthday) {
+            <p class="text-gray-300 mt-2">Born: {{ person()?.birthday }}</p>
+          }
+          
+          @if (person()?.place_of_birth) {
+            <p class="text-gray-300">Birth Place: {{ person()?.place_of_birth }}</p>
+          }
+
+          @if (person()?.also_known_as?.length) {
+            <div class="mt-4">
+              <h3 class="text-lg font-semibold">Also Known As:</h3>
+              <div class="flex flex-wrap gap-2 mt-2">
+                @for (name of person()?.also_known_as; track name) {
+                  <span class="bg-gray-700 px-2 py-1 rounded-md text-sm">{{ name }}</span>
+                }
+              </div>
+            </div>
+          }
+
+          <div class="mt-4 relative z-20">
+            <div 
+              (click)="toggleBio()" 
+              class="cursor-pointer group overflow-y-auto"
+              [class.max-h-[150px]]="!isBioExpanded()"
+              [class.max-h-[400px]]="isBioExpanded()"
+              style="scrollbar-width: thin;"
+            >
+              <p class="text-gray-300 text-sm md:text-lg transition-all duration-300 pr-4">
+                {{ person()?.biography }}
+              </p>
+              <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#201a23] to-transparent pointer-events-none"
+                   [class.hidden]="isBioExpanded()">
+              </div>
+            </div>
+            <div class="text-blue-400 hover:text-blue-300 mt-2 text-sm font-semibold">
+              {{ isBioExpanded() ? 'Show Less' : 'Read More' }}
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Filmography -->
-    <div class="relative z-10 w-full mx-auto px-4 md:px-8 py-4 md:py-12">
-      <h2 class="text-xl md:text-3xl font-bold mb-6">Filmography</h2>
+    <div class="relative z-10 w-full mx-auto px-4 md:px-8 py-8 bg-[#201a23]">
+      <h2 class="text-xl md:text-3xl font-bold mb-6">Appearances</h2>
 
-      <!-- Movies and Series -->
-      @if (hasMovies && hasSeries) {
-        <!-- Both Movies and Series -->
-        <div class="grid grid-cols-2 md:grid-cols-2 gap-8">
-          <!-- Movies -->
-          <div>
-            <h3 class="text-lg md:text-2xl font-bold mb-4">Movies</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid gap-8" [class.grid-cols-1]="!hasMovies || !hasSeries" [class.grid-cols-2]="hasMovies && hasSeries">
+        @if (hasMovies) {
+          <div class="space-y-4">
+            <h3 class="text-lg md:text-2xl font-bold">Movies</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
               @for (movie of movies(); track movie) {
                 <app-card
                   [type]="'movies'"
                   [subtitle]="movie.title"
                   [title]="movie.release_date"
-                  [imageUrl]="movie ? tmdbService.getImageUrl(movie) : null"></app-card>
+                  [imageUrl]="movie ? tmdbService.getImageUrl(movie) : null">
+                </app-card>
               }
             </div>
           </div>
+        }
 
-          <!-- Series -->
-          <div>
-            <h3 class="text-lg md:text-2xl font-bold mb-4">Series</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 gap-4">
+        @if (hasSeries) {
+          <div class="space-y-4">
+            <h3 class="text-lg md:text-2xl font-bold">Series</h3>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
               @for (show of series(); track show) {
                 <app-card
                   [type]="'series'"
                   [subtitle]="show.name"
                   [title]="show.first_air_date"
-                  [imageUrl]="show ? tmdbService.getImageUrl(show) : null"></app-card>
+                  [imageUrl]="show ? tmdbService.getImageUrl(show) : null">
+                </app-card>
               }
             </div>
           </div>
-        </div>
-      } @else {
-        <!-- Only Movies or Only Series -->
-        <div>
-          <h3 class="text-lg md:text-2xl font-bold mb-4">
-            @if (hasMovies) { Movies } @else { Series }
-          </h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            @if (hasMovies) {
-              @for (movie of movies(); track movie) {
-                <app-card
-                  [type]="'movies'"
-                  [subtitle]="movie.title"
-                  [title]="movie.release_date"
-                  [imageUrl]="movie ? tmdbService.getImageUrl(movie) : null"></app-card>
-              }
-            } @else {
-              @for (show of series(); track show) {
-                <app-card
-                  [type]="'series'"
-                  [subtitle]="show.name"
-                  [title]="show.first_air_date"
-                  [imageUrl]="show ? tmdbService.getImageUrl(show) : null"></app-card>
-              }
-            }
-          </div>
-        </div>
-      }
+        }
+      </div>
     </div>
   </div>
 }
