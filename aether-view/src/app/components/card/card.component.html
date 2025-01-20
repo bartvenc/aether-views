@@ -12,7 +12,7 @@
         @if (icon) {
           <span class="card-icon material-icons">{{icon === 'movie' ? 'theaters' : 'live_tv'}}</span>
         }
-        <div class="overlay">
+        <div class="overlay" [class.mobile]="isMobile">
           <span class="card-title">{{ title | date: 'YYYY' }}</span>
           <span class="card-subtitle">{{ subtitle }}</span>
           @if (!isMobile) {
@@ -31,7 +31,7 @@
         @if (icon) {
           <span class="card-icon material-icons">{{icon === 'movie' ? 'theaters' : 'live_tv'}}</span>
         }
-        <div class="overlay">
+        <div class="overlay" [class.mobile]="isMobile">
           <span class="card-title">{{ title | date: 'YYYY' }}</span>
           <span class="card-subtitle">{{ subtitle }}</span>
           @if (!isMobile) {
@@ -59,16 +59,16 @@
     @case ('genreStudio') {
       <div class="genreStudio">
         <img [src]="imageUrl || 'assets/poster.jpg'" [alt]="title" class="card-image">
-        <div class="genre-overlay">
-          <span class="title">{{ title }}</span>
+        <div class="genre-overlay" [class.mobile]="isMobile">
+          <span class="title" [class.mobile]="isMobile">{{ title }}</span>
         </div>
       </div>
     }
     @case ('studio') {
       <div class="studio">
         <img [src]="imageUrl || 'assets/poster.jpg'" alt="Studio Logo" class="card-image">
-        <div class="studio-overlay">
-          <span class="title">{{ title }}</span>
+        <div class="studio-overlay" [class.mobile]="isMobile">
+          <span class="title" [class.mobile]="isMobile">{{ title }}</span>
         </div>
       </div>
     }

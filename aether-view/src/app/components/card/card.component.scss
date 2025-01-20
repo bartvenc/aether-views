@@ -100,12 +100,38 @@
     animation: shimmer 1s infinite linear;
   }
 
+  .overlay {
+    &.mobile {
+      opacity: 1;
+      transform: none;
+      height: auto;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.7));
+      padding: 0.25rem;
+
+      .card-title {
+        font-size: 0.7rem;
+        margin-bottom: 0;
+      }
+
+      .card-subtitle {
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
   // Optional responsiveness for movieSeries
   @media (max-width: 768px) {
-    max-width: 120px;
+    max-width: 110px;
+
+    .overlay:not(.mobile) {
+      display: none;
+    }
   }
   @media (max-width: 480px) {
-    max-width: 100px;
+    max-width: 85px;
   }
 
   // Additional .movieSeries-specific styling...
@@ -244,6 +270,18 @@
       color: white;
       text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.8);
     }
+
+    &.mobile {
+      .title {
+        font-size: 1.2rem; // Smaller font size for mobile
+      }
+    }
+
+    @media (max-width: 480px) {
+      &.mobile .title {
+        font-size: 1rem; // Even smaller for very small screens
+      }
+    }
   }
 
   &:hover .genre-overlay {
@@ -287,7 +325,20 @@
       color: #fff;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
     }
+    
+    &.mobile {
+      .title {
+        font-size: 1.2rem; // Smaller font size for mobile
+      }
+    }
+
+    @media (max-width: 480px) {
+      &.mobile .title {
+        font-size: 1rem; // Even smaller for very small screens
+      }
+    }
   }
+  
 
   &:hover .studio-overlay {
     background: rgba(0, 0, 0, 0.5);
