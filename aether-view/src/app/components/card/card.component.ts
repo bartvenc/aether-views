@@ -38,33 +38,23 @@ export class CardComponent implements OnInit {
     if (text.length <= length) return text;
     return text.substring(0, length) + '...';
   }
-
-  onItemClicked(event: MouseEvent): void {
+  onItemClicked(event: Event): void {
     let route: string[] = [];
     let queryParams = {};
 
-    // Determine the route and params based on item type
     if (this.tmdbService.isSeries(this.item)) {
       route = ['/tv', this.item.id.toString()];
       this.tmdbService.markAsSeen('tv', this.item.id);
     } else if (this.tmdbService.isMovie(this.item)) {
-      this.tmdbService.markAsSeen('movie', this.item.id);
       route = ['/movie', this.item.id.toString()];
-    } else if (this.tmdbService.isGenre(this.item)) {
-      route = ['/discover', this.item.type === 'movie' ? 'movies' : 'series'];
-      queryParams = { genre: this.item.id };
-    } else if (this.tmdbService.isStudio(this.item)) {
-      route = ['/discover/movies'];
-      queryParams = { studio: this.item.id };
-    } else if (this.tmdbService.isPerson(this.item)) {
-      route = ['/person', this.item.id.toString()];
+      this.tmdbService.markAsSeen('movie', this.item.id);
     }
 
-    // Generate the full URL
-    const url = this.router.serializeUrl(this.router.createUrlTree(route, { queryParams }));
-
-    // Open in new tab if ctrl/cmd key is pressed, otherwise navigate normally
-    if (event.ctrlKey || event.metaKey) {
+    // Handle ctrl/cmd click only for MouseEvent
+    if (event instanceof MouseEvent && (event.ctrlKey || event.metaKey)) {
+      const url = this.router.serializeUrl(
+        this.router.createUrlTree(route, { queryParams })
+      );
       window.open(url, '_blank');
     } else {
       this.router.navigate(route, { queryParams });

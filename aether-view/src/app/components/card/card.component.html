@@ -1,9 +1,17 @@
-<div class="card-container" [ngClass]="type" (click)="onItemClicked($event)">
+<div 
+  class="card-container" 
+  [ngClass]="type" 
+  (click)="onItemClicked($event)"
+  (keydown.enter)="onItemClicked($event)"
+  (keydown.space)="onItemClicked($event)"
+  tabindex="0"
+  role="button"
+  [attr.aria-label]="subtitle || title">
   @switch (type) {
     @case ('movies') {
       <div class="movieSeries" [class.loading]="!imageUrl">
         @if (isContentSeen()) {
-          <span class="seen-indicator material-icons">visibility</span>
+          <span class="seen-indicator material-icons" aria-label="Already viewed">visibility</span>
         }
         <img
           [src]="imageUrl || 'assets/poster.png'"
@@ -15,7 +23,9 @@
           height="225"
           decoding="async" />
         @if (icon) {
-          <span class="card-icon material-icons">{{ icon === 'movie' ? 'theaters' : 'live_tv' }}</span>
+          <span class="card-icon material-icons" aria-hidden="true">
+            {{ icon === 'movie' ? 'theaters' : 'live_tv' }}
+          </span>
         }
         <div class="overlay" [class.mobile]="isMobile">
           <span class="card-title">{{ title | date: 'YYYY' }}</span>
