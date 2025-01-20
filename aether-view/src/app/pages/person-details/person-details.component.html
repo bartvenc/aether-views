@@ -14,19 +14,20 @@
       <div class="absolute inset-0 flex flex-col md:flex-row items-center md:items-start justify-center md:justify-start p-4 md:p-8">
         <!-- Profile Picture -->
         <div class="w-32 md:w-48 mb-4 md:mb-0 md:mr-8 flex-shrink-0">
-          <img [src]="tmdbService.getPosterUrl(person()?.profile_path)"
-               alt="{{ person()?.name }}"
-               class="rounded-lg shadow-lg w-full h-auto object-cover" />
+          <img
+            [src]="tmdbService.getPosterUrl(person()?.profile_path)"
+            alt="{{ person()?.name }}"
+            class="rounded-lg shadow-lg w-full h-auto object-cover" />
         </div>
 
         <!-- Info -->
         <div class="flex-1 text-center md:text-left max-w-3xl">
           <h1 class="text-2xl md:text-5xl font-extrabold">{{ person()?.name }}</h1>
-          
+
           @if (person()?.birthday) {
             <p class="text-gray-300 mt-2">Born: {{ person()?.birthday }}</p>
           }
-          
+
           @if (person()?.place_of_birth) {
             <p class="text-gray-300">Birth Place: {{ person()?.place_of_birth }}</p>
           }
@@ -43,19 +44,18 @@
           }
 
           <div class="mt-4 relative z-20">
-            <div 
-              (click)="toggleBio()" 
+            <div
+              (click)="toggleBio()"
               class="cursor-pointer group overflow-y-auto"
               [class.max-h-[150px]]="!isBioExpanded()"
               [class.max-h-[400px]]="isBioExpanded()"
-              style="scrollbar-width: thin;"
-            >
+              style="scrollbar-width: thin">
               <p class="text-gray-300 text-sm md:text-lg transition-all duration-300 pr-4">
                 {{ person()?.biography }}
               </p>
-              <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#201a23] to-transparent pointer-events-none"
-                   [class.hidden]="isBioExpanded()">
-              </div>
+              <div
+                class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#201a23] to-transparent pointer-events-none"
+                [class.hidden]="isBioExpanded()"></div>
             </div>
             <div class="text-blue-400 hover:text-blue-300 mt-2 text-sm font-semibold">
               {{ isBioExpanded() ? 'Show Less' : 'Read More' }}

@@ -2,11 +2,9 @@
 @use 'swiper/css/navigation';
 @use 'swiper/css/pagination';
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 
 @font-face {
   font-family: 'Bruno Ace SC';
@@ -21,8 +19,14 @@
   font-style: normal;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
 
 .no-checkbox.mat-option {
   display: flex;
@@ -36,13 +40,13 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 // Add these global styles to prevent CLS
 img {
   text-indent: -9999px; // Hide alt text while loading
-  &[loading="lazy"] {
+  &[loading='lazy'] {
     content-visibility: auto;
   }
 }
 
 // Reserve space for images during loading
-[loading="lazy"] {
+[loading='lazy'] {
   background: #28202b;
 }
 
@@ -50,7 +54,7 @@ img {
 .card-image {
   filter: blur(0);
   transition: filter 0.3s;
-  
+
   &.loading {
     filter: blur(10px);
     transform: scale(1.1);

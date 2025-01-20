@@ -1,7 +1,6 @@
 <div class="w-full bg-[#201a23]">
-
   <!-- Mobile toggle button (left-aligned) -->
-  <div class="flex justify-start md:hidden ">
+  <div class="flex justify-start md:hidden">
     <button class="bg-[#4e444b] px-4 py-2 flex items-center rounded-md" (click)="showFilters = !showFilters">
       <mat-icon>filter_list</mat-icon>
       <span>Filters</span>
@@ -10,7 +9,6 @@
 
   <!-- Filter row -->
   <div class="flex flex-col md:flex-row md:align-middle flex-wrap md:gap-4 p-2 sm:w-full" [class.hidden]="!showFilters && isMobile">
-
     <button class="mb-4" (click)="filterReset()" title="Reset Filters"><mat-icon class="cursor-pointer">replay</mat-icon></button>
     <!-- Type -->
     <mat-form-field class="sm:w-[10%]" appearance="fill">
@@ -36,8 +34,8 @@
     <mat-form-field class="sm:w-[8%]" appearance="fill">
       <mat-label>Year</mat-label>
       <mat-select [(ngModel)]="selectedYear" (selectionChange)="updateFilter()">
-        @if(selectedYear() !== 0){
-        <mat-option><mat-icon>replay</mat-icon></mat-option>
+        @if (selectedYear() !== 0) {
+          <mat-option><mat-icon>replay</mat-icon></mat-option>
         }
         @for (year of years; track year) {
           <mat-option [value]="year">{{ year }}</mat-option>
@@ -53,8 +51,7 @@
           {{ getFirstSelectedGenre()?.name }}
           @if ((selectedGenres().length || 0) > 1) {
             <span class="example-additional-selection">
-              (+{{(selectedGenres().length || 0) - 1}} 
-              {{ selectedGenres().length === 2 ? 'other' : 'others' }})
+              (+{{ (selectedGenres().length || 0) - 1 }} {{ selectedGenres().length === 2 ? 'other' : 'others' }})
             </span>
           }
         </mat-select-trigger>
@@ -73,8 +70,8 @@
     <mat-form-field class="sm:w-[18%]" appearance="fill">
       <mat-label>{{ selectedTypeSignal() === 'movies' ? 'Studios' : 'Networks' }}</mat-label>
       <mat-select [(ngModel)]="selectedStudiosOrNetworks" (selectionChange)="updateFilter()">
-        @if(selectedStudiosOrNetworks() !== 0){
-        <mat-option><mat-icon>replay</mat-icon></mat-option>
+        @if (selectedStudiosOrNetworks() !== 0) {
+          <mat-option><mat-icon>replay</mat-icon></mat-option>
         }
         @for (studioNetwork of studiosOrNetworks; track studioNetwork) {
           <mat-option [value]="studioNetwork.id">{{ studioNetwork.name }}</mat-option>
@@ -85,7 +82,7 @@
     <mat-form-field class="sm:w-[12%]" appearance="fill">
       <mat-label>Country</mat-label>
       <mat-select [(ngModel)]="selectedCountry" (selectionChange)="updateFilter()">
-        @if(selectedCountry()){
+        @if (selectedCountry()) {
           <mat-option [value]="null">
             <mat-icon>replay</mat-icon>
           </mat-option>
@@ -102,22 +99,14 @@
     <div class="sm:w-[15%]">
       <mat-form-field class="w-full">
         <mat-label>Keywords</mat-label>
-        <input
-          matInput
-          (input)="onKeywordInput($any($event.target).value)"
-          [(ngModel)]="keywordInput"
-          placeholder="Search keywords"
-        />
+        <input matInput (input)="onKeywordInput($any($event.target).value)" [(ngModel)]="keywordInput" placeholder="Search keywords" />
       </mat-form-field>
 
       <!-- Keyword suggestions dropdown -->
       @if (keywordResults().length > 0) {
         <ul class="absolute bg-[#231e22] z-50 w-[63%] sm:w-[14%] max-h-56 overflow-y-auto rounded-md -mt-4">
           @for (keyword of keywordResults(); track keyword.id) {
-            <li
-              (click)="addKeywordFromSuggestion(keyword)"
-              class="p-2 px-6 text-white text-base hover:bg-[#3b3539] cursor-pointer"
-            >
+            <li (click)="addKeywordFromSuggestion(keyword)" class="p-2 px-6 text-white text-base hover:bg-[#3b3539] cursor-pointer">
               {{ keyword.name }}
             </li>
           }
@@ -129,11 +118,7 @@
   <!-- Selected Keywords Row -->
   <div class="flex gap-2 justify-end w-full sm:w-[99%]">
     @for (keyword of selectedKeywords(); track keyword.id) {
-      <mat-chip
-        [removable]="true"
-        (removed)="removeKeyword(keyword.id)"
-        class="bg-gray-700 text-white"
-      >
+      <mat-chip [removable]="true" (removed)="removeKeyword(keyword.id)" class="bg-gray-700 text-white">
         {{ keyword.name }}
         <mat-icon matChipRemove>cancel</mat-icon>
       </mat-chip>

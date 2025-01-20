@@ -28,15 +28,13 @@ export class SliderComponent {
 
   getItemValue(item: any, field: string): string {
     if (field === 'releaseDate') {
-      return item.media_type === 'movie'  ? item.release_date : item.first_air_date;
+      return item.media_type === 'movie' ? item.release_date : item.first_air_date;
     }
     if (field === 'displayTitle') {
       return item.media_type === 'movie' ? item.title : item.name;
     }
     return item[field] || '';
   }
-
-  
 
   swiperOptions = {
     slidesPerView: 5,

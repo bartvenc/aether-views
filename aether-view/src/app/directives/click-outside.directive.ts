@@ -1,7 +1,7 @@
 import { Directive, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 
 @Directive({
-  selector: '[appClickOutside]'
+  selector: '[appClickOutside]',
 })
 export class ClickOutsideDirective {
   @Output() appClickOutside: EventEmitter<{ context: string }> = new EventEmitter();
@@ -29,7 +29,6 @@ export class ClickOutsideDirective {
   private handleOutsideClick(targetElement: HTMLElement): void {
     const clickedInside = this.elementRef.nativeElement.contains(targetElement);
     const clickedTrigger = this.triggerElement?.contains(targetElement);
-    console.log('Clicked inside:', clickedInside, 'Clicked trigger:', clickedTrigger);
     if (!clickedInside && !clickedTrigger) {
       this.appClickOutside.emit({ context: this.context });
     }

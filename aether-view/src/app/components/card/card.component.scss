@@ -1,7 +1,9 @@
 .card-container {
   // Parent-level declarations first:
   width: 100%;
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
 
@@ -31,7 +33,9 @@
     color: #fff; // Text color for visibility.
     padding: 0.5rem;
     transform: translateY(100%); // Start outside the card
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     opacity: 0;
     display: flex;
     flex-direction: column;
@@ -41,7 +45,6 @@
     .card-title {
       font-size: 0.875rem;
       margin-bottom: 0.1rem;
-
     }
 
     .card-subtitle {
@@ -49,7 +52,6 @@
       font-size: 1rem;
       color: lightgray;
       margin-bottom: 0.1rem;
-
     }
 
     .card-overview {
@@ -60,7 +62,6 @@
       line-height: 1.2;
       overflow: hidden;
       text-overflow: ellipsis; // Add ellipsis for overflowing text.
-
     }
   }
 }
@@ -87,7 +88,6 @@
   &:hover .seen-indicator {
     opacity: 1;
   }
-
 
   .card-image {
     position: absolute;
@@ -254,14 +254,12 @@
   overflow: hidden;
   flex-shrink: 0;
 
-
   .card-image {
     width: 100%;
     height: 150px;
     object-fit: cover;
     filter: brightness(0.7);
     transition: transform 0.4s ease-in-out;
-
   }
 
   &:hover .card-image {
@@ -314,14 +312,12 @@
   border-radius: 12px;
   overflow: hidden;
 
-
   .card-image {
     width: 100%;
     height: 150px;
     object-fit: contain;
     background-color: #111;
     transition: transform 0.4s ease-in-out;
-
   }
 
   &:hover .card-image {
@@ -356,7 +352,6 @@
       }
     }
   }
-
 
   &:hover .studio-overlay {
     background: rgba(0, 0, 0, 0.5);

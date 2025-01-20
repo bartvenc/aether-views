@@ -12,39 +12,34 @@ import { SearchResult, MediaType } from '../../interfaces/common-interfaces';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [
-    RouterLink,
-    MatMenuModule,
-    MatIconModule,
-    MatButtonModule,
-    MatInputModule,
-    FormsModule
-  ],
+  imports: [RouterLink, MatMenuModule, MatIconModule, MatButtonModule, MatInputModule, FormsModule],
   templateUrl: './header.component.html',
-  styles: [`
-    .search-input {
-      @apply w-full bg-[#201a23] text-gray-300 px-4 py-2 pr-10 rounded-lg focus:outline-none placeholder-gray-500;
-    }
-    
-    .result-card {
-      @apply relative cursor-pointer aspect-[2/3] rounded-lg overflow-hidden bg-[#28202b];
-    }
+  styles: [
+    `
+      .search-input {
+        @apply w-full bg-[#201a23] text-gray-300 px-4 py-2 pr-10 rounded-lg focus:outline-none placeholder-gray-500;
+      }
 
-    .media-icon {
-      @apply absolute top-2 right-2 z-10 text-xl text-yellow-400 drop-shadow-lg;
-    }
+      .result-card {
+        @apply relative cursor-pointer aspect-[2/3] rounded-lg overflow-hidden bg-[#28202b];
+      }
 
-    .result-title {
-      @apply absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2;
-    }
-  `]
+      .media-icon {
+        @apply absolute top-2 right-2 z-10 text-xl text-yellow-400 drop-shadow-lg;
+      }
+
+      .result-title {
+        @apply absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-2;
+      }
+    `,
+  ],
 })
 export class HeaderComponent {
   searchQuery = '';
   searchResults: SearchResult[] = [];
   private searchSubject = new Subject<string>();
-   readonly tmdbService = inject(TmdbService);
-   readonly router = inject(Router);
+  readonly tmdbService = inject(TmdbService);
+  readonly router = inject(Router);
   isMobile = window.innerWidth < 768;
   isSearchOpen = false;
   isHovered = false;
@@ -87,20 +82,22 @@ export class HeaderComponent {
   }
 
   private setupSearch() {
-    this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(),
-      switchMap(query => query ? this.tmdbService.searchMulti(query) : [])
-    ).subscribe({
-      next: (results) => {
-        this.searchResults = results;
-        this.selectedIndex = -1;
-      },
-      error: (error) => {
-        console.error('Search error:', error);
-        this.searchResults = [];
-      }
-    });
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(query => (query ? this.tmdbService.searchMulti(query) : []))
+      )
+      .subscribe({
+        next: results => {
+          this.searchResults = results;
+          this.selectedIndex = -1;
+        },
+        error: error => {
+          console.error('Search error:', error);
+          this.searchResults = [];
+        },
+      });
   }
 
   onSearchChange(query: string) {
@@ -153,7 +150,7 @@ export class HeaderComponent {
     const icons: Record<MediaType, string> = {
       movie: 'theaters',
       tv: 'live_tv',
-      person: 'person'
+      person: 'person',
     };
     return icons[mediaType] || 'help';
   }
@@ -162,7 +159,7 @@ export class HeaderComponent {
     const types: Record<MediaType, string> = {
       movie: 'Movie',
       tv: 'TV Show',
-      person: 'Person'
+      person: 'Person',
     };
     return types[mediaType] || 'Unknown';
   }

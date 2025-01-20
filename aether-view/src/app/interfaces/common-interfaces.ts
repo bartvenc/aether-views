@@ -86,7 +86,6 @@ export interface Person {
   known_for_department?: string;
   place_of_birth?: string;
   popularity?: number;
-
 }
 
 export interface ContentRating {

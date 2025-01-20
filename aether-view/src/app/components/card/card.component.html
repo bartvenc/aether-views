@@ -5,15 +5,17 @@
         @if (isContentSeen()) {
           <span class="seen-indicator material-icons">visibility</span>
         }
-        <img [src]="imageUrl || 'assets/poster.png'" 
-             [alt]="title" 
-             class="card-image"
-             [loading]="loading"
-             [attr.fetchpriority]="index < 3 ? 'high' : 'auto'"
-             width="150" height="225"
-             decoding="async">
+        <img
+          [src]="imageUrl || 'assets/poster.png'"
+          [alt]="title"
+          class="card-image"
+          [loading]="loading"
+          [attr.fetchpriority]="index < 3 ? 'high' : 'auto'"
+          width="150"
+          height="225"
+          decoding="async" />
         @if (icon) {
-          <span class="card-icon material-icons">{{icon === 'movie' ? 'theaters' : 'live_tv'}}</span>
+          <span class="card-icon material-icons">{{ icon === 'movie' ? 'theaters' : 'live_tv' }}</span>
         }
         <div class="overlay" [class.mobile]="isMobile">
           <span class="card-title">{{ title | date: 'YYYY' }}</span>
@@ -26,16 +28,12 @@
     }
     @case ('series') {
       <div class="movieSeries" [class.loading]="!imageUrl">
-           @if (isContentSeen()) {
+        @if (isContentSeen()) {
           <span class="seen-indicator material-icons">visibility</span>
         }
-        <img [src]="imageUrl || 'assets/poster.png'" 
-             [alt]="title" 
-             class="card-image"
-             width="150" height="225"
-             decoding="async">
+        <img [src]="imageUrl || 'assets/poster.png'" [alt]="title" class="card-image" width="150" height="225" decoding="async" />
         @if (icon) {
-          <span class="card-icon material-icons">{{icon === 'movie' ? 'theaters' : 'live_tv'}}</span>
+          <span class="card-icon material-icons">{{ icon === 'movie' ? 'theaters' : 'live_tv' }}</span>
         }
         <div class="overlay" [class.mobile]="isMobile">
           <span class="card-title">{{ title | date: 'YYYY' }}</span>
@@ -49,12 +47,13 @@
     @case ('person') {
       <div class="person">
         <div class="person-image-container">
-          <img [src]="imageUrl || 'assets/person.jpg'" 
-               [alt]="title" 
-               class="person-image"
-               [loading]="loading"
-               [attr.fetchpriority]="index < 3 ? 'high' : 'auto'"
-               decoding="async">
+          <img
+            [src]="imageUrl || 'assets/person.jpg'"
+            [alt]="title"
+            class="person-image"
+            [loading]="loading"
+            [attr.fetchpriority]="index < 3 ? 'high' : 'auto'"
+            decoding="async" />
         </div>
         <div class="person-details">
           <h3 class="person-title">{{ title }}</h3>
@@ -64,7 +63,7 @@
     }
     @case ('genreStudio') {
       <div class="genreStudio">
-        <img [src]="imageUrl || 'assets/poster.jpg'" [alt]="title" class="card-image">
+        <img [src]="imageUrl || 'assets/poster.jpg'" [alt]="title" class="card-image" />
         <div class="genre-overlay" [class.mobile]="isMobile">
           <span class="title" [class.mobile]="isMobile">{{ title }}</span>
         </div>
@@ -72,7 +71,7 @@
     }
     @case ('studio') {
       <div class="studio">
-        <img [src]="imageUrl || 'assets/poster.jpg'" alt="Studio Logo" class="card-image">
+        <img [src]="imageUrl || 'assets/poster.jpg'" alt="Studio Logo" class="card-image" />
         <div class="studio-overlay" [class.mobile]="isMobile">
           <span class="title" [class.mobile]="isMobile">{{ title }}</span>
         </div>

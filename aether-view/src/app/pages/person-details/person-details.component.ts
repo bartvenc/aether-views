@@ -41,11 +41,8 @@ export class PersonDetailsComponent implements OnInit, OnDestroy {
       this.series.set(series);
 
       // Collect all backdrop images
-      const backdrops = [
-        ...movies.map(m => m.backdrop_path),
-        ...series.map(s => s.backdrop_path)
-      ].filter(backdrop => backdrop != null);
-      
+      const backdrops = [...movies.map(m => m.backdrop_path), ...series.map(s => s.backdrop_path)].filter(backdrop => backdrop != null);
+
       this.allBackdrops.set(backdrops);
       this.startBackdropRotation();
     });
@@ -66,9 +63,7 @@ export class PersonDetailsComponent implements OnInit, OnDestroy {
 
   get currentBackdrop(): string | null {
     const backdrops = this.allBackdrops();
-    return backdrops.length > 0 
-      ? this.tmdbService.getBackDrop(backdrops[this.currentBackdropIndex()])
-      : this.backdropImage;
+    return backdrops.length > 0 ? this.tmdbService.getBackDrop(backdrops[this.currentBackdropIndex()]) : this.backdropImage;
   }
 
   toggleBio(): void {

@@ -9,12 +9,8 @@
 
       <!-- Search -->
       <div class="w-full max-w-xl flex gap-2 items-center justify-center">
-        <input type="text" 
-               [(ngModel)]="userQuery" 
-               [placeholder]="currentPromt()" 
-               class="search-input" />
-        <button (click)="getRecommendations()" 
-                class="button-primary">
+        <input type="text" [(ngModel)]="userQuery" [placeholder]="currentPromt()" class="search-input" />
+        <button (click)="getRecommendations()" class="button-primary">
           <span class="material-icons text-base">auto_awesome</span>
           Curate
         </button>
@@ -27,14 +23,12 @@
     @if (isLoading()) {
       <div class="flex flex-col items-center justify-center">
         <p class="text-lg md:text-xl font-bold mb-3">
-          {{ isSecondStage() ? "Searching online with AI..." : "Using offline AI recommendations..." }}
+          {{ isSecondStage() ? 'Searching online with AI...' : 'Using offline AI recommendations...' }}
         </p>
         <p class="text-gray-400 mb-2 max-w-2xl">{{ currentQuote() }}</p>
         <div class="flex space-x-3">
           @for (i of [0, 0.2, 0.4]; track i) {
-            <div class="w-3 h-3 bg-slate-500 rounded-full animate-bounce" 
-                 [style.animation-delay.s]="i">
-            </div>
+            <div class="w-3 h-3 bg-slate-500 rounded-full animate-bounce" [style.animation-delay.s]="i"></div>
           }
         </div>
       </div>
@@ -46,12 +40,8 @@
         <div class="w-full max-w-3xl flex flex-wrap gap-4 justify-center">
           <mat-button-toggle-group [(ngModel)]="filterState().mediaFilter" class="bg-[#28202b]">
             <mat-button-toggle value="all" class="text-gray-300">All</mat-button-toggle>
-            <mat-button-toggle value="movies" class="text-gray-300">
-              <span class="material-icons mr-1">theaters</span>Movies
-            </mat-button-toggle>
-            <mat-button-toggle value="series" class="text-gray-300">
-              <span class="material-icons mr-1">live_tv</span>Series
-            </mat-button-toggle>
+            <mat-button-toggle value="movies" class="text-gray-300"> <span class="material-icons mr-1">theaters</span>Movies </mat-button-toggle>
+            <mat-button-toggle value="series" class="text-gray-300"> <span class="material-icons mr-1">live_tv</span>Series </mat-button-toggle>
           </mat-button-toggle-group>
 
           <mat-button-toggle-group [(ngModel)]="filterState().sortOrder" class="bg-[#28202b]">
@@ -70,40 +60,31 @@
           @if (curation.items.length > 0) {
             <div class="mb-4">
               <h3 class="curation-title">"{{ curation.query }}"</h3>
-              <app-slider [items]="curation.items" 
-                         cardType="movies"
-                         overview="overview"
-                         titleField="releaseDate" 
-                         subtitleField="displayTitle">
+              <app-slider [items]="curation.items" cardType="movies" overview="overview" titleField="releaseDate" subtitleField="displayTitle">
               </app-slider>
             </div>
           }
         }
       </section>
     }
-    
+
     <!-- Example Curations -->
     <section class="mb-12">
       <div class="flex items-center justify-between mb-2">
         <h2 class="section-title">Example Curations</h2>
-        <button (click)="showExamples.set(!showExamples())" 
-                class="text-gray-400 hover:text-white transition-colors">
+        <button (click)="showExamples.set(!showExamples())" class="text-gray-400 hover:text-white transition-colors">
           <span class="material-icons">
             {{ showExamples() ? 'expand_less' : 'expand_more' }}
           </span>
         </button>
       </div>
-      
+
       @if (showExamples()) {
         @for (curation of exampleCurations; track curation.trackId) {
           @if (curation.items.length > 0) {
             <div class="mb-4">
               <h3 class="curation-title">"{{ curation.query }}"</h3>
-              <app-slider [items]="curation.items" 
-                         cardType="movies"
-                         overview="overview"
-                         titleField="releaseDate" 
-                         subtitleField="displayTitle">
+              <app-slider [items]="curation.items" cardType="movies" overview="overview" titleField="releaseDate" subtitleField="displayTitle">
               </app-slider>
             </div>
           }

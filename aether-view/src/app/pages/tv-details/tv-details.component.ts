@@ -23,7 +23,7 @@ export class TvDetailsComponent implements OnInit {
   allSeasonsOpen = false;
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.subscribe(params => {
       const id = Number(params.get('id'));
       if (!id) {
         console.error('Invalid series ID');
@@ -39,41 +39,35 @@ export class TvDetailsComponent implements OnInit {
         console.error('Invalid or missing series data');
         return;
       }
-  
+
       // Order seasons by most recent air_date (descending)
-      const orderedSeasons = [...seriesData.seasons].sort((a, b) =>
-        new Date(b.air_date || '').getTime() - new Date(a.air_date || '').getTime()
-      );
-  
+      const orderedSeasons = [...seriesData.seasons].sort((a, b) => new Date(b.air_date || '').getTime() - new Date(a.air_date || '').getTime());
+
       // Update the series data with ordered seasons
       this.series.set({
         ...seriesData,
         seasons: orderedSeasons,
       });
-  
+
       // Fetch detailed episode data for all seasons
-      const seasonRequests = orderedSeasons.map((season) =>
-        this.tmdbService.getSeasonDetails(id, season.season_number)
-      );
-  
+      const seasonRequests = orderedSeasons.map(season => this.tmdbService.getSeasonDetails(id, season.season_number));
+
       forkJoin(seasonRequests).subscribe({
         next: (seasonDetails: Season[]) => {
-          this.series.update((currentSeries) => {
+          this.series.update(currentSeries => {
             if (!currentSeries) return currentSeries;
-  
+
             return {
               ...currentSeries,
-              seasons: seasonDetails.map((season) => ({
+              seasons: seasonDetails.map(season => ({
                 ...season,
                 // Order episodes by most recent air_date (descending)
-                episodes: [...(season.episodes || [])].sort((a, b) =>
-                  new Date(b.air_date || '').getTime() - new Date(a.air_date || '').getTime()
-                ),
+                episodes: [...(season.episodes || [])].sort((a, b) => new Date(b.air_date || '').getTime() - new Date(a.air_date || '').getTime()),
               })),
             };
           });
         },
-        error: (error) => console.error('Error fetching season details:', error),
+        error: error => console.error('Error fetching season details:', error),
       });
     });
   }
@@ -106,7 +100,6 @@ export class TvDetailsComponent implements OnInit {
   }
 
   isSeasonFinished(season: any): boolean {
-    console.log(season);
     if (season.episodes) {
       const airDate = season.episodes[0]?.air_date;
       if (!airDate) return false;
@@ -121,11 +114,9 @@ export class TvDetailsComponent implements OnInit {
     event.preventDefault();
     const route = ['/discover', 'series'];
     const queryParams = type === 'genre' ? { genre: item.id } : { keyword: this.stringifyKeyword(item) };
-    
+
     if (event.ctrlKey || event.metaKey) {
-      const url = this.router.serializeUrl(
-        this.router.createUrlTree(route, { queryParams })
-      );
+      const url = this.router.serializeUrl(this.router.createUrlTree(route, { queryParams }));
       window.open(url, '_blank');
     } else {
       this.router.navigate(route, { queryParams });

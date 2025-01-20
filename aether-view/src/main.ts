@@ -12,8 +12,8 @@ import { TmdbService } from './app/services/tmdb.service';
 registerSwiperElements();
 bootstrapApplication(AppComponent, {
   providers: [
-    provideRouter(routes), 
-    importProvidersFrom(HttpClientModule), 
+    provideRouter(routes),
+    importProvidersFrom(HttpClientModule),
     provideAnimationsAsync(),
     provideAppInitializer(() => {
       const tmdbService = inject(TmdbService);

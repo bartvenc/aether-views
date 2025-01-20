@@ -39,7 +39,6 @@ export class CardComponent implements OnInit {
     return text.substring(0, length) + '...';
   }
 
-
   onItemClicked(event: MouseEvent): void {
     let route: string[] = [];
     let queryParams = {};
@@ -62,9 +61,7 @@ export class CardComponent implements OnInit {
     }
 
     // Generate the full URL
-    const url = this.router.serializeUrl(
-      this.router.createUrlTree(route, { queryParams })
-    );
+    const url = this.router.serializeUrl(this.router.createUrlTree(route, { queryParams }));
 
     // Open in new tab if ctrl/cmd key is pressed, otherwise navigate normally
     if (event.ctrlKey || event.metaKey) {
@@ -77,10 +74,7 @@ export class CardComponent implements OnInit {
   isContentSeen(): boolean {
     if (this.tmdbService.isSeries(this.item) || this.tmdbService.isMovie(this.item)) {
       if (!this.item?.id) return false;
-      return this.tmdbService.isContentSeen(
-        this.type === 'movies' ? 'movie' : 'tv',
-        this.item.id
-      );
+      return this.tmdbService.isContentSeen(this.type === 'movies' ? 'movie' : 'tv', this.item.id);
     }
     return false;
   }

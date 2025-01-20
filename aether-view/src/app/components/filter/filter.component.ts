@@ -16,14 +16,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 @Component({
   selector: 'app-filter',
   standalone: true,
-  imports: [CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatChipsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatSelectModule, MatFormFieldModule, MatInputModule, MatIconModule, MatChipsModule],
   templateUrl: './filter.component.html',
 })
 export class FilterComponent implements OnInit {
@@ -43,14 +36,11 @@ export class FilterComponent implements OnInit {
     { code: 'GB', name: 'UK' },
     { code: 'JP', name: 'Japan' },
     { code: 'KR', name: 'South Korea' },
-    { code: 'FR', name: 'France' }
+    { code: 'FR', name: 'France' },
   ];
-
-
 
   tmdbService = inject(TmdbService);
   router = inject(Router);
-
 
   selectedCategory = signal('Popular');
   selectedYear = signal(0);
@@ -69,7 +59,6 @@ export class FilterComponent implements OnInit {
 
   ngOnInit() {
     this.checkViewport();
-    console.log(' 5 Filter component initialized with:', this.filters);
     this.selectedTypeSignal.set(this.filters['type'] || this.type);
     this.selectedCategory.set(this.filters['category'] || 'Popular');
     this.selectedYear.set(this.filters['year'] || 0);
@@ -79,9 +68,11 @@ export class FilterComponent implements OnInit {
     this.selectedKeywords.set(keywordParam);
     const userRegion = this.tmdbService.getRegion();
     if (userRegion && !this.countries.some(c => c.code === userRegion)) {
-      this.countries = [{ code: userRegion, name: new Intl.DisplayNames(['en'], { type: 'region' }).of(userRegion) || userRegion }, ...this.countries,];
+      this.countries = [
+        { code: userRegion, name: new Intl.DisplayNames(['en'], { type: 'region' }).of(userRegion) || userRegion },
+        ...this.countries,
+      ];
     }
-
 
     this.updateFilter();
   }
@@ -105,18 +96,8 @@ export class FilterComponent implements OnInit {
       genres: this.selectedGenres(),
       studioOrNetwork: this.selectedStudiosOrNetworks(),
       keywords: this.selectedKeywords().map(kw => kw.id),
-      country: this.selectedCountry()
+      country: this.selectedCountry(),
     });
-    console.log('Filter from filter component updated:', {
-      type: this.selectedTypeSignal(),
-      category: this.selectedCategory(),
-      year: this.selectedYear(),
-      genres: this.selectedGenres(),
-      keyword: this.selectedKeywords(),
-      studioOrNetwork: this.selectedStudiosOrNetworks(),
-      country: this.selectedCountry()
-    });
-
   }
 
   filterReset() {
@@ -130,10 +111,7 @@ export class FilterComponent implements OnInit {
   }
 
   onGenreChange(event: any) {
-    // event.value is an array of selected IDs
-    console.log('Genres changed:', event.value);
     if (event.value.some((genre: number) => genre === undefined)) {
-      console.log('Deselecting all genres');
       this.selectedGenres.set([]);
     } else {
       this.selectedGenres.set(event.value);
@@ -144,7 +122,7 @@ export class FilterComponent implements OnInit {
   onKeywordInput(query: string) {
     this.keywordInput.set(query);
     if (query.length >= 3) {
-      this.tmdbService.searchKeyword(query).subscribe((response) => {
+      this.tmdbService.searchKeyword(query).subscribe(response => {
         this.keywordResults.set(response.results);
       });
     } else {
@@ -153,9 +131,9 @@ export class FilterComponent implements OnInit {
   }
 
   addKeywordFromSuggestion(keyword: { id: number; name: string }) {
-    const exists = this.selectedKeywords().some((kw) => kw.id === keyword.id);
+    const exists = this.selectedKeywords().some(kw => kw.id === keyword.id);
     if (!exists) {
-      this.selectedKeywords.update((current) => [...current, keyword]);
+      this.selectedKeywords.update(current => [...current, keyword]);
     }
 
     this.keywordInput.set('');
@@ -164,16 +142,15 @@ export class FilterComponent implements OnInit {
   }
 
   removeKeyword(keywordId: number) {
-    this.selectedKeywords.update((keywords) => keywords.filter((kw) => kw.id !== keywordId));
+    this.selectedKeywords.update(keywords => keywords.filter(kw => kw.id !== keywordId));
     this.updateFilter();
   }
-
 
   private checkViewport(): void {
     this.isMobile = window.innerWidth < 768;
   }
 
   getFirstSelectedGenre(): Genre | null {
-    return this.genres.find((genre) => this.selectedGenres().includes(genre.id)) || null;
+    return this.genres.find(genre => this.selectedGenres().includes(genre.id)) || null;
   }
 }

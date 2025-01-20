@@ -6,9 +6,9 @@ import { TmdbService } from '../../services/tmdb.service';
 import { MOVIE_GENRES, SERIES_GENRES } from '../../../../public/assets/genres';
 import { Genre, Keyword } from '../../interfaces/common-interfaces';
 import { Studio, STUDIOS } from '../../../../public/assets/studios';
-import {  NETWORKS } from '../../../../public/assets/networks';
+import { NETWORKS } from '../../../../public/assets/networks';
 import { firstValueFrom, Subscription } from 'rxjs';
-import { InfiniteScrollDirective  } from 'ngx-infinite-scroll';
+import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 
 export interface FilterState {
   type: 'movies' | 'series';
@@ -30,8 +30,6 @@ export interface ContentItem {
   poster_path: string;
   media_type: 'movie' | 'tv';
 }
-
-
 
 @Component({
   selector: 'app-filter-page',
@@ -56,10 +54,8 @@ export class FilterPageComponent implements OnInit {
   studios = STUDIOS;
   networks = NETWORKS;
 
-  years = Array.from({length: new Date().getFullYear() - 1979},
-   (_, i) => new Date().getFullYear() - i);
+  years = Array.from({ length: new Date().getFullYear() - 1979 }, (_, i) => new Date().getFullYear() - i);
 
-  
   selectedGenres = signal<number[]>([]);
 
   currentGenres: Genre[] = [];
@@ -82,7 +78,6 @@ export class FilterPageComponent implements OnInit {
     this.type = this.route.snapshot.data['type'];
     this.filters.update(f => ({ ...f, type: this.type }));
 
-   
     if (this.type === 'movies') {
       this.currentGenres = this.movieGenres;
       this.curentStudiosOrNetwork = this.studios;
@@ -94,7 +89,6 @@ export class FilterPageComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       if (params['genre']) {
         this.filters.update(f => ({ ...f, genres: params['genre'].split(',').map((id: number) => +id) }));
-
       }
       if (params['keyword']) {
         try {
@@ -160,18 +154,14 @@ export class FilterPageComponent implements OnInit {
 
   async fetchContent(initialLoad = false) {
     if (this.isLoading()) return;
-    
+
     this.isLoading.set(true);
     const filterValues = this.filters();
     const pagesToFetch = initialLoad ? [1, 2] : [this.currentPage()];
-  
+
     try {
       const responses = await Promise.all(
-        pagesToFetch.map(page =>
-          firstValueFrom(
-            this.tmdbService.fetchContent(filterValues, page, this.type === 'movies' ? 'movie' : 'tv')
-          )
-        )
+        pagesToFetch.map(page => firstValueFrom(this.tmdbService.fetchContent(filterValues, page, this.type === 'movies' ? 'movie' : 'tv')))
       );
 
       if (initialLoad) {
@@ -181,10 +171,10 @@ export class FilterPageComponent implements OnInit {
           }
           return acc;
         }, [] as any[]);
-        
+
         this.items.set(combinedResults);
         this.currentPage.set(3);
-        
+
         if (responses[0]?.total_pages) {
           this.totalPages.set(responses[0].total_pages);
         }
@@ -208,5 +198,4 @@ export class FilterPageComponent implements OnInit {
     }
     this.fetchContent(false);
   }
-
 }

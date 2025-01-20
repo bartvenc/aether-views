@@ -37,7 +37,6 @@ export class TmdbService {
         const age = Date.now() - Number(timestamp);
         if (age < this.REGION_CACHE_DURATION) {
           this.userRegion = cachedRegion;
-          console.log('Using cached region:', this.userRegion);
           return;
         }
       }
@@ -64,9 +63,7 @@ export class TmdbService {
     this.userRegion = region;
     localStorage.setItem(this.REGION_STORAGE_KEY, region);
     localStorage.setItem(this.REGION_TIMESTAMP_KEY, Date.now().toString());
-    console.log('Updated region:', region);
   }
-
 
   // Convert the HTTP Observable directly to a Signal/
   get popularSeries(): Signal<Series[]> {
@@ -84,11 +81,10 @@ export class TmdbService {
   get trendingSeries(): Signal<Series[]> {
     if (!this.trendingSeriesSignal) {
       this.trendingSeriesSignal = toSignal(
-        this.http.get<{ results: Series[] }>(`${this.baseUrl}/trending/tv/week?api_key=${this.apiKey}`)
-          .pipe(
-            map(response => response.results),
-            map(series => series.map(({ media_type, ...seriesWithoutMediaType }) => seriesWithoutMediaType))
-          ),
+        this.http.get<{ results: Series[] }>(`${this.baseUrl}/trending/tv/week?api_key=${this.apiKey}`).pipe(
+          map(response => response.results),
+          map(series => series.map(({ media_type, ...seriesWithoutMediaType }) => seriesWithoutMediaType))
+        ),
         { initialValue: [] }
       );
     }
@@ -99,11 +95,10 @@ export class TmdbService {
   get trendingMovies(): Signal<Movie[]> {
     if (!this.trendingMoviesSignal) {
       this.trendingMoviesSignal = toSignal(
-        this.http.get<{ results: Movie[] }>(`${this.baseUrl}/trending/movie/week?api_key=${this.apiKey}`)
-          .pipe(
-            map(response => response.results),
-            map(movies => movies.map(({ media_type, ...movieWithoutMediaType }) => movieWithoutMediaType))
-          ),
+        this.http.get<{ results: Movie[] }>(`${this.baseUrl}/trending/movie/week?api_key=${this.apiKey}`).pipe(
+          map(response => response.results),
+          map(movies => movies.map(({ media_type, ...movieWithoutMediaType }) => movieWithoutMediaType))
+        ),
         { initialValue: [] }
       );
     }
@@ -138,15 +133,13 @@ export class TmdbService {
   }
 
   fetchContent(filters: any, page = 1, type: 'movie' | 'tv' = 'movie'): Observable<any> {
-    console.log(filters);
-    console.log(this.userRegion);
     const params: any = {
       api_key: this.apiKey,
       language: 'en-US',
       page: page.toString(),
       include_adult: false,
       watch_region: this.userRegion,
-      with_origin_country: filters.country
+      with_origin_country: filters.country,
     };
 
     switch (filters.category) {
@@ -165,7 +158,6 @@ export class TmdbService {
 
       case 'New':
         params.sort_by = type === 'movie' ? 'release_date.desc' : 'first_air_date.desc';
-        console.log('Year:', filters.year);
         if (filters.year > 0) {
           params.primary_release_year = filters.year; // Movies
           params.first_air_date_year = filters.year; // TV
@@ -225,9 +217,7 @@ export class TmdbService {
 
     if (filters.country === 'KR') {
       // Exclude romance and drama (10749, 18) for Korean content to filter adult movies
-      params.without_genres = params.without_genres
-        ? `${params.without_genres},10749,18`
-        : '10749,18';
+      params.without_genres = params.without_genres ? `${params.without_genres},10749,18` : '10749,18';
     }
 
     const queryString = new URLSearchParams(params).toString();
@@ -306,7 +296,6 @@ export class TmdbService {
     return `https://image.tmdb.org/t/p/${size}${path}?format=webp`;
   }
 
-
   // Type guards
   isSeries(item: any): item is Series {
     return this.hasProperty<Series>(item, 'first_air_date', 'string');
@@ -364,12 +353,12 @@ export class TmdbService {
       .pipe(
         map(response => ({
           ...response,
-          recommendations: response.recommendations ? {
-            ...response.recommendations,
-            results: response.recommendations.results
-              .filter(item => item.media_type === 'tv')
-              .map(({ media_type, ...rest }) => rest as Series)
-          } : undefined
+          recommendations: response.recommendations
+            ? {
+                ...response.recommendations,
+                results: response.recommendations.results.filter(item => item.media_type === 'tv').map(({ media_type, ...rest }) => rest as Series),
+              }
+            : undefined,
         }))
       );
   }
@@ -385,17 +374,16 @@ export class TmdbService {
       .pipe(
         map(response => ({
           ...response,
-          recommendations: response.recommendations ? {
-            ...response.recommendations,
-            results: response.recommendations.results.map(item => {
-              const { media_type, ...rest } = item;
-              return rest as Movie;
-            })
-          } : undefined,
-        })),
-        tap(response => {
-          console.log('Full movie details:', response);
-        })
+          recommendations: response.recommendations
+            ? {
+                ...response.recommendations,
+                results: response.recommendations.results.map(item => {
+                  const { media_type, ...rest } = item;
+                  return rest as Movie;
+                }),
+              }
+            : undefined,
+        }))
       );
   }
 
@@ -418,7 +406,7 @@ export class TmdbService {
 
   getSeasonDetails(seriesId: number, seasonNumber: number): Observable<Season> {
     return this.http.get<Season>(`${this.baseUrl}/tv/${seriesId}/season/${seasonNumber}`, {
-      params: { api_key: this.apiKey }
+      params: { api_key: this.apiKey },
     });
   }
 
@@ -450,9 +438,6 @@ export class TmdbService {
   }
 
   isContentSeen(type: 'movie' | 'tv', id: number): boolean {
-    if (this.seenContent.has(`${type}_${id}`)) {
-      console.log('Checking seen:', `${type}_${id}`, this.seenContent.has(`${type}_${id}`),);
-    }
     return this.seenContent.has(`${type}_${id}`);
   }
 }

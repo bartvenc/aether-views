@@ -1,29 +1,38 @@
-<div class="p-6 bg-[#201a23] text-white min-h-screen"
-     infiniteScroll
-     [infiniteScrollDistance]="2"
-     [infiniteScrollThrottle]="300"
-     [infiniteScrollDisabled]="isLoading()"
-     (scrolled)="onScroll()">
-  
+<div
+  class="p-6 bg-[#201a23] text-white min-h-screen"
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="300"
+  [infiniteScrollDisabled]="isLoading()"
+  (scrolled)="onScroll()">
   <!-- Filters -->
-  <app-filter [type]="type" (filterChange)="updateFilters($event)" [genres]="currentGenres" [years]="years"
-    [studiosOrNetworks]="curentStudiosOrNetwork" [filters]="filters()"></app-filter>
+  <app-filter
+    [type]="type"
+    (filterChange)="updateFilters($event)"
+    [genres]="currentGenres"
+    [years]="years"
+    [studiosOrNetworks]="curentStudiosOrNetwork"
+    [filters]="filters()"></app-filter>
 
   <!-- Items Grid -->
   <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols- lg:grid-cols-7 gap-4 mt-6">
     @for (item of items(); track item) {
-    <app-card [type]="type === 'movies' ? 'movies' : 'series'" [subtitle]="item.title"
-      [title]="item.release_date ? item.release_date : item.first_air_date"
-      [imageUrl]="item ? tmdbService.getImageUrl(item) : null" [overview]="item.overview" [item]="item"></app-card>
+      <app-card
+        [type]="type === 'movies' ? 'movies' : 'series'"
+        [subtitle]="item.title"
+        [title]="item.release_date ? item.release_date : item.first_air_date"
+        [imageUrl]="item ? tmdbService.getImageUrl(item) : null"
+        [overview]="item.overview"
+        [item]="item"></app-card>
     }
 
     <!-- Skeleton Loading for Cards -->
     @if (isLoading()) {
-    @for (item of [1,2,3,4,5,6]; track item) {
-    <div class="w-full h-64 bg-gray-800 animate-pulse rounded-lg">
-      <!-- Optional: use the index if needed -->
-    </div>
-    }
+      @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+        <div class="w-full h-64 bg-gray-800 animate-pulse rounded-lg">
+          <!-- Optional: use the index if needed -->
+        </div>
+      }
     }
   </div>
 </div>

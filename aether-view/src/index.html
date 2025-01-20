@@ -1,46 +1,54 @@
 <!doctype html>
 <html lang="en">
-  
   <head>
-    <base href="/">
+    <base href="/" />
     <meta charset="utf-8" />
     <title>Aether Stream</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
+
     <!-- Preconnect to Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" type="image/png" href="assets/AetherIcon.png">
-    <link rel="apple-touch-icon" href="assets/AetherIcon.png">
-   
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="icon" type="image/png" href="assets/AetherIcon.png" />
+    <link rel="apple-touch-icon" href="assets/AetherIcon.png" />
+
     <!-- Load Material Icons with font-display swap -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" onload="this.rel='stylesheet'">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" onload="this.rel='stylesheet'" />
     <noscript>
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet" />
     </noscript>
-    
+
     <!-- Load Roboto font with font-display swap -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" onload="this.rel='stylesheet'">
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+      onload="this.rel='stylesheet'" />
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
     </noscript>
-    
+
     <!-- Preload critical CSS -->
-    <link rel="preload" href="styles.css" as="style" onload="this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="styles.css"></noscript>
-    
+    <link rel="preload" href="styles.css" as="style" onload="this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="styles.css" /></noscript>
+
     <!-- Inline critical CSS -->
     <style>
       /* Critical styles only */
-      body { margin: 0; background: #201a23; color: white; }
-      .material-icons { font-family: 'Material Icons'; font-display: swap; }
+      body {
+        margin: 0;
+        background: #201a23;
+        color: white;
+      }
+      .material-icons {
+        font-family: 'Material Icons';
+        font-display: swap;
+      }
     </style>
-    
-    <!-- Preload TMDB images -->
-    <link rel="preconnect" href="https://image.tmdb.org" crossorigin>
-    <link rel="dns-prefetch" href="https://image.tmdb.org">
-    
 
+    <!-- Preload TMDB images -->
+    <link rel="preconnect" href="https://image.tmdb.org" crossorigin />
+    <link rel="dns-prefetch" href="https://image.tmdb.org" />
   </head>
   <body class="text-white mat-typography">
     <app-root>Loading...</app-root>

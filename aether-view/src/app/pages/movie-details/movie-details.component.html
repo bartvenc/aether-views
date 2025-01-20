@@ -1,150 +1,148 @@
 @if (movie()) {
-<div class="relative text-white">
-  <!-- Backdrop Section -->
-  <div class="relative w-full h-[450px] md:h-[600px] overflow-hidden">
-    @if (tmdbService.getBackDrop(movie()?.backdrop_path)) {
-    <img [src]="tmdbService.getBackDrop(movie()?.backdrop_path)" [alt]="movie()?.title"
-      class="absolute w-full h-full object-cover" />
-    }
-    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#201a23]"></div>
-    <div class="absolute inset-0 bg-[#201a23] bg-opacity-40"></div>
+  <div class="relative text-white">
+    <!-- Backdrop Section -->
+    <div class="relative w-full h-[450px] md:h-[600px] overflow-hidden">
+      @if (tmdbService.getBackDrop(movie()?.backdrop_path)) {
+        <img [src]="tmdbService.getBackDrop(movie()?.backdrop_path)" [alt]="movie()?.title" class="absolute w-full h-full object-cover" />
+      }
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent to-[#201a23]"></div>
+      <div class="absolute inset-0 bg-[#201a23] bg-opacity-40"></div>
 
-    <!-- Poster, Title, Tagline, and Trailer -->
-    <div
-      class="relative z-20 w-full h-full flex flex-col md:flex-row items-center md:items-center justify-center md:justify-start px-4 md:px-16 space-y-8 md:space-y-0 md:space-x-12">
-
-      <!-- Poster -->
-      <div class="w-32 md:w-64 flex-shrink-0">
-        @if (movie()?.poster_path) {
-        <img [src]="tmdbService.getPosterUrl(movie()?.poster_path)" [alt]="movie()?.title"
-          class="rounded-lg shadow-lg w-full" />
-        }
-      </div>
-
-      <!-- Title and Info -->
-      <div class="flex flex-col text-center md:text-left items-center md:items-start space-y-4 max-w-lg">
-        <h1 class="text-2xl md:text-5xl font-extrabold">
-          {{ movie()?.title }}
-          @if (movie()?.release_date) {
-          <span class="text-gray-400 text-xl md:text-3xl"> ({{ movie()?.release_date |
-            date: 'yyyy'
-            }}) </span>
-          }
-          <!-- Trailer Button -->
-          @if (tmdbService.getTrailerUrl(movie())) {
-          <a [href]="tmdbService.getTrailerUrl(movie())" target="_blank"
-            class="inline-flex ml-2 align-middle text-gray-300 hover:text-slate-200 transition-colors duration-300">
-            <span class="material-icons text-2xl md:text-3xl">play_circle</span>
-          </a>
-          }
-        </h1>
-
-
-
-
-        <!-- Runtime and Ratings -->
-        @if(movie()?.runtime) {
-        <div class="text-base md:text-lg text-gray-300">
-          {{ movie()?.runtime }} minutes
-        </div>
-        }
-
-        <!-- Genres -->
-        <div class="flex flex-wrap gap-2 justify-center md:justify-start">
-          @for (genre of movie()?.genres || []; track genre) {
-          <span (click)="handleClick($event, 'genre', genre)"
-            class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm hover:bg-[#3b3539] cursor-pointer">
-            {{ genre.name }}
-          </span>
+      <!-- Poster, Title, Tagline, and Trailer -->
+      <div
+        class="relative z-20 w-full h-full flex flex-col md:flex-row items-center md:items-center justify-center md:justify-start px-4 md:px-16 space-y-8 md:space-y-0 md:space-x-12">
+        <!-- Poster -->
+        <div class="w-32 md:w-64 flex-shrink-0">
+          @if (movie()?.poster_path) {
+            <img [src]="tmdbService.getPosterUrl(movie()?.poster_path)" [alt]="movie()?.title" class="rounded-lg shadow-lg w-full" />
           }
         </div>
 
-        <!-- Tagline -->
-        @if (movie()?.tagline) {
-        <p class="text-xl md:text-2xl italic text-gray-200">
-          {{ movie()?.tagline }}
-        </p>
-        }
+        <!-- Title and Info -->
+        <div class="flex flex-col text-center md:text-left items-center md:items-start space-y-4 max-w-lg">
+          <h1 class="text-2xl md:text-5xl font-extrabold">
+            {{ movie()?.title }}
+            @if (movie()?.release_date) {
+              <span class="text-gray-400 text-xl md:text-3xl"> ({{ movie()?.release_date | date: 'yyyy' }}) </span>
+            }
+            <!-- Trailer Button -->
+            @if (tmdbService.getTrailerUrl(movie())) {
+              <a
+                [href]="tmdbService.getTrailerUrl(movie())"
+                target="_blank"
+                class="inline-flex ml-2 align-middle text-gray-300 hover:text-slate-200 transition-colors duration-300">
+                <span class="material-icons text-2xl md:text-3xl">play_circle</span>
+              </a>
+            }
+          </h1>
+
+          <!-- Runtime and Ratings -->
+          @if (movie()?.runtime) {
+            <div class="text-base md:text-lg text-gray-300">{{ movie()?.runtime }} minutes</div>
+          }
+
+          <!-- Genres -->
+          <div class="flex flex-wrap gap-2 justify-center md:justify-start">
+            @for (genre of movie()?.genres || []; track genre) {
+              <span
+                (click)="handleClick($event, 'genre', genre)"
+                class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm hover:bg-[#3b3539] cursor-pointer">
+                {{ genre.name }}
+              </span>
+            }
+          </div>
+
+          <!-- Tagline -->
+          @if (movie()?.tagline) {
+            <p class="text-xl md:text-2xl italic text-gray-200">
+              {{ movie()?.tagline }}
+            </p>
+          }
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Main Content -->
-  <div class="relative z-20 w-full mx-auto px-4 md:px-8 py-4 md:py-8">
-    <!-- Overview Section -->
-    <div class="mb-8">
-      <h2 class="text-2xl md:text-3xl font-bold mb-4">Overview</h2>
-      @if (movie()?.overview) {
-      <p class="text-gray-300 mb-6 leading-relaxed">
-        {{ movie()?.overview }}
-      </p>
+    <!-- Main Content -->
+    <div class="relative z-20 w-full mx-auto px-4 md:px-8 py-4 md:py-8">
+      <!-- Overview Section -->
+      <div class="mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4">Overview</h2>
+        @if (movie()?.overview) {
+          <p class="text-gray-300 mb-6 leading-relaxed">
+            {{ movie()?.overview }}
+          </p>
+        }
+      </div>
+
+      <!-- Creators and Producers -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-300 text-sm mb-8">
+        <div>
+          <strong class="text-white">Director:</strong>
+          @for (director of movie()?.credits?.crew || []; track director) {
+            @if (director.job === 'Director') {
+              <div>{{ director.name }}</div>
+            }
+          }
+        </div>
+        <div>
+          <strong class="text-white">Producers:</strong>
+          @for (producer of movie()?.credits?.crew || []; track producer) {
+            @if (producer.job === 'Producer') {
+              <div>{{ producer.name }}</div>
+            }
+          }
+        </div>
+        <div>
+          <strong class="text-white">Executive Producers:</strong>
+          @for (producer of movie()?.credits?.crew || []; track producer) {
+            @if (producer.job === 'Executive Producer') {
+              <div>{{ producer.name }}</div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Keywords -->
+      @if (movie()?.keywords?.keywords?.length) {
+        <div class="flex flex-wrap gap-2 mb-6">
+          @for (keyword of movie()?.keywords?.keywords || []; track keyword) {
+            <button
+              (click)="handleClick($event, 'keyword', keyword)"
+              class="flex justify-center bg-gray-800 px-3 py-1 rounded-full cursor-pointer hover:bg-[#3b3539]">
+              <span class="material-icons text-sm mr-1"> sell </span>
+              <span class="text-gray-200 text-sm">{{ keyword.name }}</span>
+            </button>
+          }
+        </div>
+      }
+
+      <!-- Recommendations -->
+
+      @if (movie()?.recommendations?.results?.length) {
+        <h2 class="text-2xl md:text-3xl font-bold mt-8 mb-4">Recommendations</h2>
+        <app-slider
+          titleField="release_date"
+          subtitleField="title"
+          [items]="movie()?.recommendations?.results || []"
+          overview="overview"></app-slider>
+      }
+
+      @if (movie()?.recommendations?.results?.length) {
+        <!-- Similar Series -->
+        <h2 class="text-2xl md:text-3xl font-bold mt-12 mb-4">Similar Movies</h2>
+        <app-slider overview="overview" titleField="release_date" subtitleField="title" [items]="movie()?.similar?.results || []"></app-slider>
+      }
+
+      @if (movie()?.credits?.cast?.length) {
+        <!-- Cast -->
+        <h2 class="text-2xl md:text-3xl font-bold mt-12 mb-4">Cast</h2>
+        <app-slider
+          [items]="movie()?.credits?.cast || []"
+          cardType="person"
+          imageField="profile_path"
+          titleField="character"
+          subtitleField="name"></app-slider>
       }
     </div>
-
-    <!-- Creators and Producers -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-300 text-sm mb-8">
-      <div>
-        <strong class="text-white">Director:</strong>
-        @for (director of movie()?.credits?.crew || []; track director) {
-        @if (director.job === 'Director') {
-        <div>{{ director.name }}</div>
-        }
-        }
-      </div>
-      <div>
-        <strong class="text-white">Producers:</strong>
-        @for (producer of movie()?.credits?.crew || []; track producer) {
-        @if (producer.job === 'Producer') {
-        <div>{{ producer.name }}</div>
-        }
-        }
-      </div>
-      <div>
-        <strong class="text-white">Executive Producers:</strong>
-        @for (producer of movie()?.credits?.crew || []; track producer) {
-        @if (producer.job === 'Executive Producer') {
-        <div>{{ producer.name }}</div>
-        }
-        }
-      </div>
-    </div>
-
-    <!-- Keywords -->
-    @if (movie()?.keywords?.keywords?.length) {
-    <div class="flex flex-wrap gap-2 mb-6">
-      @for (keyword of movie()?.keywords?.keywords || []; track keyword) {
-      <button (click)="handleClick($event, 'keyword', keyword)"
-        class=" flex justify-center  bg-gray-800  px-3 py-1 rounded-full cursor-pointer hover:bg-[#3b3539]">
-        <span class="material-icons text-sm mr-1 ">
-          sell
-        </span>
-        <span class="text-gray-200 text-sm ">{{keyword.name}}</span>
-      </button>
-      }
-    </div>
-    }
-
-    <!-- Recommendations -->
-
-    @if (movie()?.recommendations?.results?.length) {
-    <h2 class="text-2xl md:text-3xl font-bold mt-8 mb-4">Recommendations</h2>
-    <app-slider titleField="release_date" subtitleField="title" [items]="movie()?.recommendations?.results || []"
-      overview="overview"></app-slider>
-    }
-
-    @if (movie()?.recommendations?.results?.length) {
-    <!-- Similar Series -->
-    <h2 class="text-2xl md:text-3xl font-bold mt-12 mb-4">Similar Movies</h2>
-    <app-slider overview="overview" titleField="release_date" subtitleField="title"
-      [items]="movie()?.similar?.results || []"></app-slider>
-    }
-
-    @if (movie()?.credits?.cast?.length) {
-    <!-- Cast -->
-    <h2 class="text-2xl md:text-3xl font-bold mt-12 mb-4">Cast</h2>
-    <app-slider [items]="movie()?.credits?.cast || []" cardType="person" imageField="profile_path"
-      titleField="character" subtitleField="name"></app-slider>
-    }
   </div>
-</div>
 }

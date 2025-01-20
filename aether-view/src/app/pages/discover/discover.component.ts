@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
   templateUrl: './discover.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
-export class DiscoverComponent implements OnInit {
+export class DiscoverComponent {
   MOVIE_GENRES = MOVIE_GENRES;
   SERIES_GENRES = SERIES_GENRES;
   STUDIOS = STUDIOS;
@@ -26,9 +26,4 @@ export class DiscoverComponent implements OnInit {
   upcomingMovies = this.tmdbService.upcomingMovies;
 
   currentPopularSeriesPage = signal(1);
-
-  // Using existing service function for popular series
-  ngOnInit() {
-    console.log(this.popularSeries());
-  }
 }

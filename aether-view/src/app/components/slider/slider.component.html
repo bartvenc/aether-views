@@ -1,18 +1,19 @@
 <div class="swiper-container">
-  <swiper-container #swiper
+  <swiper-container
+    #swiper
     [slidesPerView]="swiperOptions.slidesPerView"
     [spaceBetween]="swiperOptions.spaceBetween"
     [breakpoints]="swiperOptions.breakpoints"
     [freeMode]="swiperOptions.freeMode"
     [navigation]="true"
-    style="--swiper-navigation-color: #ede5f2;"
+    style="--swiper-navigation-color: #ede5f2"
     class="mySwiper">
     @for (item of items; track item.id; let i = $index) {
       <swiper-slide class="cursor-pointer" [ngClass]="{ 'pb-1': isMobile }">
         <app-card
           [type]="cardType"
           [imageUrl]="item ? tmdbService.getImageUrl(item) : null"
-          [title]="item.media_type ? getItemValue(item, 'releaseDate') :item[titleField]"
+          [title]="item.media_type ? getItemValue(item, 'releaseDate') : item[titleField]"
           [subtitle]="item.media_type ? getItemValue(item, 'displayTitle') : item[subtitleField]"
           [overview]="item[overviewField]"
           [item]="item"

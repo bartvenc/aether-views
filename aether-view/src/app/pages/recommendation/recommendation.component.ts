@@ -29,39 +29,41 @@ interface QuoteState {
   templateUrl: './recommendation.component.html',
   imports: [CommonModule, FormsModule, MatButtonToggleModule, SliderComponent],
   host: {
-    class: 'recommendation-page'
+    class: 'recommendation-page',
   },
-  styles: [`
-    :host {
-      @apply block min-h-screen bg-[#201a23] text-white;
-    }
-    
-    .header-gradient {
-      @apply bg-gradient-to-b from-transparent to-[#201a23];
-    }
+  styles: [
+    `
+      :host {
+        @apply block min-h-screen bg-[#201a23] text-white;
+      }
 
-    .content-wrapper {
-      @apply px-4 md:px-8 py-2 md:py-1;
-    }
+      .header-gradient {
+        @apply bg-gradient-to-b from-transparent to-[#201a23];
+      }
 
-    .search-input {
-      @apply w-full max-w-md bg-[#28202b] border border-gray-700 text-gray-300 p-2 rounded-lg
+      .content-wrapper {
+        @apply px-4 md:px-8 py-2 md:py-1;
+      }
+
+      .search-input {
+        @apply w-full max-w-md bg-[#28202b] border border-gray-700 text-gray-300 p-2 rounded-lg
              focus:outline-none focus:ring-2 focus:ring-slate-500 transition-all duration-300 text-sm;
-    }
+      }
 
-    .button-primary {
-      @apply px-4 py-2 bg-[#3a2e3d] hover:bg-[#4a3e4d] text-white rounded-lg
+      .button-primary {
+        @apply px-4 py-2 bg-[#3a2e3d] hover:bg-[#4a3e4d] text-white rounded-lg
              transition duration-300 flex items-center justify-center gap-2 text-sm whitespace-nowrap;
-    }
+      }
 
-    .section-title {
-      @apply text-2xl font-bold mb-6;
-    }
+      .section-title {
+        @apply text-2xl font-bold mb-6;
+      }
 
-    .curation-title {
-      @apply text-xl font-bold mb-2 px-2;
-    }
-  `]
+      .curation-title {
+        @apply text-xl font-bold mb-2 px-2;
+      }
+    `,
+  ],
 })
 export class RecommendationComponent implements OnInit, OnDestroy {
   // Signals
@@ -74,7 +76,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   readonly currentPromt = signal('');
   readonly filterState = signal<FilterState>({
     mediaFilter: 'all',
-    sortOrder: 'newest'
+    sortOrder: 'newest',
   });
 
   // Regular properties
@@ -83,7 +85,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   private quoteState: QuoteState = { index: 0, interval: null };
   private promptState: QuoteState = {
     index: Math.floor(Math.random() * prompts.length),
-    interval: null
+    interval: null,
   };
 
   // Dependency injection
@@ -117,10 +119,10 @@ export class RecommendationComponent implements OnInit, OnDestroy {
 
     this.fetchRecommendations().subscribe({
       next: () => this.resetState(),
-      error: (error) => {
+      error: error => {
         console.error('Error in recommendation flow:', error);
         this.handleError();
-      }
+      },
     });
   }
 
@@ -133,9 +135,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   }
 
   private processInitialResults(response: any): Observable<void> {
-    return forkJoin<(Series | Movie | null)[]>(
-      response.recommendations.map((item: RecommendationItem) => this.searchSingleTitle(item))
-    ).pipe(
+    return forkJoin<(Series | Movie | null)[]>(response.recommendations.map((item: RecommendationItem) => this.searchSingleTitle(item))).pipe(
       map(results => this.updateRecommendations(results, true))
     );
   }
@@ -143,44 +143,35 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   private fetchSecondaryResults(): Observable<void> {
     this.isSecondStage.set(true);
     return this.backendService.search(this.userQuery).pipe(
-      switchMap(response => forkJoin(
-        response.results.map(item => this.searchSingleTitle(item))
-      )),
+      switchMap(response => forkJoin(response.results.map(item => this.searchSingleTitle(item)))),
       map(results => this.updateRecommendations(results, false))
     );
   }
 
   private updateRecommendations(results: (Series | Movie | null)[], isInitial: boolean): void {
     // Filter out nulls first
-    const validResults = results.filter((result): result is (Series | Movie) => result !== null);
-    
+    const validResults = results.filter((result): result is Series | Movie => result !== null);
+
     // For secondary stage, remove duplicates from both current movies and series
     const uniqueResults = isInitial ? validResults : validResults.filter(result => !this.isDuplicate(result));
-  
+
     const movies = uniqueResults.filter(item => item.media_type === 'movie') as Movie[];
     const series = uniqueResults.filter(item => item.media_type === 'tv') as Series[];
-  
+
     this.currentRecommendations.update(current => {
       if (isInitial || current.length === 0) {
         return [{ query: this.userQuery, movies, series }, ...current];
       }
-  
+
       // Merge with existing results
-      return [{
-        query: this.userQuery,
-        movies: [...current[0].movies, ...movies],
-        series: [...current[0].series, ...series]
-      }, ...current.slice(1)];
-    });
-  
-    // Debug logging
-    console.log('Updated recommendations:', {
-      isInitial,
-      totalResults: results.length,
-      validResults: validResults.length,
-      uniqueResults: uniqueResults.length,
-      finalMovies: movies.length,
-      finalSeries: series.length
+      return [
+        {
+          query: this.userQuery,
+          movies: [...current[0].movies, ...movies],
+          series: [...current[0].series, ...series],
+        },
+        ...current.slice(1),
+      ];
     });
   }
 
@@ -228,8 +219,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   // Filtering and sorting methods
   get filteredCurations() {
     const userCurations = this.filterCurations(this.currentRecommendations(), false);
-    const defaultCurations = this.showExamples() ? 
-      this.filterCurations(this.defaultRecommendations(), true) : [];
+    const defaultCurations = this.showExamples() ? this.filterCurations(this.defaultRecommendations(), true) : [];
     return [...userCurations, ...defaultCurations];
   }
 
@@ -237,7 +227,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
     return curations.map((curation, index) => ({
       ...this.applySortingAndFiltering(curation),
       isDefault,
-      trackId: `${curation.query}_${isDefault ? index + 1000 : index}`
+      trackId: `${curation.query}_${isDefault ? index + 1000 : index}`,
     }));
   }
 
@@ -249,7 +239,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
 
     return {
       query: curation.query,
-      items: allItems
+      items: allItems,
     };
   }
 
@@ -261,26 +251,20 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   private sortByDate(a: Movie | Series, b: Movie | Series, sortOrder: string): number {
     const dateA = new Date(this.getItemDate(a));
     const dateB = new Date(this.getItemDate(b));
-    return sortOrder === 'newest' ? 
-      dateB.getTime() - dateA.getTime() : 
-      dateA.getTime() - dateB.getTime();
+    return sortOrder === 'newest' ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime();
   }
 
   private getItemDate(item: Movie | Series): string {
-    return item.media_type === 'movie' ?
-      (item as Movie).release_date ?? '' :
-      (item as Series).first_air_date ?? '';
+    return item.media_type === 'movie' ? ((item as Movie).release_date ?? '') : ((item as Series).first_air_date ?? '');
   }
 
   // Utility methods
   private isDuplicate(result: Series | Movie): boolean {
     if (this.currentRecommendations().length === 0) return false;
-    
+
     const current = this.currentRecommendations()[0];
-    
-    return result.media_type === 'movie' 
-      ? current.movies.some(m => m.id === result.id)
-      : current.series.some(s => s.id === result.id);
+
+    return result.media_type === 'movie' ? current.movies.some(m => m.id === result.id) : current.series.some(s => s.id === result.id);
   }
 
   private handleError(): void {
