@@ -15,8 +15,10 @@
 
       <!-- Poster -->
       <div class="w-32 md:w-64 flex-shrink-0">
-        <img *ngIf="series()?.poster_path" [src]="tmdbService.getPosterUrl(series()?.poster_path)"
-          [alt]="series()?.name" class="rounded-lg shadow-lg w-full" />
+        @if (series()?.poster_path) {
+        <img [src]="tmdbService.getPosterUrl(series()?.poster_path)" [alt]="series()?.name"
+          class="rounded-lg shadow-lg w-full" />
+        }
       </div>
 
       <!-- Main Info (title, year + trailer icon, rating, seasons, genres, tagline) -->
@@ -24,16 +26,18 @@
         <!-- Title, Year, and Trailer Icon -->
         <h1 class="text-2xl md:text-5xl font-extrabold">
           {{ series()?.name }}
-          <span *ngIf="series()?.first_air_date" class="text-gray-400 text-xl md:text-3xl">
+          @if (series()?.first_air_date) {
+          <span class="text-gray-400 text-xl md:text-3xl">
             ({{ series()?.first_air_date | date: 'yyyy' }})
           </span>
-
+          }
           <!-- Trailer icon (tooltip on hover), only if there's a trailer link -->
-          <a *ngIf="tmdbService.getTrailerUrl(series())" [href]="tmdbService.getTrailerUrl(series())" target="_blank"
-            title="Watch Trailer"
+          @if (tmdbService.getTrailerUrl(series())) {
+          <a [href]="tmdbService.getTrailerUrl(series())" target="_blank" title="Watch Trailer"
             class="inline-flex ml-2 align-middle text-gray-300 hover:text-slate-200 transition-colors duration-300">
             <span class="material-icons text-2xl md:text-3xl">play_circle</span>
           </a>
+          }
         </h1>
 
         <!-- Rating and Seasons -->
@@ -45,8 +49,7 @@
         <!-- Genres -->
         <div class="flex flex-wrap gap-2 justify-center md:justify-start">
           @for (genre of series()?.genres || []; track genre) {
-          <span 
-           (click)="handleClick($event, 'genre', genre)"
+          <span (click)="handleClick($event, 'genre', genre)"
             class="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-sm  hover:bg-[#3b3539] cursor-pointer">
             {{ genre.name }}
           </span>
@@ -54,9 +57,11 @@
         </div>
 
         <!-- Tagline -->
-        <p *ngIf="series()?.tagline" class="text-xl md:text-2xl italic text-gray-200">
+        @if (series()?.tagline) {
+        <p class="text-xl md:text-2xl italic text-gray-200">
           {{ series()?.tagline }}
         </p>
+        }
       </div>
     </div>
   </div>
@@ -65,9 +70,11 @@
   <div class="relative z-20 w-full mx-auto px-4 md:px-8 py-4 md:py-8">
     <div class="mb-8">
       <h2 class="text-2xl md:text-3xl font-bold mb-4">Overview</h2>
-      <p *ngIf="series()?.overview" class="text-gray-300 mb-6 leading-relaxed">
+      @if (series()?.overview) {
+      <p class="text-gray-300 mb-6 leading-relaxed">
         {{ series()?.overview }}
       </p>
+      }
     </div>
 
     <!-- Creators & Producers -->
@@ -100,95 +107,100 @@
     @if (series()?.keywords?.results?.length) {
     <div class="flex flex-wrap gap-2 mb-6">
       @for (keyword of series()?.keywords?.results || []; track keyword) {
-        <button
-         (click)="handleClick($event, 'keyword', keyword)"
+      <button (click)="handleClick($event, 'keyword', keyword)"
         class=" flex justify-center  bg-gray-800  px-3 py-1 rounded-full cursor-pointer hover:bg-[#3b3539]">
         <span class="material-icons text-sm mr-1 ">
           sell
-          </span>
+        </span>
         <span class="text-gray-200 text-sm ">{{keyword.name}}</span>
       </button>
-      
+
       }
     </div>
     }
 
     <!-- Seasons -->
     @if (series()) {
-      <div class="z-20 w-full mt-4">
-        <!-- Seasons Section -->
-        @if (series()?.seasons?.length) {
+    <div class="z-20 w-full mt-4">
+      <!-- Seasons Section -->
+      @if (series()?.seasons?.length) {
+      <div>
+        <button (click)="toggleAllSeasons()"
+          class="w-full flex justify-between items-center bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all">
+          <h2 class="text-2xl md:text-3xl font-bold">
+            {{ series()?.seasons?.length }} Seasons
+            <span class="text-sm text-gray-400">({{ series()?.number_of_episodes }} Episodes)</span>
+          </h2>
+          <span class="material-icons text-gray-400">
+            {{ allSeasonsOpen ? 'expand_less' : 'expand_more' }}
+          </span>
+        </button>
+
+        <!-- Seasons Accordion -->
+        @if (allSeasonsOpen) {
+        <div class="mt-4 space-y-4">
+          @for (season of series()?.seasons || []; track season) {
           <div>
-            <button (click)="toggleAllSeasons()" 
+            <!-- Season Header -->
+            <button (click)="toggleSeason(season.id)"
               class="w-full flex justify-between items-center bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all">
-              <h2 class="text-2xl md:text-3xl font-bold">
-                {{ series()?.seasons?.length }} Seasons 
-                <span class="text-sm text-gray-400">({{ series()?.number_of_episodes }} Episodes)</span>
-              </h2>
-              <span class="material-icons text-gray-400">
-                {{ allSeasonsOpen ? 'expand_less' : 'expand_more' }}
-              </span>
+              <div class="text-left">
+                <h3 class="text-lg font-semibold text-gray-200 flex items-center">
+
+                  @if (season.air_date && isSeasonFinished(season)) {
+                  <span class="material-icons mr-2">check_circle</span>
+                  }@else if(season.air_date){
+                  <span class="material-icons mr-2">schedule</span>
+                  }
+                  {{ season.name }}
+                </h3>
+                <p class="text-sm text-gray-400">
+                  {{ season.air_date | date: 'longDate' }} - {{ season.episodes?.length }} Episodes
+                </p>
+              </div>
+              <span class="material-icons text-gray-400 transition-transform"
+                [ngClass]="{ 'rotate-180': isSeasonOpen(season.id) }">expand_more</span>
             </button>
-    
-            <!-- Seasons Accordion -->
-            <div *ngIf="allSeasonsOpen" class="mt-4 space-y-4">
-              @for (season of series()?.seasons || []; track season) {
+
+            <!-- Episodes List -->
+            @if (isSeasonOpen(season.id)) {
+            <div class="mt-4 space-y-2 pl-6">
+              @for (episode of season.episodes || []; track episode) {
+              <div class="flex gap-4 items-start">
+                @if (episode.still_path) {
+                <img [src]="tmdbService.getPosterUrl(episode.still_path)" [alt]="episode.name"
+                  class="w-24 h-16 rounded-lg object-cover">
+                }
                 <div>
-                  <!-- Season Header -->
-                  <button (click)="toggleSeason(season.id)" 
-                    class="w-full flex justify-between items-center bg-gray-800 px-4 py-2 rounded-lg hover:bg-gray-700 transition-all">
-                    <div class="text-left">
-                      <h3 class="text-lg font-semibold text-gray-200 flex items-center">
-                        
-                        @if (season.air_date && isSeasonFinished(season)) {
-                          <span class="material-icons mr-2">check_circle</span>
-                        }@else if(season.air_date){
-                          <span class="material-icons mr-2">schedule</span>
-                        }
-                        {{ season.name }}
-                      </h3>
-                      <p class="text-sm text-gray-400">
-                        {{ season.air_date | date: 'longDate' }} - {{ season.episodes?.length }} Episodes
-                      </p>
-                    </div>
-                    <span class="material-icons text-gray-400 transition-transform"
-                      [ngClass]="{ 'rotate-180': isSeasonOpen(season.id) }">expand_more</span>
-                  </button>
-    
-                  <!-- Episodes List -->
-                  @if (isSeasonOpen(season.id)) {
-                    <div class="mt-4 space-y-2 pl-6">
-                      @for (episode of season.episodes || []; track episode) {
-                        <div class="flex gap-4 items-start">
-                          <img *ngIf="episode.still_path" [src]="tmdbService.getPosterUrl(episode.still_path)" 
-                            [alt]="episode.name" class="w-24 h-16 rounded-lg object-cover">
-                          <div>
-                            <h4 class="text-gray-200 font-medium flex items-center">
-                        
-                              @if (episode.air_date && isEpisodeAired(episode.air_date)) {
-                                <span class="material-icons mr-2">check</span>
-                              }@else if(episode.air_date){
-                                <span class="material-icons mr-2">schedule</span>
-                              }
-                              {{ episode.name }}
-                            </h4>
-                            <p class="text-sm text-gray-400">{{ episode.air_date | date: 'longDate' }}</p>
-                            <p class="text-sm text-gray-300 leading-relaxed" *ngIf="episode.overview">
-                              {{ episode.overview }}
-                            </p>
-                          </div>
-                        </div>
-                      }
-                    </div>
+                  <h4 class="text-gray-200 font-medium flex items-center">
+
+                    @if (episode.air_date && isEpisodeAired(episode.air_date)) {
+                    <span class="material-icons mr-2">check</span>
+                    }@else if(episode.air_date){
+                    <span class="material-icons mr-2">schedule</span>
+                    }
+                    {{ episode.name }}
+                  </h4>
+                  <p class="text-sm text-gray-400">{{ episode.air_date | date: 'longDate' }}</p>
+                  @if (episode.overview) {
+                  <p class="text-sm text-gray-300 leading-relaxed">
+                    {{ episode.overview }}
+                  </p>
                   }
                 </div>
+              </div>
               }
             </div>
+            }
           </div>
+          }
+        </div>
         }
       </div>
+      }
+    </div>
     }
-    
+
 
     <!-- Recommendations -->
     @if (series()?.recommendations?.results?.length) {
