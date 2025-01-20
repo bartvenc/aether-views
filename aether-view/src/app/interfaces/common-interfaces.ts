@@ -152,3 +152,14 @@ export interface Curation {
   movies: any[];
   series: any[];
 }
+
+export type MediaType = 'movie' | 'tv' | 'person';
+
+export interface SearchResult {
+  id: number;
+  title?: string;
+  name?: string;
+  media_type: MediaType;
+  poster_path?: string;
+  profile_path?: string;
+}
