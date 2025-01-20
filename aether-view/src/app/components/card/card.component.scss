@@ -41,7 +41,7 @@
     .card-title {
       font-size: 0.875rem;
       margin-bottom: 0.1rem;
-    
+
     }
 
     .card-subtitle {
@@ -49,7 +49,7 @@
       font-size: 1rem;
       color: lightgray;
       margin-bottom: 0.1rem;
-    
+
     }
 
     .card-overview {
@@ -60,7 +60,7 @@
       line-height: 1.2;
       overflow: hidden;
       text-overflow: ellipsis; // Add ellipsis for overflowing text.
-    
+
     }
   }
 }
@@ -71,6 +71,23 @@
   max-width: 150px;
   aspect-ratio: 2/3; // Fixed aspect ratio for movie posters
   background: #28202b; // Placeholder background
+
+  .seen-indicator {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover .seen-indicator {
+    opacity: 1;
+  }
+
 
   .card-image {
     position: absolute;
@@ -130,6 +147,7 @@
       display: none;
     }
   }
+
   @media (max-width: 480px) {
     max-width: 85px;
   }
@@ -158,7 +176,7 @@
   @media (max-width: 768px) {
     max-width: 150px;
   }
-  
+
   @media (max-width: 480px) {
     max-width: 100px;
     max-height: 130px;
@@ -325,7 +343,7 @@
       color: #fff;
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
     }
-    
+
     &.mobile {
       .title {
         font-size: 1.2rem; // Smaller font size for mobile
@@ -338,7 +356,7 @@
       }
     }
   }
-  
+
 
   &:hover .studio-overlay {
     background: rgba(0, 0, 0, 0.5);
@@ -354,13 +372,18 @@
   font-size: 1.25rem;
 }
 
-.overlay, .person-details, .genre-overlay, .studio-overlay {
+.overlay,
+.person-details,
+.genre-overlay,
+.studio-overlay {
   span {
     display: block;
   }
 }
 
-.card-title, .card-subtitle, .card-overview {
+.card-title,
+.card-subtitle,
+.card-overview {
   display: block;
   width: 100%;
 }

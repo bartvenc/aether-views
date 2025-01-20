@@ -43,11 +43,13 @@ export class CardComponent implements OnInit {
   onItemClicked(event: MouseEvent): void {
     let route: string[] = [];
     let queryParams = {};
-   
+
     // Determine the route and params based on item type
     if (this.tmdbService.isSeries(this.item)) {
       route = ['/tv', this.item.id.toString()];
+      this.tmdbService.markAsSeen('tv', this.item.id);
     } else if (this.tmdbService.isMovie(this.item)) {
+      this.tmdbService.markAsSeen('movie', this.item.id);
       route = ['/movie', this.item.id.toString()];
     } else if (this.tmdbService.isGenre(this.item)) {
       route = ['/discover', this.item.type === 'movie' ? 'movies' : 'series'];
@@ -70,5 +72,16 @@ export class CardComponent implements OnInit {
     } else {
       this.router.navigate(route, { queryParams });
     }
+  }
+
+  isContentSeen(): boolean {
+    if (this.tmdbService.isSeries(this.item) || this.tmdbService.isMovie(this.item)) {
+      if (!this.item?.id) return false;
+      return this.tmdbService.isContentSeen(
+        this.type === 'movies' ? 'movie' : 'tv',
+        this.item.id
+      );
+    }
+    return false;
   }
 }

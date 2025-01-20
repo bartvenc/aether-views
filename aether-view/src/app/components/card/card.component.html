@@ -2,6 +2,9 @@
   @switch (type) {
     @case ('movies') {
       <div class="movieSeries" [class.loading]="!imageUrl">
+        @if (isContentSeen()) {
+          <span class="seen-indicator material-icons">visibility</span>
+        }
         <img [src]="imageUrl || 'assets/poster.png'" 
              [alt]="title" 
              class="card-image"
@@ -23,6 +26,9 @@
     }
     @case ('series') {
       <div class="movieSeries" [class.loading]="!imageUrl">
+           @if (isContentSeen()) {
+          <span class="seen-indicator material-icons">visibility</span>
+        }
         <img [src]="imageUrl || 'assets/poster.png'" 
              [alt]="title" 
              class="card-image"
