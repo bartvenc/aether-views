@@ -103,10 +103,6 @@ export class HeaderComponent {
     });
   }
 
-  trackByResultId(index: number, result: SearchResult): number {
-    return result.id;
-  }
-
   onSearchChange(query: string) {
     this.searchSubject.next(query);
   }
