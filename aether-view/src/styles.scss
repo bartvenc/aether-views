@@ -32,3 +32,27 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 .no-checkbox .mat-pseudo-checkbox {
   display: none;
 }
+
+// Add these global styles to prevent CLS
+img {
+  text-indent: -9999px; // Hide alt text while loading
+  &[loading="lazy"] {
+    content-visibility: auto;
+  }
+}
+
+// Reserve space for images during loading
+[loading="lazy"] {
+  background: #28202b;
+}
+
+// Add blur-up loading effect
+.card-image {
+  filter: blur(0);
+  transition: filter 0.3s;
+  
+  &.loading {
+    filter: blur(10px);
+    transform: scale(1.1);
+  }
+}
