@@ -1,85 +1,76 @@
 <div class="card-container" [ngClass]="type" (click)="onItemClicked()">
-  @switch (type || 'movies') {
-  <!-- Movie/Series Card -->
-  @case ('movies') {
-  <div class="movieSeries">
-    <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
-    @if (icon) {
-      <span class="material-icons absolute top-2 right-2 z-10 text-yellow-400 text-xl">
-        {{ icon === 'movie' ? 'theaters' : 'live_tv' }}
-      </span>
+  @switch (type) {
+    @case ('movies') {
+      <div class="movieSeries" [class.loading]="!imageUrl">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" 
+             [alt]="title" 
+             class="card-image"
+             [loading]="loading"
+             [attr.fetchpriority]="index < 3 ? 'high' : 'auto'"
+             width="150" height="225"
+             decoding="async">
+        @if (icon) {
+          <span class="card-icon material-icons">{{icon === 'movie' ? 'theaters' : 'live_tv'}}</span>
+        }
+        <div class="overlay">
+          <span class="card-title">{{ title | date: 'YYYY' }}</span>
+          <span class="card-subtitle">{{ subtitle }}</span>
+          @if (!isMobile) {
+            <span class="card-overview">{{ getTruncatedText(overview, maxOverviewLength) }}</span>
+          }
+        </div>
+      </div>
     }
-    <div class="overlay">
-      <div class="hidden md:block">
-        <p class="card-title">{{ title | date: 'YYYY' }}</p>
-        <p class="card-subtitle">{{ subtitle }}</p>
-        <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
+    @case ('series') {
+      <div class="movieSeries" [class.loading]="!imageUrl">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" 
+             [alt]="title" 
+             class="card-image"
+             width="150" height="225"
+             decoding="async">
+        @if (icon) {
+          <span class="card-icon material-icons">{{icon === 'movie' ? 'theaters' : 'live_tv'}}</span>
+        }
+        <div class="overlay">
+          <span class="card-title">{{ title | date: 'YYYY' }}</span>
+          <span class="card-subtitle">{{ subtitle }}</span>
+          @if (!isMobile) {
+            <span class="card-overview">{{ getTruncatedText(overview, maxOverviewLength) }}</span>
+          }
+        </div>
       </div>
-      <div class="block md:hidden">
-        <p class="card-title text-lg font-bold">{{ title | date: 'YYYY' }}</p>
-        <p class="card-subtitle text-sm text-gray-400">{{ subtitle }}</p>
-      </div>
-    </div>
-  </div>
-  }
-  @case ('series') {
-  <div class="movieSeries">
-    <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Card Image" class="card-image" />
-    @if (icon) {
-      <span class="material-icons absolute top-2 right-2 z-10 text-yellow-400 text-xl">
-        {{ icon === 'movie' ? 'theaters' : 'live_tv' }}
-      </span>
     }
-    <div class="overlay">
-      <div class="hidden md:block">
-        <p class="card-title">{{ title | date: 'YYYY' }}</p>
-        <p class="card-subtitle">{{ subtitle }}</p>
-        <p class="card-overview">{{ getTruncatedText(overview, maxOverviewLength || 100) }}</p>
+    @case ('person') {
+      <div class="person">
+        <div class="person-image-container">
+          <img [src]="imageUrl || 'assets/no-image.jpg'" 
+               [alt]="title" 
+               class="person-image"
+               [loading]="loading"
+               [attr.fetchpriority]="index < 3 ? 'high' : 'auto'"
+               decoding="async">
+        </div>
+        <div class="person-details">
+          <h3 class="person-title">{{ title }}</h3>
+          <p class="person-subtitle">{{ subtitle }}</p>
+        </div>
       </div>
-      <div class="block md:hidden">
-        <p class="card-title text-lg font-bold">{{ title | date: 'YYYY' }}</p>
-        <p class="card-subtitle text-sm text-gray-400">{{ subtitle }}</p>
+    }
+    @case ('genreStudio') {
+      <div class="genreStudio">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="card-image">
+        <div class="genre-overlay">
+          <span class="title">{{ title }}</span>
+        </div>
       </div>
-    </div>
-  </div>
-  }
-
-  <!-- Person Card -->
-@case ('person') {
-  <div class="person">
-    <div class="person-image-container">
-      <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="person-image" />
-    </div>
-    <div class="person-details">
-      <h3 class="person-title">{{ title }}</h3>
-      <p class="person-subtitle">{{ subtitle }}</p>
-    </div>
-  </div>
-}
-
-  <!-- Genre/Studio Card -->
-  @case ('genreStudio') {
-  <div class="genreStudio">
-    <img [src]="imageUrl || 'assets/no-image.jpg'" [alt]="title" class="card-image" />
-    <div class="genre-overlay">
-      <div class="hidden md:block">
-        <p class="title font-bold">{{ title }}</p>
+    }
+    @case ('studio') {
+      <div class="studio">
+        <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Studio Logo" class="card-image">
+        <div class="studio-overlay">
+          <span class="title">{{ title }}</span>
+        </div>
       </div>
-      <div class="block md:hidden">
-        <p class="card-title font-bold">{{ title }}</p>
-      </div>
-    </div>
-  </div>
-  }
-
-  <!-- Studio Card -->
-  @case ('studio') {
-  <div class="studio">
-    <img [src]="imageUrl || 'assets/no-image.jpg'" alt="Studio Logo" class="card-image" />
-    <div class="studio-overlay">
-      <h3 class="title">{{ title }}</h3>
-    </div>
-  </div>
-  }
+    }
   }
 </div>

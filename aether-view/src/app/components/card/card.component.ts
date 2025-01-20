@@ -1,4 +1,4 @@
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TmdbService } from '../../services/tmdb.service';
 import { Router } from '@angular/router';
@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
 })
-export class CardComponent {
+export class CardComponent implements OnInit {
   @Input() imageUrl?: string | null = null;
   @Input() title?: string = '';
   @Input() subtitle?: string | null = null;
@@ -19,15 +19,26 @@ export class CardComponent {
   @Input() maxOverviewLength?: number = 100;
   @Input() item?: number | null = null; // ID of the item
   @Input() icon?: string | null = null; // Icon to display on the card
+  @Input() index = 0;
+  @Input() loading?: string = 'lazy';
 
   tmdbService = inject(TmdbService);
   router = inject(Router);
 
-  getTruncatedText(text: string | null | undefined, maxLength: number): string {
-    if (!text) return ''; // Handle null or undefined gracefully
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+  isMobile = false;
+
+  ngOnInit() {
+    // Check mobile once instead of using media queries in template
+    this.isMobile = window.innerWidth < 768;
   }
+
+  getTruncatedText(text: string | null | undefined, maxLength: number | undefined): string {
+    if (!text) return ''; // Handle null or undefined gracefully
+    const length = maxLength ?? 100; // Default to 100 if maxLength is undefined
+    if (text.length <= length) return text;
+    return text.substring(0, length) + '...';
+  }
+
 
   onItemClicked(): void {
     console.log(this.type, ' Item clicked:', this.item);
