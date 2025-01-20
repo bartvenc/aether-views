@@ -13,32 +13,59 @@ import { ContentItem } from '../pages/filter-page/filter-page.component';
 export class TmdbService {
   private readonly apiKey = '4692df374a198e0172ac98003b5cdab3';
   private readonly baseUrl = 'https://api.themoviedb.org/3';
-  private userRegion: string = 'US';
+  private readonly REGION_STORAGE_KEY = 'user_region';
+  private readonly REGION_TIMESTAMP_KEY = 'region_timestamp';
+  private readonly REGION_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  private userRegion: string = 'US'; // Default fallback
+  private readonly SEEN_STORAGE_KEY = 'seen_content';
+  private seenContent: Set<string> = new Set();
 
   http: HttpClient = inject(HttpClient);
 
   private popularSeriesSignal: Signal<Series[]> | null = null;
+  constructor() {
+    this.loadSeenContent();
+  }
 
   async initializeRegion(): Promise<void> {
     try {
+      // Check if we have a cached region and it's not expired
+      const cachedRegion = localStorage.getItem(this.REGION_STORAGE_KEY);
+      const timestamp = localStorage.getItem(this.REGION_TIMESTAMP_KEY);
+
+      if (cachedRegion && timestamp) {
+        const age = Date.now() - Number(timestamp);
+        if (age < this.REGION_CACHE_DURATION) {
+          this.userRegion = cachedRegion;
+          console.log('Using cached region:', this.userRegion);
+          return;
+        }
+      }
+
+      // Try browser language first
       const browserLang = navigator.language;
       if (browserLang) {
         const region = browserLang.split('-')[1] || browserLang.toUpperCase();
-        console.log('Detected region:', region);
-        this.userRegion = region;
+        this.updateRegion(region);
       }
 
+      // Then try IP geolocation for more accuracy
       const response = await fetch('https://ipapi.co/json/');
       const data = await response.json();
       if (data.country) {
-        this.userRegion = data.country;
-        console.log('Detected ipapi region:', this.userRegion);
+        this.updateRegion(data.country);
       }
     } catch (error) {
       console.warn('Could not detect region, using default:', this.userRegion);
     }
   }
 
+  private updateRegion(region: string): void {
+    this.userRegion = region;
+    localStorage.setItem(this.REGION_STORAGE_KEY, region);
+    localStorage.setItem(this.REGION_TIMESTAMP_KEY, Date.now().toString());
+    console.log('Updated region:', region);
+  }
 
 
   // Convert the HTTP Observable directly to a Signal/
@@ -198,8 +225,8 @@ export class TmdbService {
 
     if (filters.country === 'KR') {
       // Exclude romance and drama (10749, 18) for Korean content to filter adult movies
-      params.without_genres = params.without_genres 
-        ? `${params.without_genres},10749,18` 
+      params.without_genres = params.without_genres
+        ? `${params.without_genres},10749,18`
         : '10749,18';
     }
 
@@ -266,10 +293,10 @@ export class TmdbService {
 
     const size = this.getOptimizedImageSize(type);
     const format = type === 'logo' ? '' : '?format=webp'; // Keep logos in original format for transparency
-    
+
     // Add loading priority hints
     const priority = isPriority ? '#priority=true' : '';
-    
+
     return `https://image.tmdb.org/t/p/${size}${path}${format}${priority}`;
   }
 
@@ -407,5 +434,25 @@ export class TmdbService {
   // Add method to get current region
   getRegion(): string {
     return this.userRegion;
+  }
+
+  private loadSeenContent(): void {
+    const saved = localStorage.getItem(this.SEEN_STORAGE_KEY);
+    if (saved) {
+      this.seenContent = new Set(JSON.parse(saved));
+    }
+  }
+
+  markAsSeen(type: 'movie' | 'tv', id: number): void {
+    const key = `${type}_${id}`;
+    this.seenContent.add(key);
+    localStorage.setItem(this.SEEN_STORAGE_KEY, JSON.stringify([...this.seenContent]));
+  }
+
+  isContentSeen(type: 'movie' | 'tv', id: number): boolean {
+    if (this.seenContent.has(`${type}_${id}`)) {
+      console.log('Checking seen:', `${type}_${id}`, this.seenContent.has(`${type}_${id}`),);
+    }
+    return this.seenContent.has(`${type}_${id}`);
   }
 }
