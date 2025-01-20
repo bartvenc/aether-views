@@ -239,11 +239,11 @@ export class TmdbService {
   }
 
   getImageUrl(item: Series | Movie | Studio | Genre | Person | null | ContentItem | undefined, isPriority = false): string {
-    if (!item) return 'assets/no-image.jpg';
+    if (!item) return 'assets/poster.jpg';
 
     let path: string | undefined | null = null;
     let type: 'poster' | 'profile' | 'logo' | 'backdrop' = 'poster';
-    let fallback = 'assets/no-image.jpg';
+    let fallback = 'assets/poster.jpg';
 
     if (this.isSeries(item) || this.isMovie(item)) {
       path = item.poster_path;
@@ -274,7 +274,7 @@ export class TmdbService {
   }
 
   getLargeImageUrl(path: string | null, type: 'backdrop' | 'poster' = 'backdrop'): string {
-    if (!path) return 'assets/no-image.jpg';
+    if (!path) return 'assets/poster.jpg';
     const size = type === 'backdrop' ? 'w1280' : 'w780';
     return `https://image.tmdb.org/t/p/${size}${path}?format=webp`;
   }
