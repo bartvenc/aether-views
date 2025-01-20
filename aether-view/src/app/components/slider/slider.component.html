@@ -12,7 +12,7 @@
         <app-card
           [type]="cardType"
           [imageUrl]="item ? tmdbService.getImageUrl(item) : null"
-          [title]="item.media_type ? getItemValue(item, 'release_date') :item[titleField]"
+          [title]="item.media_type ? getItemValue(item, 'releaseDate') :item[titleField]"
           [subtitle]="item.media_type ? getItemValue(item, 'displayTitle') : item[subtitleField]"
           [overview]="item[overviewField]"
           [item]="item"
