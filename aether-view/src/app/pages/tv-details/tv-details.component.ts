@@ -1,7 +1,7 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TmdbService } from '../../services/tmdb.service';
-import { Series, Season, Episode } from '../../interfaces/series';
+import { Series, Season } from '../../interfaces/series';
 import { CommonModule, DatePipe } from '@angular/common';
 import { SliderComponent } from '../../components/slider/slider.component';
 import { forkJoin } from 'rxjs';
@@ -9,13 +9,14 @@ import { forkJoin } from 'rxjs';
 @Component({
   standalone: true,
   selector: 'app-tv-details',
-  imports: [CommonModule, SliderComponent, DatePipe, RouterLink],
+  imports: [CommonModule, SliderComponent, DatePipe],
   templateUrl: './tv-details.component.html',
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TvDetailsComponent implements OnInit {
   tmdbService = inject(TmdbService);
   route = inject(ActivatedRoute);
+  router = inject(Router);
 
   series = signal<Series | undefined>(undefined);
   openSeasons: Set<number> = new Set();
@@ -114,5 +115,20 @@ export class TvDetailsComponent implements OnInit {
       return new Date(airDate) <= today;
     }
     return false;
+  }
+
+  handleClick(event: MouseEvent, type: 'genre' | 'keyword', item: any) {
+    event.preventDefault();
+    const route = ['/discover', 'series'];
+    const queryParams = type === 'genre' ? { genre: item.id } : { keyword: this.stringifyKeyword(item) };
+    
+    if (event.ctrlKey || event.metaKey) {
+      const url = this.router.serializeUrl(
+        this.router.createUrlTree(route, { queryParams })
+      );
+      window.open(url, '_blank');
+    } else {
+      this.router.navigate(route, { queryParams });
+    }
   }
 }
