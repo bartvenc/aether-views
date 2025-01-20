@@ -28,7 +28,6 @@ export class MovieDetailsComponent implements OnInit {
 
   getMovieDetails(id: number): void {
     this.tmdbService.getMovieDetailsById(id).subscribe(data => {
-      console.log(data);
       this.movie.set(data);
     });
   }
