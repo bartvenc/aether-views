@@ -1,5 +1,5 @@
 <div class="swiper-container">
-  <swiper-container
+  <swiper-container #swiper
     [slidesPerView]="swiperOptions.slidesPerView"
     [spaceBetween]="swiperOptions.spaceBetween"
     [breakpoints]="swiperOptions.breakpoints"
@@ -7,7 +7,7 @@
     [navigation]="true"
     style="--swiper-navigation-color: #5e4869;"
     class="mySwiper">
-    @for (item of items; track item) {
+    @for (item of items; track item.id; let i = $index) {
       <swiper-slide class="cursor-pointer" [ngClass]="{ 'pb-1': isMobile }">
         <app-card
           [type]="cardType"
@@ -17,7 +17,9 @@
           [overview]="item[overviewField]"
           [item]="item"
           [icon]="item.media_type ? item.media_type : null"
-          ></app-card>
+          [loading]="i > 5 ? 'lazy' : 'eager'"
+          [index]="i">
+        </app-card>
       </swiper-slide>
     }
   </swiper-container>
