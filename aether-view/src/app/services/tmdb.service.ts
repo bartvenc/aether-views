@@ -215,8 +215,8 @@ export class TmdbService {
       params.with_cast = filters.person;
     }
 
-    if (filters.country === 'KR') {
-      // Exclude romance and drama (10749, 18) for Korean content to filter adult movies
+    if (filters.country === 'KR' || filters.country === 'JP') {
+      // Exclude romance and drama (10749, 18) for Korean and Japanese content to filter adult movies
       params.without_genres = params.without_genres ? `${params.without_genres},10749,18` : '10749,18';
     }
 
