@@ -119,6 +119,7 @@
 
 /* Person styling */
 .person {
+  // Move all declarations before nested rules
   position: relative;
   width: 150px;
   height: 200px;
@@ -127,14 +128,17 @@
   overflow: hidden;
   border-radius: 8px;
 
+  // Media queries
   @media (max-width: 768px) {
     max-width: 150px;
   }
+  
   @media (max-width: 480px) {
     max-width: 100px;
     max-height: 130px;
   }
 
+  // Nested elements
   .person-image-container {
     position: relative;
     width: 90%;

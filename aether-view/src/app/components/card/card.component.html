@@ -1,8 +1,8 @@
-<div class="card-container" [ngClass]="type" (click)="onItemClicked()">
+<div class="card-container" [ngClass]="type" (click)="onItemClicked($event)">
   @switch (type) {
     @case ('movies') {
       <div class="movieSeries" [class.loading]="!imageUrl">
-        <img [src]="imageUrl || 'assets/no-image.jpg'" 
+        <img [src]="imageUrl || 'assets/poster.png'" 
              [alt]="title" 
              class="card-image"
              [loading]="loading"
@@ -23,7 +23,7 @@
     }
     @case ('series') {
       <div class="movieSeries" [class.loading]="!imageUrl">
-        <img [src]="imageUrl || 'assets/no-image.jpg'" 
+        <img [src]="imageUrl || 'assets/poster.png'" 
              [alt]="title" 
              class="card-image"
              width="150" height="225"
@@ -43,7 +43,7 @@
     @case ('person') {
       <div class="person">
         <div class="person-image-container">
-          <img [src]="imageUrl || 'assets/no-image.jpg'" 
+          <img [src]="imageUrl || 'assets/person.jpg'" 
                [alt]="title" 
                class="person-image"
                [loading]="loading"

@@ -40,23 +40,35 @@ export class CardComponent implements OnInit {
   }
 
 
-  onItemClicked(): void {
-    console.log(this.type, ' Item clicked:', this.item);
+  onItemClicked(event: MouseEvent): void {
+    let route: string[] = [];
+    let queryParams = {};
+   
+    // Determine the route and params based on item type
     if (this.tmdbService.isSeries(this.item)) {
-      this.router.navigate(['/tv', this.item.id]);
+      route = ['/tv', this.item.id.toString()];
     } else if (this.tmdbService.isMovie(this.item)) {
-      this.router.navigate(['/movie', this.item.id]);
-    } else if (this.tmdbService.isGenre(this.item) && this.item.type === 'movie') {
-      this.router.navigate(['/discover/movies'], { queryParams: { genre: this.item.id } });
-    } else if (this.tmdbService.isGenre(this.item) && this.item.type === 'series') {
-      this.router.navigate(['/discover/series'], { queryParams: { genre: this.item.id } });
+      route = ['/movie', this.item.id.toString()];
+    } else if (this.tmdbService.isGenre(this.item)) {
+      route = ['/discover', this.item.type === 'movie' ? 'movies' : 'series'];
+      queryParams = { genre: this.item.id };
     } else if (this.tmdbService.isStudio(this.item)) {
-      this.router.navigate(['/discover/movies'], { queryParams: { studio: this.item.id } });
-    } else if (this.tmdbService.isPerson(this.item) && this.type === 'person') {
-      console.log('movie Person:', this.item);
-      this.router.navigate(['/person', this.item.id]);
+      route = ['/discover/movies'];
+      queryParams = { studio: this.item.id };
+    } else if (this.tmdbService.isPerson(this.item)) {
+      route = ['/person', this.item.id.toString()];
+    }
+
+    // Generate the full URL
+    const url = this.router.serializeUrl(
+      this.router.createUrlTree(route, { queryParams })
+    );
+
+    // Open in new tab if ctrl/cmd key is pressed, otherwise navigate normally
+    if (event.ctrlKey || event.metaKey) {
+      window.open(url, '_blank');
     } else {
-      console.warn('Unknown item type:', this.item);
+      this.router.navigate(route, { queryParams });
     }
   }
 }
