@@ -36,9 +36,12 @@ export class SliderComponent {
     return item[field] || '';
   }
 
+  
+
   swiperOptions = {
     slidesPerView: 5,
     spaceBetween: 20,
+    lazy: true,
     breakpoints: {
       320: {
         slidesPerView: 3,
