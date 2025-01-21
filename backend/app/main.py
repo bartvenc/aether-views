@@ -21,6 +21,7 @@ app.add_middleware(
         "http://localhost:4200",
         "https://www.aether-view.com",
         "https://api.aether-view.com",
+        "https://aether-view.com"
     ],
     allow_credentials=True,
     allow_methods=["*"],
