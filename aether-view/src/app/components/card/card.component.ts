@@ -48,7 +48,16 @@ export class CardComponent implements OnInit {
     } else if (this.tmdbService.isMovie(this.item)) {
       route = ['/movie', this.item.id.toString()];
       this.tmdbService.markAsSeen('movie', this.item.id);
+    }else if (this.tmdbService.isGenre(this.item)) {
+      route = ['/discover', this.item.type === 'movie' ? 'movies' : 'series'];
+      queryParams = { genre: this.item.id };
+    } else if (this.tmdbService.isStudio(this.item)) {
+      route = ['/discover/movies'];
+      queryParams = { studio: this.item.id };
+    } else if (this.tmdbService.isPerson(this.item)) {
+      route = ['/person', this.item.id.toString()];
     }
+
 
     // Handle ctrl/cmd click only for MouseEvent
     if (event instanceof MouseEvent && (event.ctrlKey || event.metaKey)) {
