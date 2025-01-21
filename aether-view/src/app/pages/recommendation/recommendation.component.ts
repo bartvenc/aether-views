@@ -143,7 +143,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   private fetchSecondaryResults(): Observable<void> {
     this.isSecondStage.set(true);
     return this.backendService.search(this.userQuery).pipe(
-      switchMap(response => forkJoin(response.results.map(item => this.searchSingleTitle(item)))),
+      switchMap(response => forkJoin<(Series | Movie | null)[]>(response.results.map((item: RecommendationItem) => this.searchSingleTitle(item)))),
       map(results => this.updateRecommendations(results, false))
     );
   }
