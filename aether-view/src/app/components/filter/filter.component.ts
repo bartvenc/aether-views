@@ -146,6 +146,33 @@ export class FilterComponent implements OnInit {
     this.updateFilter();
   }
 
+  async onCountryChange(event: any) {
+    const newCountry = event.value;
+    if (!newCountry){
+      this.selectedCountry.set('');
+      this.updateFilter();
+      return;
+
+    } 
+    console.log(newCountry);
+    const previousCountry = this.selectedCountry();
+
+    if (newCountry === 'JP' || newCountry === 'KR') {
+      const countryName = newCountry === 'JP' ? 'Japan' : 'Korea';
+      const confirmed = confirm(
+        `Notice\n\nSome content from ${countryName} may not be properly marked as adult due to inconsistent tagging practices. As a result, we cannot guarantee filtering of all adult content. Please proceed with this in mind.`
+      );
+
+      if (!confirmed) {
+        this.selectedCountry.set(previousCountry);
+        return;
+      }
+    }
+
+    this.selectedCountry.set(newCountry);
+    this.updateFilter();
+  }
+
   private checkViewport(): void {
     this.isMobile = window.innerWidth < 768;
   }

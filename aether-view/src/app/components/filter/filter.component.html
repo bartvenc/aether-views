@@ -81,9 +81,9 @@
 
     <mat-form-field class="sm:w-[12%]" appearance="fill">
       <mat-label>Country</mat-label>
-      <mat-select [(ngModel)]="selectedCountry" (selectionChange)="updateFilter()">
+      <mat-select [(ngModel)]="selectedCountry" (selectionChange)="onCountryChange($event)">
         @if (selectedCountry()) {
-          <mat-option [value]="null">
+          <mat-option>
             <mat-icon>replay</mat-icon>
           </mat-option>
         }
