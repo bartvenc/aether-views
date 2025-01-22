@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class BackendService {
-  private localBaseUrl = 'http://localhost:8080'; // Cloudflare tunnel endpoint
+  private localBaseUrl = 'api.aether-view.com'; // Cloudflare tunnel endpoint
   private cloudBaseUrl = 'https://aether-backend-247441061608.europe-north1.run.app';
   private retryDelay = 2000;
 
