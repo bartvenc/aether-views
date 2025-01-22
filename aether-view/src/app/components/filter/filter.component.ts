@@ -63,7 +63,8 @@ export class FilterComponent implements OnInit {
     this.selectedCategory.set(this.filters['category'] || 'Popular');
     this.selectedYear.set(this.filters['year'] || 0);
     this.selectedGenres.set(this.filters['genres'] || []);
-    this.selectedStudiosOrNetworks.set(this.filters['studiosOrNetworks'] || 0);
+    const studioId = this.filters['studiosOrNetworks'] ? Number(this.filters['studiosOrNetworks']) : 0;
+    this.selectedStudiosOrNetworks.set(studioId);
     const keywordParam = this.filters['keyword'] ? [this.filters['keyword']] : [];
     this.selectedKeywords.set(keywordParam);
     const userRegion = this.tmdbService.getRegion();
