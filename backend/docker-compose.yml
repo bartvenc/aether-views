@@ -1,0 +1,45 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"  # Expose port for Ollama service
+    volumes:
+      - ./ollama-data:/root/.ollama  # Persistent volume for cached models
+      - ./entrypoint.sh:/entrypoint.sh  # Mount the custom entrypoint script
+    networks:
+      - aether-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/v1/models"]
+      interval: 10s
+      timeout: 10s
+      retries: 100
+    container_name: ollama
+    restart: always
+    tty: true
+    entrypoint: ["/usr/bin/bash", "/entrypoint.sh"]
+
+  backend:
+    build: .  # Build backend from your local context
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434  # Connect to Ollama service
+      - OLLAMA_MODEL=llama3.1:latest
+    depends_on:
+      ollama:
+        condition: service_healthy  # Wait for Ollama to be healthy
+    networks:
+      - aether-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 100
+
+volumes:
+  ollama-data:  # Separate named volume for models to persist data
+
+networks:
+  aether-network:
+    driver: bridge

@@ -1,7 +1,10 @@
-flask==3.0.0
-flask-cors==4.0.0
-requests==2.31.0
-beautifulsoup4==4.12.2
-google==3.0.0
-google-search==1.1.1
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.2
+structlog==23.2.0
+playwright==1.40.0
+bs4==0.0.1
 ollama==0.1.6
+aiohttp==3.9.1
+gunicorn==21.2.0
+requests==2.31.0
