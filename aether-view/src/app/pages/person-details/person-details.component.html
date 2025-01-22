@@ -77,6 +77,7 @@
               @for (movie of movies(); track movie) {
                 <app-card
                   [type]="'movies'"
+                  [item]="movie"
                   [subtitle]="movie.title"
                   [title]="movie.release_date"
                   [imageUrl]="movie ? tmdbService.getImageUrl(movie) : null">
@@ -93,6 +94,7 @@
               @for (show of series(); track show) {
                 <app-card
                   [type]="'series'"
+                  [item]="show"
                   [subtitle]="show.name"
                   [title]="show.first_air_date"
                   [imageUrl]="show ? tmdbService.getImageUrl(show) : null">
