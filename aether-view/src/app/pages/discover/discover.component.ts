@@ -1,9 +1,10 @@
 import { Component, inject, Signal, signal, CUSTOM_ELEMENTS_SCHEMA, OnInit } from '@angular/core';
-import { TmdbService } from '../../services/tmdb.service';
-import { SliderComponent } from '../../components/slider/slider.component';
-import { MOVIE_GENRES, SERIES_GENRES } from '../../../../public/assets/genres';
-import { STUDIOS } from '../../../../public/assets/studios';
 import { RouterLink } from '@angular/router';
+import { TmdbService } from '@services/tmdb.service';
+import { SliderComponent } from '@components/slider/slider.component';
+import { MOVIE_GENRES, SERIES_GENRES } from '@assets/genres';
+import { STUDIOS } from '@assets/studios';
+
 
 @Component({
   selector: 'app-discover',

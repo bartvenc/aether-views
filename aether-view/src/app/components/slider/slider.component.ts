@@ -1,7 +1,7 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardComponent } from '../card/card.component';
-import { TmdbService } from '../../services/tmdb.service';
+import { CardComponent } from '@components/card/card.component';
+import { TmdbService } from '@services/tmdb.service';
 
 @Component({
   selector: 'app-slider',

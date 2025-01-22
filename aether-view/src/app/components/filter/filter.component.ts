@@ -1,17 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, inject, Input, Output, signal, OnInit, HostListener } from '@angular/core';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { Network } from '../../interfaces/series';
-import { Studio } from '../../../../public/assets/studios';
-import { Genre } from '../../interfaces/common-interfaces';
-import { TmdbService } from '../../services/tmdb.service';
+
+import { Network } from '@interfaces/series';
+import { Studio } from '@assets/studios';
+import { Genre } from '@interfaces/common-interfaces';  
+import { TmdbService } from '@services/tmdb.service';
 import { Router } from '@angular/router';
 import { MatChipsModule } from '@angular/material/chips';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
+
 
 @Component({
   selector: 'app-filter',

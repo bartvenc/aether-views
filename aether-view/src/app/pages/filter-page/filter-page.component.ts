@@ -1,12 +1,12 @@
 import { Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FilterComponent } from '../../components/filter/filter.component';
-import { CardComponent } from '../../components/card/card.component';
-import { TmdbService } from '../../services/tmdb.service';
-import { MOVIE_GENRES, SERIES_GENRES } from '../../../../public/assets/genres';
-import { Genre, Keyword } from '../../interfaces/common-interfaces';
-import { Studio, STUDIOS } from '../../../../public/assets/studios';
-import { NETWORKS } from '../../../../public/assets/networks';
+import { FilterComponent } from '@components/filter/filter.component';
+import { CardComponent } from '@components/card/card.component';
+import { TmdbService } from '@services/tmdb.service';
+import { MOVIE_GENRES, SERIES_GENRES } from '@assets/genres';
+import { Genre, Keyword } from '@interfaces/common-interfaces';
+import { Studio, STUDIOS } from '@assets/studios';
+import { NETWORKS } from '@assets/networks';
 import { firstValueFrom, Subscription } from 'rxjs';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 
@@ -61,11 +61,9 @@ export class FilterPageComponent implements OnInit {
   currentGenres: Genre[] = [];
   curentStudiosOrNetwork: Studio[] = [];
 
-  items = signal<any[]>([]); // This will hold the fetched data
+  items = signal<any[]>([]);
   isLoading = signal(false);
   page = signal(1);
-  private scrollSubscription?: Subscription;
-  private isLoadingMore = false;
   currentPage = signal(1);
   totalPages = signal(0);
 

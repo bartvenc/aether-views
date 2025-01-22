@@ -1,8 +1,10 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, OnInit, signal } from '@angular/core';
-import { SliderComponent } from '../../components/slider/slider.component';
-import { TmdbService } from '../../services/tmdb.service';
 import { ActivatedRoute, Router } from '@angular/router';
+
+import { SliderComponent } from '@components/slider/slider.component';
+import { TmdbService } from '@services/tmdb.service';
+
 import { Movie } from '../../interfaces/movies';
 
 @Component({

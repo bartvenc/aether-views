@@ -1,7 +1,11 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TmdbService } from '../../services/tmdb.service';
 import { Router } from '@angular/router';
+
+import { TmdbService } from '@services/tmdb.service';
+import { Series } from '@app/interfaces/series';
+import { Movie } from '@app/interfaces/movies';
+
 
 @Component({
   selector: 'app-card',
@@ -15,10 +19,10 @@ export class CardComponent implements OnInit {
   @Input() title?: string = '';
   @Input() subtitle?: string | null = null;
   @Input() type: 'movies' | 'series' | 'person' | 'genreStudio' | 'studio' = 'movies'; // Card type
-  @Input() overview?: string | null = null; // Overview/Summary
+  @Input() overview?: string | null = null; 
   @Input() maxOverviewLength?: number = 100;
-  @Input() item?: number | null = null; // ID of the item
-  @Input() icon?: string | null = null; // Icon to display on the card
+  @Input() item?: number | Series | Movie | null = null; 
+  @Input() icon?: string | null = null;
   @Input() index = 0;
   @Input() loading?: string = 'lazy';
 
@@ -28,25 +32,26 @@ export class CardComponent implements OnInit {
   isMobile = false;
 
   ngOnInit() {
-    // Check mobile once instead of using media queries in template
+   
     this.isMobile = window.innerWidth < 768;
   }
 
   getTruncatedText(text: string | null | undefined, maxLength: number | undefined): string {
-    if (!text) return ''; // Handle null or undefined gracefully
-    const length = maxLength ?? 100; // Default to 100 if maxLength is undefined
+    if (!text) return ''; 
+    const length = maxLength ?? 100;
     if (text.length <= length) return text;
     return text.substring(0, length) + '...';
   }
   onItemClicked(event: Event): void {
     let route: string[] = [];
     let queryParams = {};
-
+    console.log('clicked',event ,this.item)
     if (this.tmdbService.isSeries(this.item)) {
       route = ['/tv', this.item.id.toString()];
       this.tmdbService.markAsSeen('tv', this.item.id);
     } else if (this.tmdbService.isMovie(this.item)) {
       route = ['/movie', this.item.id.toString()];
+      console.log(route)
       this.tmdbService.markAsSeen('movie', this.item.id);
     }else if (this.tmdbService.isGenre(this.item)) {
       route = ['/discover', this.item.type === 'movie' ? 'movies' : 'series'];
@@ -58,8 +63,6 @@ export class CardComponent implements OnInit {
       route = ['/person', this.item.id.toString()];
     }
 
-
-    // Handle ctrl/cmd click only for MouseEvent
     if (event instanceof MouseEvent && (event.ctrlKey || event.metaKey)) {
       const url = this.router.serializeUrl(
         this.router.createUrlTree(route, { queryParams })

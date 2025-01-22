@@ -1,14 +1,15 @@
 import { Injectable, inject, Signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Season, Series } from '../interfaces/series';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { forkJoin, Observable, tap, of } from 'rxjs';
-import { Movie } from '../interfaces/movies';
-import { Genre, Person } from '../interfaces/common-interfaces';
-import { Studio } from '../../../public/assets/studios';
-import { ContentItem } from '../pages/filter-page/filter-page.component';
 import { catchError } from 'rxjs/operators';
+import { Series, Season } from '@interfaces/series';
+import { Movie } from '@interfaces/movies';
+import { Genre, Person } from '@interfaces/common-interfaces';
+import { Studio } from '@assets/studios';
+import { ContentItem } from '@pages/filter-page/filter-page.component';
+
 
 interface TmdbConfig {
   apiKey: string;

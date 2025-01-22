@@ -1,10 +1,11 @@
 import { Component, OnInit, inject, Signal, signal, computed, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { TmdbService } from '../../services/tmdb.service';
-import { Person } from '../../interfaces/common-interfaces';
-import { Movie } from '../../interfaces/movies';
-import { Series } from '../../interfaces/series';
-import { CardComponent } from '../../components/card/card.component';
+
+import { TmdbService } from '@services/tmdb.service';
+import { Person } from '@interfaces/common-interfaces';
+import { Movie } from '@interfaces/movies';
+import { Series } from '@interfaces/series';
+import { CardComponent } from '@components/card/card.component';
 
 @Component({
   selector: 'app-person-details',

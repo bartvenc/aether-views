@@ -6,27 +6,38 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class BackendService {
-  private backEndBaseUrl = environment.BACKEND_BASE_URL;
+  private localBaseUrl = 'http://localhost:8080'; // Cloudflare tunnel endpoint
+  private cloudBaseUrl = 'https://aether-backend-247441061608.europe-north1.run.app';
+  private retryDelay = 2000;
 
   constructor(private http: HttpClient) {}
 
-  private pollJobStatus(requestType: string, jobId: string): Observable<any> {
-    if (!jobId) {
-      console.error(`Invalid ${requestType} job ID:`, jobId);
-      return throwError(() => new Error(`Invalid ${requestType} job ID`));
-    }
+  private tryEndpoint(endpoint: string, data: any, serverUrl: string): Observable<any> {
+    return this.http.post<{request_id: string, source?: string}>(
+      `${serverUrl}${endpoint}`, 
+      data
+    ).pipe(
+      catchError(error => {
+        if (error.status === 503 || error.status === 429) {
+          // Service busy or rate limited - try cloud
+          return throwError(() => ({ useCloud: true, error }));
+        }
+        return throwError(() => error);
+      })
+    );
+  }
 
+  private pollJobStatus(requestType: string, jobId: string, serverUrl: string): Observable<any> {
     return interval(2000).pipe(
-      switchMap(() => this.http.get<{ 
-        status: string; 
-        error?: string; 
-        result?: { 
-          recommendations: any[],
-          results: any[]
-        } 
-      }>(`${this.backEndBaseUrl}/status/${requestType}/${jobId}`)),
+      switchMap(() => this.http.get<any>(`${serverUrl}/status/${requestType}/${jobId}`).pipe(
+        catchError(error => {
+          if (error.status === 0) { // Connection lost
+            return throwError(() => ({ useCloud: true, error }));
+          }
+          return throwError(() => error);
+        })
+      )),
       map(response => {
-        console.log(`${requestType} response:`, response); // Debug log
         if (response.status === 'error') {
           throw new Error(response.error || `${requestType} request failed`);
         }
@@ -34,19 +45,36 @@ export class BackendService {
       }),
       takeWhile(
         response => response.status === 'pending' || response.status === 'processing', 
-        true // Include the last value before completing
+        true
       )
     );
   }
 
   getRecommendations(query: string): Observable<any> {
-    return this.http.post<{request_id: string}>(
-      `${this.backEndBaseUrl}/recommend`, 
-      { query }
-    ).pipe(
+    // Try local first
+    return this.tryEndpoint('/recommend', { query }, this.localBaseUrl).pipe(
+      catchError(error => {
+        if (error.useCloud) {
+          console.log('Local server busy, trying cloud...');
+          return this.tryEndpoint('/recommend', { query }, this.cloudBaseUrl);
+        }
+        throw error;
+      }),
       switchMap(response => {
-        console.log('Received recommendation ID:', response.request_id);
-        return this.pollJobStatus('recommend', response.request_id);
+        const serverUrl = response.source === 'cloud' ? this.cloudBaseUrl : this.localBaseUrl;
+        return this.pollJobStatus('recommend', response.request_id, serverUrl).pipe(
+          catchError(error => {
+            if (error.useCloud) {
+              console.log('Local connection lost, failing over to cloud...');
+              return this.tryEndpoint('/recommend', { query }, this.cloudBaseUrl).pipe(
+                switchMap(cloudResponse => 
+                  this.pollJobStatus('recommend', cloudResponse.request_id, this.cloudBaseUrl)
+                )
+              );
+            }
+            throw error;
+          })
+        );
       }),
       map(response => ({
         recommendations: response.result?.recommendations || [],
@@ -56,11 +84,30 @@ export class BackendService {
   }
 
   search(query: string): Observable<any> {
-    return this.http.post<{request_id: string}>(
-      `${this.backEndBaseUrl}/search`, 
-      { query }
-    ).pipe(
-      switchMap(response => this.pollJobStatus('search', response.request_id)),
+    // Similar pattern for search endpoint
+    return this.tryEndpoint('/search', { query }, this.localBaseUrl).pipe(
+      catchError(error => {
+        if (error.useCloud) {
+          console.log('Local server busy, trying cloud...');
+          return this.tryEndpoint('/search', { query }, this.cloudBaseUrl);
+        }
+        throw error;
+      }),
+      switchMap(response => {
+        const serverUrl = response.source === 'cloud' ? this.cloudBaseUrl : this.localBaseUrl;
+        return this.pollJobStatus('search', response.request_id, serverUrl).pipe(
+          catchError(error => {
+            if (error.useCloud) {
+              return this.tryEndpoint('/search', { query }, this.cloudBaseUrl).pipe(
+                switchMap(cloudResponse => 
+                  this.pollJobStatus('search', cloudResponse.request_id, this.cloudBaseUrl)
+                )
+              );
+            }
+            throw error;
+          })
+        );
+      }),
       map(response => ({
         recommendations: [],
         results: response.result?.results || []

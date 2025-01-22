@@ -6,8 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
-import { TmdbService } from '../../services/tmdb.service';
-import { SearchResult, MediaType } from '../../interfaces/common-interfaces';
+
+import { TmdbService } from '@services/tmdb.service';
+import { SearchResult, MediaType } from '@interfaces/common-interfaces';
 
 @Component({
   selector: 'app-header',
