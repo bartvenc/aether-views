@@ -1,17 +1,19 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { BackendService } from '../../services/backend.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Series } from '../../interfaces/series';
-import { TmdbService } from '../../services/tmdb.service';
-import { forkJoin, map, Observable, switchMap, catchError, of } from 'rxjs';
-import { Movie } from '../../interfaces/movies';
-import { prompts, quotes, secondStageMessages } from '../../../../public/assets/placeholders';
-import { Curation, RecommendationItem } from '../../interfaces/common-interfaces';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { Router } from '@angular/router';
-import { SliderComponent } from '../../components/slider/slider.component';
-import { defaultCurations } from '../../../../public/assets/currations';
+
+import { forkJoin, map, Observable, switchMap, catchError, of } from 'rxjs';
+
+import { SliderComponent } from '@components/slider/slider.component';
+import { defaultCurations } from '@assets/currations';
+import { BackendService } from '@services/backend.service';
+import { prompts, quotes, secondStageMessages } from '@assets/placeholders';
+import { Curation, RecommendationItem } from '@interfaces/common-interfaces';
+import { Movie } from '@interfaces/movies';
+import { Series } from '@interfaces/series';
+import { TmdbService } from '@services/tmdb.service';
 
 interface FilterState {
   mediaFilter: 'all' | 'movies' | 'series';

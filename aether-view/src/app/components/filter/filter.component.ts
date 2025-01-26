@@ -156,8 +156,7 @@ export class FilterComponent implements OnInit {
       this.updateFilter();
       return;
 
-    } 
-    console.log(newCountry);
+    }
     const previousCountry = this.selectedCountry();
 
     if (newCountry === 'JP' || newCountry === 'KR') {

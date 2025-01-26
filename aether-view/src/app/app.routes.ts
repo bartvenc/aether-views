@@ -7,12 +7,12 @@ export const routes: Routes = [
     path: 'discover/movies',
     loadComponent: () => import('./pages/filter-page/filter-page.component').then(m => m.FilterPageComponent),
     data: { type: 'movies' },
-  }, // Filter movies
+  },
   {
     path: 'discover/series',
     loadComponent: () => import('./pages/filter-page/filter-page.component').then(m => m.FilterPageComponent),
     data: { type: 'series' },
-  }, // Filter series
+  },
   { path: 'tv/:id', loadComponent: () => import('./pages/tv-details/tv-details.component').then(m => m.TvDetailsComponent) },
   { path: 'movie/:id', loadComponent: () => import('./pages/movie-details/movie-details.component').then(m => m.MovieDetailsComponent) },
   {

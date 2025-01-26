@@ -1,5 +1,4 @@
 .card-container {
-  // Parent-level declarations first:
   width: 100%;
   transition:
     transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
@@ -7,7 +6,6 @@
   position: relative;
   overflow: hidden;
 
-  // Nested rules follow:
   &:hover {
     transform: translateY(-5px); // Slight lift on hover
     opacity: 1; // Ensure the card remains visible

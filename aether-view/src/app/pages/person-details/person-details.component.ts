@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, Signal, signal, computed, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, signal, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { TmdbService } from '@services/tmdb.service';

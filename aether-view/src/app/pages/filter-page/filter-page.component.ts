@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FilterComponent } from '@components/filter/filter.component';
 import { CardComponent } from '@components/card/card.component';
@@ -7,7 +7,7 @@ import { MOVIE_GENRES, SERIES_GENRES } from '@assets/genres';
 import { Genre, Keyword } from '@interfaces/common-interfaces';
 import { Studio, STUDIOS } from '@assets/studios';
 import { NETWORKS } from '@assets/networks';
-import { firstValueFrom, Subscription } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 
 export interface FilterState {

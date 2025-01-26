@@ -45,13 +45,11 @@ export class CardComponent implements OnInit {
   onItemClicked(event: Event): void {
     let route: string[] = [];
     let queryParams = {};
-    console.log('clicked',event ,this.item)
     if (this.tmdbService.isSeries(this.item)) {
       route = ['/tv', this.item.id.toString()];
       this.tmdbService.markAsSeen('tv', this.item.id);
     } else if (this.tmdbService.isMovie(this.item)) {
       route = ['/movie', this.item.id.toString()];
-      console.log(route)
       this.tmdbService.markAsSeen('movie', this.item.id);
     }else if (this.tmdbService.isGenre(this.item)) {
       route = ['/discover', this.item.type === 'movie' ? 'movies' : 'series'];

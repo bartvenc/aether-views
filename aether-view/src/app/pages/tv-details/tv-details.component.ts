@@ -1,10 +1,12 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TmdbService } from '../../services/tmdb.service';
-import { Series, Season } from '../../interfaces/series';
 import { CommonModule, DatePipe } from '@angular/common';
-import { SliderComponent } from '../../components/slider/slider.component';
 import { forkJoin } from 'rxjs';
+
+import { TmdbService } from '@services/tmdb.service';
+import { Series, Season } from '@interfaces/series';
+
+import { SliderComponent } from '@components/slider/slider.component';
 
 @Component({
   standalone: true,
