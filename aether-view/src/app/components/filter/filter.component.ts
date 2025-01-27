@@ -14,6 +14,20 @@ import { TmdbService } from '@services/tmdb.service';
 import { Router } from '@angular/router';
 import { MatChipsModule } from '@angular/material/chips';
 
+export interface FilterState {
+  type: 'movies' | 'series' | null;
+  category: string;
+  year: number;
+  genres: number[];
+  studioOrNetwork: number;
+  keywords: number[];
+  country: string | null;
+}
+
+export interface KeywordResult {
+  id: number;
+  name: string;
+}
 
 @Component({
   selector: 'app-filter',
@@ -41,21 +55,22 @@ export class FilterComponent implements OnInit {
     { code: 'FR', name: 'France' },
   ];
 
-  tmdbService = inject(TmdbService);
-  router = inject(Router);
+  protected readonly tmdbService = inject(TmdbService);
+  protected readonly router = inject(Router);
 
-  selectedCategory = signal('Popular');
-  selectedYear = signal(0);
-  selectedGenres = signal<number[]>([]);
-  selectedStudiosOrNetworks = signal(0);
-  keywordInput = signal('');
-  keywordResults = signal<{ id: number; name: string }[]>([]);
-  selectedKeywords = signal<{ id: number; name: string }[]>([]);
-  separatorKeysCodes = [ENTER, COMMA] as const;
+  readonly selectedCategory = signal('Popular');
+  readonly selectedYear = signal(0);
+  readonly selectedGenres = signal<number[]>([]);
+  readonly selectedStudiosOrNetworks = signal(0);
+  readonly keywordInput = signal('');
+  readonly keywordResults = signal<{ id: number; name: string }[]>([]);
+  readonly selectedKeywords = signal<{ id: number; name: string }[]>([]);
+  readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
-  selectedCountry = signal<string | null>('');
+  readonly selectedCountry = signal<string | null>('');
 
-  selectedTypeSignal = signal<'movies' | 'series' | null>(this.type);
+  readonly selectedTypeSignal = signal<'movies' | 'series' | null>(this.type);
+  readonly activeFiltersCount = signal(0);
   showFilters = false;
   isMobile = false;
 
@@ -101,6 +116,7 @@ export class FilterComponent implements OnInit {
       keywords: this.selectedKeywords().map(kw => kw.id),
       country: this.selectedCountry(),
     });
+    this.activeFiltersCount.set(this.countActiveFilters());
   }
 
   filterReset() {
@@ -110,6 +126,7 @@ export class FilterComponent implements OnInit {
     this.selectedStudiosOrNetworks.set(0);
     this.selectedKeywords.set([]);
     this.selectedCountry.set('');
+    this.activeFiltersCount.set(0);
     this.updateFilter();
   }
 
@@ -182,4 +199,19 @@ export class FilterComponent implements OnInit {
   getFirstSelectedGenre(): Genre | null {
     return this.genres.find(genre => this.selectedGenres().includes(genre.id)) || null;
   }
+
+  private countActiveFilters(): number {
+    let count = 0;
+    
+    // Check non-default values
+    if (this.selectedCategory() !== 'Popular') count++;
+    if (this.selectedYear() !== 0) count++;
+    if (this.selectedGenres().length > 0) count++;
+    if (this.selectedStudiosOrNetworks() !== 0) count++;
+    if (this.selectedKeywords().length > 0) count++;
+    if (this.selectedCountry() !== '') count++;
+    
+    return count;
+  }
+
 }
