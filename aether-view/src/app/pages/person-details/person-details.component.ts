@@ -29,19 +29,16 @@ export class PersonDetailsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const personId = this.route.snapshot.params['id'];
 
-    // Fetch person details
     this.tmdbService.getPersonDetails(personId).subscribe(person => {
       this.person.set(person);
     });
 
-    // Fetch combined credits and split into movies and series
     this.tmdbService.getPersonCombinedCredits(personId).subscribe(credits => {
       const movies = credits.filter(credit => credit.media_type === 'movie') as Movie[];
       const series = credits.filter(credit => credit.media_type === 'tv') as Series[];
       this.movies.set(movies);
       this.series.set(series);
 
-      // Collect all backdrop images
       const backdrops = [...movies.map(m => m.backdrop_path), ...series.map(s => s.backdrop_path)].filter(backdrop => backdrop != null);
 
       this.allBackdrops.set(backdrops);
