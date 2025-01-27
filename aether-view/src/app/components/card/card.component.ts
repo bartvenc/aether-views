@@ -18,10 +18,10 @@ export class CardComponent implements OnInit {
   @Input() imageUrl?: string | null = null;
   @Input() title?: string = '';
   @Input() subtitle?: string | null = null;
-  @Input() type: 'movies' | 'series' | 'person' | 'genreStudio' | 'studio' = 'movies'; // Card type
-  @Input() overview?: string | null = null; 
+  @Input() type: 'movies' | 'series' | 'person' | 'genreStudio' | 'studio' | 'network' = 'movies';
+  @Input() overview?: string | null = null;
   @Input() maxOverviewLength?: number = 100;
-  @Input() item?: number | Series | Movie | null = null; 
+  @Input() item?: number | Series | Movie | null = null;
   @Input() icon?: string | null = null;
   @Input() index = 0;
   @Input() loading?: string = 'lazy';
@@ -32,12 +32,12 @@ export class CardComponent implements OnInit {
   isMobile = false;
 
   ngOnInit() {
-   
+
     this.isMobile = window.innerWidth < 768;
   }
 
   getTruncatedText(text: string | null | undefined, maxLength: number | undefined): string {
-    if (!text) return ''; 
+    if (!text) return '';
     const length = maxLength ?? 100;
     if (text.length <= length) return text;
     return text.substring(0, length) + '...';
@@ -51,11 +51,14 @@ export class CardComponent implements OnInit {
     } else if (this.tmdbService.isMovie(this.item)) {
       route = ['/movie', this.item.id.toString()];
       this.tmdbService.markAsSeen('movie', this.item.id);
-    }else if (this.tmdbService.isGenre(this.item)) {
+    } else if (this.tmdbService.isGenre(this.item)) {
       route = ['/discover', this.item.type === 'movie' ? 'movies' : 'series'];
       queryParams = { genre: this.item.id };
-    } else if (this.tmdbService.isStudio(this.item)) {
+    } else if (this.type === 'studio' && this.tmdbService.isStudio(this.item)) {
       route = ['/discover/movies'];
+      queryParams = { studio: this.item.id };
+    } else if (this.type === 'network'  && this.tmdbService.isNetwork(this.item)) {
+      route = ['/discover/series'];
       queryParams = { studio: this.item.id };
     } else if (this.tmdbService.isPerson(this.item)) {
       route = ['/person', this.item.id.toString()];

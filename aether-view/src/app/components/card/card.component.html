@@ -87,5 +87,13 @@
         </div>
       </div>
     }
+    @case ('network') {
+      <div class="studio">
+        <img [src]="imageUrl || 'assets/poster.jpg'" alt="Studio Logo" class="card-image" />
+        <div class="studio-overlay" [class.mobile]="isMobile">
+          <span class="title" [class.mobile]="isMobile">{{ title }}</span>
+        </div>
+      </div>
+    }
   }
 </div>
