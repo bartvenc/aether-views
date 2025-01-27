@@ -7,9 +7,9 @@ import { Router } from '@angular/router';
 import { forkJoin, map, Observable, switchMap, catchError, of } from 'rxjs';
 
 import { SliderComponent } from '@components/slider/slider.component';
-import { defaultCurations } from '@assets/currations';
+import { defaultCurations } from '@app/data/constants/currations';
 import { BackendService } from '@services/backend.service';
-import { prompts, quotes, secondStageMessages } from '@assets/placeholders';
+import { prompts, quotes, secondStageMessages } from '@app/data/constants/placeholders';
 import { Curation, RecommendationItem } from '@interfaces/common-interfaces';
 import { Movie } from '@interfaces/movies';
 import { Series } from '@interfaces/series';

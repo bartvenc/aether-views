@@ -2,8 +2,8 @@ import { Component, inject, Signal, signal, CUSTOM_ELEMENTS_SCHEMA, OnInit } fro
 import { RouterLink } from '@angular/router';
 import { TmdbService } from '@services/tmdb.service';
 import { SliderComponent } from '@components/slider/slider.component';
-import { MOVIE_GENRES, SERIES_GENRES } from '@assets/genres';
-import { STUDIOS } from '@assets/studios';
+import { MOVIE_GENRES, SERIES_GENRES } from '@app/data/constants/genres';
+import { STUDIOS } from '@app/data/constants/studios';
 
 
 @Component({
@@ -20,11 +20,11 @@ export class DiscoverComponent {
 
   protected readonly tmdbService = inject(TmdbService);
 
-  popularSeries = this.tmdbService.popularSeries;
-  trendingSeries = this.tmdbService.trendingSeries;
+  protected readonly popularSeries = this.tmdbService.popularSeries;
+  protected readonly trendingSeries = this.tmdbService.trendingSeries;
 
-  trendingMovies = this.tmdbService.trendingMovies;
-  upcomingMovies = this.tmdbService.upcomingMovies;
+  protected readonly trendingMovies = this.tmdbService.trendingMovies;
+  protected readonly upcomingMovies = this.tmdbService.upcomingMovies;
 
-  currentPopularSeriesPage = signal(1);
+  protected readonly currentPopularSeriesPage = signal(1);
 }

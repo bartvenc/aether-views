@@ -7,7 +7,7 @@ import { catchError } from 'rxjs/operators';
 import { Series, Season } from '@interfaces/series';
 import { Movie } from '@interfaces/movies';
 import { Genre, Person } from '@interfaces/common-interfaces';
-import { Studio } from '@assets/studios';
+import { Studio } from '@app/data/constants/studios';
 import { ContentItem } from '@pages/filter-page/filter-page.component';
 
 

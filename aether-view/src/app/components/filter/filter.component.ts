@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 
 import { Network } from '@interfaces/series';
-import { Studio } from '@assets/studios';
+import { Studio } from '@app/data/constants/studios';
 import { Genre } from '@interfaces/common-interfaces';  
 import { TmdbService } from '@services/tmdb.service';
 import { Router } from '@angular/router';
@@ -76,6 +76,12 @@ export class FilterComponent implements OnInit {
 
   ngOnInit() {
     this.checkViewport();
+    this.initializeSelections();
+    this.updateFilter(); // Moved common startup logic into a single method
+  }
+
+  private initializeSelections(): void {
+    // Consolidated the signal initializations here for clarity
     this.selectedTypeSignal.set(this.filters['type'] || this.type);
     this.selectedCategory.set(this.filters['category'] || 'Popular');
     this.selectedYear.set(this.filters['year'] || 0);
@@ -91,23 +97,27 @@ export class FilterComponent implements OnInit {
         ...this.countries,
       ];
     }
-
-    this.updateFilter();
   }
 
-  updateFilter() {
-    const newType = this.selectedTypeSignal();
-
-    if (newType !== this.type) {
-      this.router.navigate([`/discover/${newType}`]);
+  updateFilter(): void {
+    if (this.shouldNavigateType()) {
+      this.router.navigate([`/discover/${this.selectedTypeSignal()}`]);
       return;
     }
-
     if (this.selectedCategory() === 'New' && this.selectedYear() === 0) {
       this.selectedYear.set(new Date().getFullYear());
     }
+    this.emitFilterChange();
+    this.activeFiltersCount.set(this.countActiveFilters());
+  }
 
-    this.filterChange.emit({
+  private shouldNavigateType(): boolean {
+    const newType = this.selectedTypeSignal();
+    return !!newType && newType !== this.type;
+  }
+
+  private emitFilterChange(): void {
+    const payload = {
       type: this.selectedTypeSignal(),
       category: this.selectedCategory(),
       year: this.selectedYear(),
@@ -115,11 +125,11 @@ export class FilterComponent implements OnInit {
       studioOrNetwork: this.selectedStudiosOrNetworks(),
       keywords: this.selectedKeywords().map(kw => kw.id),
       country: this.selectedCountry(),
-    });
-    this.activeFiltersCount.set(this.countActiveFilters());
+    };
+    this.filterChange.emit(payload);
   }
 
-  filterReset() {
+  filterReset(): void {
     this.selectedCategory.set('Popular');
     this.selectedYear.set(0);
     this.selectedGenres.set([]);
@@ -130,7 +140,7 @@ export class FilterComponent implements OnInit {
     this.updateFilter();
   }
 
-  onGenreChange(event: any) {
+  onGenreChange(event: any): void {
     if (event.value.some((genre: number) => genre === undefined)) {
       this.selectedGenres.set([]);
     } else {
@@ -157,7 +167,7 @@ export class FilterComponent implements OnInit {
     }
 
     this.keywordInput.set('');
-    this.keywordResults.set([]); // Clear the results menu
+    this.keywordResults.set([]);
     this.updateFilter();
   }
 
@@ -203,7 +213,6 @@ export class FilterComponent implements OnInit {
   private countActiveFilters(): number {
     let count = 0;
     
-    // Check non-default values
     if (this.selectedCategory() !== 'Popular') count++;
     if (this.selectedYear() !== 0) count++;
     if (this.selectedGenres().length > 0) count++;

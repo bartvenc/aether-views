@@ -1,4 +1,4 @@
-import { Curation } from '../../src/app/interfaces/common-interfaces';
+import { Curation } from '@interfaces/common-interfaces';
 
 export const defaultCurations: Curation[] = [
   {

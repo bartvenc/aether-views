@@ -1,4 +1,4 @@
-import { Genre } from '../../src/app/interfaces/common-interfaces';
+import { Genre } from '@interfaces/common-interfaces';
 
 export const MOVIE_GENRES: Genre[] = [
   {
