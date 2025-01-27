@@ -45,13 +45,14 @@ export class SliderComponent {
         slidesPerView: 3,
         spaceBetween: 10,
       },
-      480: {
-        slidesPerView: 3,
+
+      400: {
+        slidesPerView: 4,
         spaceBetween: 10,
       },
       640: {
-        slidesPerView: 4,
-        spaceBetween: 10,
+        slidesPerView: 5,
+        spaceBetween: 8,
       },
       768: {
         slidesPerView: 5,
@@ -65,12 +66,16 @@ export class SliderComponent {
         slidesPerView: 10,
         spaceBetween: 10,
       },
+      1920: {
+        slidesPerView: 12,
+        spaceBetween: 10,
+      },
       2560: {
-        slidesPerView: 13,
+        slidesPerView: 15,
         spaceBetween: 10,
       },
       3440: {
-        slidesPerView: 17,
+        slidesPerView: 19,
         spaceBetween: 10,
       },
     },
