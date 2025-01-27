@@ -26,8 +26,8 @@ export class CardComponent implements OnInit {
   @Input() index = 0;
   @Input() loading?: string = 'lazy';
 
-  tmdbService = inject(TmdbService);
-  router = inject(Router);
+  protected readonly tmdbService = inject(TmdbService);
+  protected readonly router = inject(Router);
 
   isMobile = false;
 

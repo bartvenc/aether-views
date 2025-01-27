@@ -20,7 +20,7 @@ export class SliderComponent {
   @Input() overviewField = 'overview';
   isMobile = false;
 
-  tmdbService = inject(TmdbService);
+  protected readonly tmdbService = inject(TmdbService);
 
   ngOnInit(): void {
     this.isMobile = window.matchMedia('(max-width: 768px)').matches;

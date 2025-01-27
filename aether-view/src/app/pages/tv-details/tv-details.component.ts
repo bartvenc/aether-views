@@ -16,9 +16,9 @@ import { SliderComponent } from '@components/slider/slider.component';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TvDetailsComponent implements OnInit {
-  tmdbService = inject(TmdbService);
-  route = inject(ActivatedRoute);
-  router = inject(Router);
+  protected readonly tmdbService = inject(TmdbService);
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly router = inject(Router);
 
   series = signal<Series | undefined>(undefined);
   openSeasons: Set<number> = new Set();

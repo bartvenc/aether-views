@@ -18,7 +18,7 @@ export class DiscoverComponent {
   SERIES_GENRES = SERIES_GENRES;
   STUDIOS = STUDIOS;
 
-  tmdbService = inject(TmdbService);
+  protected readonly tmdbService = inject(TmdbService);
 
   popularSeries = this.tmdbService.popularSeries;
   trendingSeries = this.tmdbService.trendingSeries;

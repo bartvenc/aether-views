@@ -15,9 +15,9 @@ import { Movie } from '../../interfaces/movies';
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class MovieDetailsComponent implements OnInit {
-  tmdbService = inject(TmdbService);
-  router = inject(Router);
-  route = inject(ActivatedRoute);
+  protected readonly tmdbService = inject(TmdbService);
+  protected readonly router = inject(Router);
+  protected readonly route = inject(ActivatedRoute);
 
   movie = signal<Movie | undefined>(undefined);
 

@@ -14,8 +14,8 @@ import { CardComponent } from '@components/card/card.component';
   templateUrl: './person-details.component.html',
 })
 export class PersonDetailsComponent implements OnInit, OnDestroy {
-  route = inject(ActivatedRoute);
-  tmdbService = inject(TmdbService);
+  protected readonly route = inject(ActivatedRoute);
+  protected readonly tmdbService = inject(TmdbService);
 
   person = signal<Person | null>(null);
   movies = signal<Movie[]>([]);
