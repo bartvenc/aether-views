@@ -6,7 +6,6 @@ import { MOVIE_GENRES, SERIES_GENRES } from '@app/data/constants/genres';
 import { STUDIOS } from '@app/data/constants/studios';
 import { NETWORKS } from '@app/data/constants/networks';
 
-
 @Component({
   selector: 'app-discover',
   standalone: true,

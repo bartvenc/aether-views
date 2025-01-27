@@ -41,11 +41,9 @@ export class MovieDetailsComponent implements OnInit {
     event.preventDefault();
     const route = ['/discover', 'movies'];
     const queryParams = type === 'genre' ? { genre: item.id } : { keyword: this.stringifyKeyword(item) };
-    
+
     if (event.ctrlKey || event.metaKey) {
-      const url = this.router.serializeUrl(
-        this.router.createUrlTree(route, { queryParams })
-      );
+      const url = this.router.serializeUrl(this.router.createUrlTree(route, { queryParams }));
       window.open(url, '_blank');
     } else {
       this.router.navigate(route, { queryParams });

@@ -76,13 +76,12 @@ export class FilterPageComponent implements OnInit {
     this.initializeComponent();
     this.subscribeToRouteParams();
   }
-  
+
   private initializeComponent(): void {
     this.type = this.route.snapshot.data['type'];
     this.filters.update(f => ({ ...f, type: this.type }));
     this.setCurrentFilters();
   }
-
 
   private setCurrentFilters(): void {
     if (this.type === 'movies') {
@@ -95,11 +94,9 @@ export class FilterPageComponent implements OnInit {
   }
 
   private subscribeToRouteParams(): void {
-    this.route.queryParams
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(params => this.handleQueryParams(params));
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => this.handleQueryParams(params));
   }
-  
+
   private handleQueryParams(params: Record<string, string>): void {
     try {
       this.updateFiltersFromParams(params);
@@ -138,7 +135,7 @@ export class FilterPageComponent implements OnInit {
       ...currentFilters,
       ...newFilters,
       keyword: newFilters.keyword || null,
-      year: this.determineYear(newFilters, currentFilters)
+      year: this.determineYear(newFilters, currentFilters),
     }));
 
     this.resetAndFetchContent();
@@ -154,7 +151,7 @@ export class FilterPageComponent implements OnInit {
   private resetAndFetchContent(): void {
     this.currentPage.set(1);
     this.items.set([]);
-    
+
     setTimeout(() => {
       if (!this.isLoading()) {
         this.fetchContent(true);

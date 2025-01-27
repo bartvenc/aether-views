@@ -6,7 +6,6 @@ import { TmdbService } from '@services/tmdb.service';
 import { Series } from '@app/interfaces/series';
 import { Movie } from '@app/interfaces/movies';
 
-
 @Component({
   selector: 'app-card',
   standalone: true,
@@ -32,7 +31,6 @@ export class CardComponent implements OnInit {
   isMobile = false;
 
   ngOnInit() {
-
     this.isMobile = window.innerWidth < 768;
   }
 
@@ -57,7 +55,7 @@ export class CardComponent implements OnInit {
     } else if (this.type === 'studio' && this.tmdbService.isStudio(this.item)) {
       route = ['/discover/movies'];
       queryParams = { studio: this.item.id };
-    } else if (this.type === 'network'  && this.tmdbService.isNetwork(this.item)) {
+    } else if (this.type === 'network' && this.tmdbService.isNetwork(this.item)) {
       route = ['/discover/series'];
       queryParams = { studio: this.item.id };
     } else if (this.tmdbService.isPerson(this.item)) {
@@ -65,9 +63,7 @@ export class CardComponent implements OnInit {
     }
 
     if (event instanceof MouseEvent && (event.ctrlKey || event.metaKey)) {
-      const url = this.router.serializeUrl(
-        this.router.createUrlTree(route, { queryParams })
-      );
+      const url = this.router.serializeUrl(this.router.createUrlTree(route, { queryParams }));
       window.open(url, '_blank');
     } else {
       this.router.navigate(route, { queryParams });

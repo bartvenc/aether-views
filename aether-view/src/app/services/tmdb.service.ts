@@ -11,7 +11,6 @@ import { Studio } from '@app/data/constants/studios';
 import { ContentItem } from '@pages/filter-page/filter-page.component';
 import { Network } from '@app/data/constants/networks';
 
-
 interface TmdbConfig {
   apiKey: string;
   baseUrl: string;
@@ -208,7 +207,7 @@ export class TmdbService {
 
     // Add category-specific parameters
     this.addCategoryParams(params, filters, type);
-    
+
     // Add additional filters
     this.addAdditionalFilters(params, filters, type);
 
@@ -468,7 +467,9 @@ export class TmdbService {
   get popularSeries(): Signal<Series[]> {
     if (!this.popularSeriesSignal) {
       this.popularSeriesSignal = toSignal(
-        this.http.get<{ results: Series[] }>(`${this.config.baseUrl}/tv/popular?api_key=${this.config.apiKey}`).pipe(map(response => response.results)),
+        this.http
+          .get<{ results: Series[] }>(`${this.config.baseUrl}/tv/popular?api_key=${this.config.apiKey}`)
+          .pipe(map(response => response.results)),
         { initialValue: [] }
       );
     }
@@ -505,7 +506,9 @@ export class TmdbService {
   get upcomingMovies(): Signal<Movie[]> {
     if (!this.upcomingMoviesSignal) {
       this.upcomingMoviesSignal = toSignal(
-        this.http.get<{ results: Movie[] }>(`${this.config.baseUrl}/movie/upcoming?api_key=${this.config.apiKey}`).pipe(map(response => response.results)),
+        this.http
+          .get<{ results: Movie[] }>(`${this.config.baseUrl}/movie/upcoming?api_key=${this.config.apiKey}`)
+          .pipe(map(response => response.results)),
         { initialValue: [] }
       );
     }
@@ -515,7 +518,9 @@ export class TmdbService {
   get movieGenres(): Signal<Genre[]> {
     if (!this.movieGenresSignal) {
       this.movieGenresSignal = toSignal(
-        this.http.get<{ genres: Genre[] }>(`${this.config.baseUrl}/genre/movie/list?api_key=${this.config.apiKey}`).pipe(map(response => response.genres)),
+        this.http
+          .get<{ genres: Genre[] }>(`${this.config.baseUrl}/genre/movie/list?api_key=${this.config.apiKey}`)
+          .pipe(map(response => response.genres)),
         { initialValue: [] }
       );
     }

@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { Network } from '@interfaces/series';
 import { Studio } from '@app/data/constants/studios';
-import { Genre } from '@interfaces/common-interfaces';  
+import { Genre } from '@interfaces/common-interfaces';
 import { TmdbService } from '@services/tmdb.service';
 import { Router } from '@angular/router';
 import { MatChipsModule } from '@angular/material/chips';
@@ -178,11 +178,10 @@ export class FilterComponent implements OnInit {
 
   async onCountryChange(event: any) {
     const newCountry = event.value;
-    if (!newCountry){
+    if (!newCountry) {
       this.selectedCountry.set('');
       this.updateFilter();
       return;
-
     }
     const previousCountry = this.selectedCountry();
 
@@ -212,15 +211,14 @@ export class FilterComponent implements OnInit {
 
   private countActiveFilters(): number {
     let count = 0;
-    
+
     if (this.selectedCategory() !== 'Popular') count++;
     if (this.selectedYear() !== 0) count++;
     if (this.selectedGenres().length > 0) count++;
     if (this.selectedStudiosOrNetworks() !== 0) count++;
     if (this.selectedKeywords().length > 0) count++;
     if (this.selectedCountry() !== '') count++;
-    
+
     return count;
   }
-
 }
