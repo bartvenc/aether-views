@@ -199,6 +199,8 @@ export class RecommendationComponent implements OnInit, OnDestroy {
     this.promptState.interval = setInterval(() => {
       if (this.hasUserInput) {
         clearInterval(this.promptState.interval);
+        this.promptState.interval = null;
+        this.quoteState.interval = null;
         return;
       }
       this.promptState.index = (this.promptState.index + 1) % prompts.length;
@@ -290,6 +292,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
     clearInterval(this.promptState.interval);
     clearInterval(this.quoteState.interval);
     this.startQuoteRotation();
+
   }
 
   get userCurations() {

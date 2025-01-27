@@ -9,6 +9,17 @@ export class BackendService {
   private remoteBackendUrl = 'https://aether-views-api-247441061608.europe-north1.run.app';
   private currentBackendUrl: string;
 
+  private cleanTitle(title: string): string {
+    return title.replace(/: Season \d+|: Episode \d+|: Chapter \d+|: Part \d+| - The Series| - Season \d+|: Act \d+|: City of Angels|: A Jedi's Return|: The Complete Series|: Series Finale/gi, '');
+  }
+
+  private filterInvalidTitles(items: any[]): any[] {
+    return items.map(item => ({
+      ...item,
+      title: this.cleanTitle(item.title)
+    }));
+  }
+  
   constructor(private http: HttpClient) {
     this.currentBackendUrl = this.localBackendUrl;
     this.checkLocalServer();
@@ -70,34 +81,31 @@ export class BackendService {
 
   getRecommendations(query: string): Observable<any> {
     return this.handleRequest('recommend', query).pipe(
-      switchMap(response => {
-        return this.pollJobStatus('recommend', response.request_id);
-      }),
+      switchMap(response => this.pollJobStatus('recommend', response.request_id)),
       map(response => {
-        if (!response.result?.recommendations?.length && !response.result?.results?.length) {
+        const recommendations = this.filterInvalidTitles(response.result?.recommendations || []);
+        const results = this.filterInvalidTitles(response.result?.results || []);
+        
+        if (!recommendations.length && !results.length) {
           return { recommendations: [], results: [] };
         }
-        return {
-          recommendations: response.result?.recommendations || [],
-          results: response.result?.results || [],
-        };
+        return { recommendations, results };
       })
     );
   }
-
   search(query: string): Observable<any> {
     return this.handleRequest('search', query).pipe(
       switchMap(response => this.pollJobStatus('search', response.request_id)),
       map(response => {
-        if (!response.result?.recommendations?.length && !response.result?.results?.length) {
+        const results = this.filterInvalidTitles(response.result?.results || []);
+        
+        if (!results.length) {
           return { recommendations: [], results: [] };
         }
-        return {
-          recommendations: [],
-          results: response.result?.results || [],
-        };
+        return { recommendations: [], results };
       })
     );
   }
 }
+
 
