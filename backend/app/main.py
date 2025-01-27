@@ -39,8 +39,10 @@ searcher = OnlineAgent(llm=llm_provider, temperature=0.8)
 recommend_queue = RequestQueue(max_workers=1)
 search_queue = RequestQueue(max_workers=1)
 
+
 class QueryRequest(BaseModel):
     query: str
+
 
 class SearchManager:
     def __init__(self, searcher):
@@ -61,7 +63,9 @@ class SearchManager:
                 self.search_queue.process_next()
             return request_id
 
+
 search_manager = SearchManager(searcher)
+
 
 @app.post("/recommend")
 async def recommend(request: QueryRequest):
@@ -83,6 +87,7 @@ async def search(request: QueryRequest):
     )
     return {"request_id": request_id, "source": "local"}
 
+
 @app.get("/status/{request_type}/{request_id}")
 async def get_status(request_type: str, request_id: str):
     if request_type not in ['recommend', 'search']:
@@ -103,9 +108,11 @@ async def get_status(request_type: str, request_id: str):
 
     return status
 
+
 @app.get("/health")
 async def health_check():
     return {"message": "OK"}
+
 
 @app.get("/")
 async def root():

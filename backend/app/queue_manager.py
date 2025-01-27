@@ -6,7 +6,6 @@ import threading
 import uuid
 from typing import Any, Dict, Optional, Callable
 import asyncio
-from functools import partial
 import time
 
 
@@ -15,7 +14,7 @@ class QueueItem:
     id: str
     query: str
     timestamp: datetime
-    processor_func: Callable  # Add processor function to item
+    processor_func: Callable
     status: str = 'pending'
     result: Any = None
     error: Optional[str] = None
