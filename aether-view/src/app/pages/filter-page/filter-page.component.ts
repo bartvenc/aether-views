@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, Input, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FilterComponent } from '@components/filter/filter.component';
 import { CardComponent } from '@components/card/card.component';
@@ -9,6 +9,7 @@ import { Studio, STUDIOS } from '@assets/studios';
 import { NETWORKS } from '@assets/networks';
 import { firstValueFrom } from 'rxjs';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface FilterState {
   type: 'movies' | 'series';
@@ -39,110 +40,121 @@ export interface ContentItem {
 })
 export class FilterPageComponent implements OnInit {
   @Input() type: 'movies' | 'series' = 'movies';
-  filters = signal({
+
+  readonly filters = signal<FilterState>({
     type: this.type,
     category: 'Popular',
-    year: null as number | null,
-    genres: [] as number[],
-    keyword: null as Keyword | null,
-    studiosOrNetworks: null as number | null,
-    person: null as number | null,
+    year: null,
+    genres: [],
+    keyword: null,
+    studiosOrNetworks: null,
+    person: null,
   });
 
-  movieGenres = MOVIE_GENRES;
-  seriesGenres = SERIES_GENRES;
-  studios = STUDIOS;
-  networks = NETWORKS;
+  readonly movieGenres = MOVIE_GENRES;
+  readonly seriesGenres = SERIES_GENRES;
+  readonly studios = STUDIOS;
+  readonly networks = NETWORKS;
+  readonly years = Array.from({ length: new Date().getFullYear() - 1979 }, (_, i) => new Date().getFullYear() - i);
 
-  years = Array.from({ length: new Date().getFullYear() - 1979 }, (_, i) => new Date().getFullYear() - i);
-
-  selectedGenres = signal<number[]>([]);
+  readonly selectedGenres = signal<number[]>([]);
 
   currentGenres: Genre[] = [];
   curentStudiosOrNetwork: Studio[] = [];
 
-  items = signal<any[]>([]);
-  isLoading = signal(false);
-  page = signal(1);
-  currentPage = signal(1);
-  totalPages = signal(0);
+  readonly items = signal<any[]>([]);
+  readonly isLoading = signal(false);
+  readonly currentPage = signal(1);
+  readonly totalPages = signal(0);
 
-  repeatArray = new Array(6);
-
-  route: ActivatedRoute = inject(ActivatedRoute);
-  tmdbService = inject(TmdbService);
+  readonly repeatArray = new Array(6);
+  private readonly destroyRef = inject(DestroyRef);
+  protected readonly route: ActivatedRoute = inject(ActivatedRoute);
+  protected readonly tmdbService = inject(TmdbService);
 
   ngOnInit(): void {
+    this.initializeComponent();
+    this.subscribeToRouteParams();
+  }
+  
+  private initializeComponent(): void {
     this.type = this.route.snapshot.data['type'];
     this.filters.update(f => ({ ...f, type: this.type }));
+    this.setCurrentFilters();
+  }
 
+
+  private setCurrentFilters(): void {
     if (this.type === 'movies') {
       this.currentGenres = this.movieGenres;
       this.curentStudiosOrNetwork = this.studios;
-    } else if (this.type === 'series') {
+    } else {
       this.currentGenres = this.seriesGenres;
       this.curentStudiosOrNetwork = this.networks;
     }
+  }
 
-    this.route.queryParams.subscribe(params => {
-      if (params['genre']) {
-        this.filters.update(f => ({ ...f, genres: params['genre'].split(',').map((id: number) => +id) }));
-      }
-      if (params['keyword']) {
-        try {
-          const keyword = JSON.parse(params['keyword']);
-          this.filters.update(f => ({ ...f, keyword }));
-        } catch (e) {
-          console.error('Invalid keyword format:', e);
-        }
-      }
-      if (params['studio']) {
-        try {
-          this.filters.update(f => ({ ...f, studiosOrNetworks: params['studio'] }));
-        } catch (e) {
-          console.error('Invalid keyword format:', e);
-        }
-      }
-      if (params['person']) {
-        try {
-          this.filters.update(f => ({ ...f, person: params['person'] }));
-        } catch (e) {
-          console.error('Invalid keyword format:', e);
-        }
-      }
-      if (params['category']) {
-        try {
-          this.filters.update(f => ({ ...f, category: params['category'] }));
-        } catch (e) {
-          console.error('Invalid keyword format:', e);
-        }
-      }
-    });
+  private subscribeToRouteParams(): void {
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => this.handleQueryParams(params));
+  }
+  
+  private handleQueryParams(params: Record<string, string>): void {
+    try {
+      this.updateFiltersFromParams(params);
+    } catch (error) {
+      console.error('Error processing query parameters', error);
+    }
+  }
+
+  private updateFiltersFromParams(params: Record<string, string>): void {
+    const updates: Partial<FilterState> = {};
+
+    if (params['genre']) {
+      updates.genres = params['genre'].split(',').map(Number);
+    }
+    if (params['keyword']) {
+      updates.keyword = JSON.parse(params['keyword']);
+    }
+    if (params['studio']) {
+      updates.studiosOrNetworks = Number(params['studio']);
+    }
+    if (params['person']) {
+      updates.person = Number(params['person']);
+    }
+    if (params['category']) {
+      updates.category = params['category'];
+    }
+
+    this.filters.update(f => ({ ...f, ...updates }));
   }
 
   // Triggered by the filter component
-  updateFilters(newFilters: any) {
-    if (this.isLoading()) {
-      return;
+  updateFilters(newFilters: Partial<FilterState>): void {
+    if (this.isLoading()) return;
+
+    this.filters.update(currentFilters => ({
+      ...currentFilters,
+      ...newFilters,
+      keyword: newFilters.keyword || null,
+      year: this.determineYear(newFilters, currentFilters)
+    }));
+
+    this.resetAndFetchContent();
+  }
+
+  private determineYear(newFilters: Partial<FilterState>, currentFilters: FilterState): number | null {
+    if (newFilters.category === 'New' && !newFilters.year) {
+      return new Date().getFullYear();
     }
-    this.filters.update(currentFilters => {
-      const updatedYear =
-        newFilters.category === 'New' && !newFilters.year
-          ? new Date().getFullYear()
-          : newFilters.year !== undefined
-            ? newFilters.year
-            : currentFilters.year;
+    return newFilters.year ?? currentFilters.year;
+  }
 
-      return {
-        ...currentFilters,
-        ...newFilters,
-        keywords: newFilters.keywords || [],
-        year: updatedYear,
-      };
-    });
-
+  private resetAndFetchContent(): void {
     this.currentPage.set(1);
     this.items.set([]);
+    
     setTimeout(() => {
       if (!this.isLoading()) {
         this.fetchContent(true);
