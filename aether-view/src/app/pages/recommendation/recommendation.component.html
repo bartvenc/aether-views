@@ -9,10 +9,24 @@
 
       <!-- Search -->
       <div class="w-full max-w-xl flex gap-2 items-center justify-center">
-        <input type="text" [(ngModel)]="userQuery" [placeholder]="currentPromt()" class="search-input" />
-        <button (click)="getRecommendations()" class="button-primary">
-          <span class="material-icons text-base">auto_awesome</span>
-          Curate
+        <input 
+          type="text" 
+          [(ngModel)]="userQuery" 
+          [placeholder]="currentPromt()" 
+          class="search-input"
+          [disabled]="isLoading()" 
+          [class.opacity-50]="isLoading()"
+          (input)="onUserInput()" />
+        
+        <button 
+          (click)="getRecommendations()" 
+          class="button-primary"
+          [disabled]="isLoading() || !hasUserInput"
+          [class.opacity-50]="isLoading() || !hasUserInput">
+          <span class="material-icons text-base">
+            {{ isLoading() ? 'hourglass_empty' : 'auto_awesome' }}
+          </span>
+          {{ isLoading() ? 'Curating...' : 'Curate' }}
         </button>
       </div>
     </div>

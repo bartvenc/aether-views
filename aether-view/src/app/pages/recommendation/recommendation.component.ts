@@ -52,6 +52,12 @@ interface QuoteState {
              focus:outline-none focus:ring-2 focus:ring-slate-500 transition-all duration-300 text-sm;
       }
 
+      .search-input:disabled {
+         @apply cursor-not-allowed;
+      }
+      .button-primary:disabled {
+        @apply cursor-not-allowed;
+      }
       .button-primary {
         @apply px-4 py-2 bg-[#3a2e3d] hover:bg-[#4a3e4d] text-white rounded-lg
              transition duration-300 flex items-center justify-center gap-2 text-sm whitespace-nowrap;
@@ -83,7 +89,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
 
   // Regular properties
   userQuery = '';
-  private hasUserInput = false;
+  hasUserInput = false;
   private quoteState: QuoteState = { index: 0, interval: null };
   private promptState: QuoteState = {
     index: Math.floor(Math.random() * prompts.length),
@@ -120,7 +126,9 @@ export class RecommendationComponent implements OnInit, OnDestroy {
     this.startQuoteRotation();
 
     this.fetchRecommendations().subscribe({
-      next: () => this.resetState(),
+      next: () => {
+        this.resetState();
+      },
       error: error => {
         console.error('Error in recommendation flow:', error);
         this.handleError();
@@ -276,6 +284,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   }
 
   private resetState(): void {
+    console.log('resetting state', this.isLoading());
     this.userQuery = '';
     this.hasUserInput = false;
     this.isLoading.set(false);
@@ -283,6 +292,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
     clearInterval(this.promptState.interval);
     clearInterval(this.quoteState.interval);
     this.startQuoteRotation();
+    console.log(this.isLoading())
   }
 
   get userCurations() {
