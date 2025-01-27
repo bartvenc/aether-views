@@ -9,6 +9,7 @@ import { Movie } from '@interfaces/movies';
 import { Genre, Person } from '@interfaces/common-interfaces';
 import { Studio } from '@app/data/constants/studios';
 import { ContentItem } from '@pages/filter-page/filter-page.component';
+import { Network } from '@app/data/constants/networks';
 
 
 interface TmdbConfig {
@@ -418,6 +419,9 @@ export class TmdbService {
 
   isStudio(item: any): item is Studio {
     return this.hasProperty<Studio>(item, 'logo_path', 'string') && this.hasProperty<Studio>(item, 'name', 'string');
+  }
+  isNetwork(item: any): item is Network {
+    return this.hasProperty<Network>(item, 'logo_path', 'string') && this.hasProperty<Network>(item, 'name', 'string');
   }
 
   isGenre(item: any): item is Genre {

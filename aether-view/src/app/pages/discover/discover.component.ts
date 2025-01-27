@@ -4,6 +4,7 @@ import { TmdbService } from '@services/tmdb.service';
 import { SliderComponent } from '@components/slider/slider.component';
 import { MOVIE_GENRES, SERIES_GENRES } from '@app/data/constants/genres';
 import { STUDIOS } from '@app/data/constants/studios';
+import { NETWORKS } from '@app/data/constants/networks';
 
 
 @Component({
@@ -17,6 +18,7 @@ export class DiscoverComponent {
   MOVIE_GENRES = MOVIE_GENRES;
   SERIES_GENRES = SERIES_GENRES;
   STUDIOS = STUDIOS;
+  NETWORKS = NETWORKS;
 
   protected readonly tmdbService = inject(TmdbService);
 

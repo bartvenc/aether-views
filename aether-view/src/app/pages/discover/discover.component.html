@@ -66,4 +66,10 @@
       <app-slider [items]="SERIES_GENRES || []" titleField="name" imageField="posterUrl" cardType="genreStudio"></app-slider>
     </section>
   }
+  @if (NETWORKS) {
+    <section>
+      <h2 class="text-3xl font-bold mt-4 mb-4">Networks</h2>
+      <app-slider [items]="NETWORKS || []" imageField="logo_path" cardType="network"></app-slider>
+    </section>
+  }
 </div>
