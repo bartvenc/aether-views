@@ -40,7 +40,7 @@
       <mat-label>Year</mat-label>
       <mat-select [(ngModel)]="selectedYear" (selectionChange)="updateFilter()">
         @if (selectedYear() !== 0) {
-          <mat-option><mat-icon>replay</mat-icon></mat-option>
+          <mat-option [value]="0"><mat-icon>replay</mat-icon></mat-option >
         }
         @for (year of years; track year) {
           <mat-option [value]="year">{{ year }}</mat-option>

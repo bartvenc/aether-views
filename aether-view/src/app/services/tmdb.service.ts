@@ -226,6 +226,9 @@ export class TmdbService {
           if (type === 'movie') {
             params['primary_release_year'] = filters.year;
           }
+          if (type === 'tv') {
+            params['first_air_date_year'] = filters.year;
+          }
           // No direct year filter for TV popular category
         }
         break;
