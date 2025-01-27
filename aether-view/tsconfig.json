@@ -21,6 +21,8 @@
     "paths": {
       "@app/*": ["app/*"],
       "@assets/*": ["../public/assets/*"],
+      "@data/*": ["app/data/*"],
+      "@constants/*": ["app/data/constants/*"],
       "@components/*": ["app/components/*"],
       "@pages/*": ["app/pages/*"],
       "@services/*": ["app/services/*"],
