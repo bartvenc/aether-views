@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, interval, throwError, of } from 'rxjs';
 import { map, switchMap, takeWhile, catchError } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class BackendService {
-  private localBackendUrl = 'https://api.aether-view.com'; //testing with both with docker and just python
-  private remoteBackendUrl = 'https://aether-views-api-247441061608.europe-north1.run.app'; //we're not using this atm.
+  private localBackendUrl = 'https://api.aether-view.com';
+  private remoteBackendUrl = 'https://aether-views-api-247441061608.europe-north1.run.app';
   private currentBackendUrl: string;
 
   constructor(private http: HttpClient) {
@@ -52,7 +51,7 @@ export class BackendService {
       }),
       takeWhile(
         response => response.status === 'pending' || response.status === 'processing',
-        true // Include the last value before completing
+        true
       )
     );
   }
@@ -72,22 +71,33 @@ export class BackendService {
   getRecommendations(query: string): Observable<any> {
     return this.handleRequest('recommend', query).pipe(
       switchMap(response => {
-        return this.pollJobStatus('recommend', response.request_id); // This should poll until complete
+        return this.pollJobStatus('recommend', response.request_id);
       }),
-      map(response => ({
-        recommendations: response.result?.recommendations || [],
-        results: response.result?.results || [],
-      }))
+      map(response => {
+        if (!response.result?.recommendations?.length && !response.result?.results?.length) {
+          return { recommendations: [], results: [] };
+        }
+        return {
+          recommendations: response.result?.recommendations || [],
+          results: response.result?.results || [],
+        };
+      })
     );
   }
 
   search(query: string): Observable<any> {
     return this.handleRequest('search', query).pipe(
-      switchMap(response => this.pollJobStatus('search', response.request_id)), // This polls same way
-      map(response => ({
-        recommendations: [],
-        results: response.result?.results || [],
-      }))
+      switchMap(response => this.pollJobStatus('search', response.request_id)),
+      map(response => {
+        if (!response.result?.recommendations?.length && !response.result?.results?.length) {
+          return { recommendations: [], results: [] };
+        }
+        return {
+          recommendations: [],
+          results: response.result?.results || [],
+        };
+      })
     );
   }
 }
+
