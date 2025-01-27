@@ -5,7 +5,7 @@
   [infiniteScrollThrottle]="300"
   [infiniteScrollDisabled]="isLoading()"
   (scrolled)="onScroll()">
-  <!-- Filters -->
+
   <app-filter
     [type]="type"
     (filterChange)="updateFilters($event)"
@@ -14,8 +14,7 @@
     [studiosOrNetworks]="curentStudiosOrNetwork"
     [filters]="filters()"></app-filter>
 
-  <!-- Items Grid -->
-  <div class="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-9 lg:grid-cols-12 gap-4 mt-6">
+  <div class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-10  2xl:grid-cols-12 gap-4 mt-6">
     @for (item of items(); track item) {
       <app-card
         [type]="type === 'movies' ? 'movies' : 'series'"
@@ -26,11 +25,9 @@
         [item]="item"></app-card>
     }
 
-    <!-- Skeleton Loading for Cards -->
     @if (isLoading()) {
       @for (item of [1, 2, 3, 4, 5, 6]; track item) {
         <div class="w-full h-64 bg-gray-800 animate-pulse rounded-lg">
-          <!-- Optional: use the index if needed -->
         </div>
       }
     }
