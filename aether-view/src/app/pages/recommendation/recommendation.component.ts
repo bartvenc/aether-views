@@ -74,6 +74,7 @@ interface QuoteState {
   ],
 })
 export class RecommendationComponent implements OnInit, OnDestroy {
+  private readonly STORAGE_KEY = 'user_curations';
   // Signals
   readonly currentRecommendations = signal<Curation[]>([]);
   readonly showExamples = signal(true);
@@ -90,6 +91,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   // Regular properties
   userQuery = '';
   hasUserInput = false;
+  
   private quoteState: QuoteState = { index: 0, interval: null };
   private promptState: QuoteState = {
     index: Math.floor(Math.random() * prompts.length),
@@ -102,6 +104,7 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   private readonly tmdbService = inject(TmdbService);
 
   ngOnInit(): void {
+    this.loadSavedCurations();
     this.startQuoteRotation();
     this.defaultRecommendations.set(defaultCurations);
   }
@@ -158,30 +161,26 @@ export class RecommendationComponent implements OnInit, OnDestroy {
     );
   }
 
-  private updateRecommendations(results: (Series | Movie | null)[], isInitial: boolean): void {
-    // Filter out nulls first
-    const validResults = results.filter((result): result is Series | Movie => result !== null);
+  private updateRecommendations(results: (Series | Movie | null)[], isNew: boolean): void {
+    if (results.length === 0) return;
 
-    // For secondary stage, remove duplicates from both current movies and series
-    const uniqueResults = isInitial ? validResults : validResults.filter(result => !this.isDuplicate(result));
+    const validResults = results.filter((r): r is Series | Movie => r !== null);
+    const movies = validResults.filter(r => r.media_type === 'movie') as Movie[];
+    const series = validResults.filter(r => r.media_type === 'tv') as Series[];
 
-    const movies = uniqueResults.filter(item => item.media_type === 'movie') as Movie[];
-    const series = uniqueResults.filter(item => item.media_type === 'tv') as Series[];
+    const newCuration: Curation = {
+      id: crypto.randomUUID(),
+      query: this.userQuery,
+      timestamp: new Date().toISOString(),
+      isDefault: false,
+      movies,
+      series
+    };
 
-    this.currentRecommendations.update(current => {
-      if (isInitial || current.length === 0) {
-        return [{ query: this.userQuery, movies, series }, ...current];
-      }
-
-      // Merge with existing results
-      return [
-        {
-          query: this.userQuery,
-          movies: [...current[0].movies, ...movies],
-          series: [...current[0].series, ...series],
-        },
-        ...current.slice(1),
-      ];
+    this.currentRecommendations.update(curations => {
+      const updated = isNew ? [newCuration, ...curations] : [...curations];
+      this.saveCurations(); // Save after updating
+      return updated;
     });
   }
 
@@ -284,7 +283,6 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   }
 
   private resetState(): void {
-    console.log('resetting state', this.isLoading());
     this.userQuery = '';
     this.hasUserInput = false;
     this.isLoading.set(false);
@@ -292,7 +290,6 @@ export class RecommendationComponent implements OnInit, OnDestroy {
     clearInterval(this.promptState.interval);
     clearInterval(this.quoteState.interval);
     this.startQuoteRotation();
-    console.log(this.isLoading())
   }
 
   get userCurations() {
@@ -309,8 +306,30 @@ export class RecommendationComponent implements OnInit, OnDestroy {
   }
 
   navigateToDetails(item: Movie | Series): void {
+    this.saveCurations();
     const route = item.media_type === 'movie' ? '/movie' : '/tv';
     this.router.navigate([`${route}/${item.id}`]);
+  }
+
+  private loadSavedCurations(): void {
+    try {
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        const curations = JSON.parse(saved);
+        this.currentRecommendations.set(curations);
+      }
+    } catch (error) {
+      console.error('Error loading curations:', error);
+    }
+  }
+
+  private saveCurations(): void {
+    try {
+      const curations = this.currentRecommendations();
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(curations));
+    } catch (error) {
+      console.error('Error saving curations:', error);
+    }
   }
 
   ngOnDestroy(): void {

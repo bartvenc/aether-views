@@ -157,9 +157,12 @@ export interface SearchResponse {
 }
 
 export interface Curation {
+  id? : string;
   query: string;
   movies: any[];
   series: any[];
+  timestamp? : string;
+  isDefault?: false;
 }
 
 export type MediaType = 'movie' | 'tv' | 'person';
