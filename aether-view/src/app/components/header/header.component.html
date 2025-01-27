@@ -58,7 +58,7 @@
       <span class="material-icons">menu</span>
     </button>
 
-    <mat-menu #mobileMenu="matMenu" class="bg-[#201a23]">
+    <mat-menu #mobileMenu="matMenu" class="bg-[#201a23] border border-gray-700 shadow-xl text-gray-300 z-50 backdrop-blur-md">
       <button mat-menu-item routerLink="/" class="uppercase tracking-wide font-medium text-gray-300 hover:text-slate-500">Discover</button>
       <button
         mat-menu-item
@@ -89,13 +89,12 @@
           (ngModelChange)="onSearchChange($event)"
           placeholder="Search movies, TV shows, or people..."
           class="w-full bg-[#201a23] text-gray-300 px-4 py-3 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 placeholder-gray-500" />
-        @if (searchQuery) {
           <button
             (click)="clearSearch()"
             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-colors duration-200">
             <span class="material-icons">close</span>
           </button>
-        }
+        
       </div>
     </div>
   }
