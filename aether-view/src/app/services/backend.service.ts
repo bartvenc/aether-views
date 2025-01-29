@@ -97,8 +97,9 @@ export class BackendService {
     return this.handleRequest('search', query).pipe(
       switchMap(response => this.pollJobStatus('search', response.request_id)),
       map(response => {
+        console.log(response)
         const results = this.filterInvalidTitles(response.result?.results || []);
-        
+        console.log(results)
         if (!results.length) {
           return { recommendations: [], results: [] };
         }

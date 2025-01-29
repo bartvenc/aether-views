@@ -168,21 +168,42 @@ export class RecommendationComponent implements OnInit, OnDestroy {
     const movies = validResults.filter(r => r.media_type === 'movie') as Movie[];
     const series = validResults.filter(r => r.media_type === 'tv') as Series[];
 
-    const newCuration: Curation = {
-      id: crypto.randomUUID(),
-      query: this.userQuery,
-      timestamp: new Date().toISOString(),
-      isDefault: false,
-      movies,
-      series
-    };
-
     this.currentRecommendations.update(curations => {
-      const updated = isNew ? [newCuration, ...curations] : [...curations];
-      this.saveCurations(); // Save after updating
-      return updated;
+        if (isNew) {
+            // Create new curation for initial recommendations
+            const newCuration: Curation = {
+                id: crypto.randomUUID(),
+                query: this.userQuery,
+                timestamp: new Date().toISOString(),
+                isDefault: false,
+                movies,
+                series
+            };
+            return [newCuration, ...curations];
+        } else {
+            // Get current curation and append new results
+            const [current, ...rest] = curations;
+            
+            // Only add non-duplicate movies and series
+            const uniqueMovies = movies.filter(m => 
+                !current.movies.some(existing => existing.id === m.id)
+            );
+            const uniqueSeries = series.filter(s => 
+                !current.series.some(existing => existing.id === s.id)
+            );
+
+            const updatedCuration = {
+                ...current,
+                movies: [...current.movies, ...uniqueMovies],
+                series: [...current.series, ...uniqueSeries]
+            };
+
+            return [updatedCuration, ...rest];
+        }
     });
-  }
+
+    this.saveCurations();
+}
 
   // Quote rotation methods
   private startQuoteRotation(): void {

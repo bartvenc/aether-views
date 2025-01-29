@@ -131,11 +131,15 @@ class SearchQueryAgent:
         system_prompt = {
             "role": "system",
             "content": (
-                "You are an expert in crafting concise and effective search queries for movies and TV series. "
-                "If the user question explicitly mentions 'movies' or 'series', tailor the query to include only the specified type. "
-                "If no specific type is mentioned, include both movies and TV series in the search (films OR tv shows) "
-                "Ensure the search query is optimized for finding the most relevant results with shortest possible query. "
-                "Do not include explanations or additional text. Output the search query as plain text."
+                "You are an expert in understanding user intent for movie and TV series recommendations and crafting effective search queries. "
+                "Your primary goal is to generate search queries that will find movies and TV series based on the user's request. "
+                "Analyze the user's question to identify the core intent (e.g., genre, themes, setting, story type). "
+                "**Crucially, ensure the generated search query is explicitly tailored to find *only* movies and TV series.** "
+                "If the user explicitly mentions 'movies' or 'series', prioritize that media type. If not, search for both. "
+                "Use concise and effective keywords relevant to movies and TV series databases and search engines. "
+                "Avoid queries that are too broad or might return results for video games, books, or other media types unless the user *specifically* asks for adaptations. " # Explicitly avoid other media
+                "Output the search query as plain text, optimized for finding movies and TV series. No extra text or explanations."
+                "Current year is 2025"
             )
         }
         user_prompt = {"role": "user", "content": question}
@@ -146,7 +150,12 @@ class SearchQueryAgent:
 
 
 class ContentFetcherAgent:
-    async def search_internet(self, query: str, num_results: int = 2):
+    def __init__(self, llm: any, temperature: float = 0.8):
+        self.llm = llm
+        self.temperature = temperature
+        self.url_picker = CustomUrlPicker(llm=self.llm, temperature=0.8)
+    async def search_internet(self, promt, query: str, num_results: int = 2):
+        
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True)
             context = await browser.new_context()
@@ -166,6 +175,12 @@ class ContentFetcherAgent:
                 valid_domains = ['letterboxd.com', 'rottentomatoes.com', 'reddit.com',
                                  'themoviedb.org', 'https://www.cnet.com/culture/entertainment/']
 
+                print('------------------------------------------------------- \n')
+                valid_links = [link for link in links if isinstance(link, str)]
+                print(f"DEBUG: search_internet - Valid links: {valid_links}\n")
+                best_url = self.url_picker.pick_best_url(promt, valid_links)
+                print(f"DEBUG: search_internet - Best URL: {best_url}\n")
+                print('------------------------------------------------------- \n')
                 for link in links:
                     print('/n', link)
                     if not isinstance(link, str):
@@ -183,7 +198,7 @@ class ContentFetcherAgent:
                             break
 
                 print(f"DEBUG: search_internet - Filtered links:", filtered_links)
-                return filtered_links[:num_results]
+                return best_url[:num_results]
 
             finally:
                 await browser.close()
@@ -216,8 +231,10 @@ class ContentFetcherAgent:
                         if response.status == 200:
                             html = await response.text()
                             soup = BeautifulSoup(html, 'html.parser')
+                            for script in soup(["script", "style", "header", "footer", "nav"]):
+                                script.extract()
                             content = soup.get_text(separator=' ', strip=True)
-                            print(content)
+                            #print(content)
                             aggregated_content += f" {content[:5000]}"
             except Exception as e:
                 print(f"Error fetching URL {url}: {e}")
@@ -226,7 +243,7 @@ class ContentFetcherAgent:
         print("\n" + "="*80)
         print("AGGREGATED CONTENT:")
         print("="*80)
-        print(aggregated_content)
+        #print(aggregated_content)
         return aggregated_content.strip()
 
 
@@ -240,9 +257,13 @@ class ResultParserAgent:
         system_prompt = {
             "role": "system",
             "content": (
-                "You are an AI that recommends movies or TV series based on input content and a query. "
+                "You are an AI that **ONLY** recommends movies or TV series based on input content and a query. " 
+                "**You MUST ONLY recommend movies or TV series. DO NOT recommend video games, books, or any other media type.** "
+                "The title should not include seasons, episode, chapters, or any other specific details. "
                 "Provide exactly 20 unique titles in JSON format. Each title must have 'title' and 'media_type' keys. "
+                "**The 'media_type' MUST be either 'movie' or 'tv'.  Do not use 'game' or any other value.**" 
                 "Respond only with the JSON array, no additional text."
+                "Current year is 2025"
             )
         }
 
@@ -270,7 +291,7 @@ class OnlineAgent:
 
     def __init__(self, llm: any, temperature: float = 0.8):
         self.query_agent = SearchQueryAgent(llm, temperature)
-        self.fetcher_agent = ContentFetcherAgent()
+        self.fetcher_agent = ContentFetcherAgent(llm, temperature)
         self.parser_agent = ResultParserAgent(llm, temperature)
         self.llm = llm
         self.temperature = temperature
@@ -289,7 +310,7 @@ class OnlineAgent:
 
         for site in self.TRUSTED_SITES:
             query = f"{search_query} {site}"
-            urls = await self.fetcher_agent.search_internet(query, num_results=2)
+            urls = await self.fetcher_agent.search_internet(prompt, query, num_results=2)
             print(f"DEBUG: searchOnline - URLs found for {site}: {urls}")
             all_urls.update(urls)
 
@@ -298,8 +319,6 @@ class OnlineAgent:
             return []
 
         aggregated_content = await self.fetcher_agent.fetch_content(list(all_urls))
-        print(
-            f"DEBUG: searchOnline - Aggregated content: {aggregated_content}")
         if not aggregated_content:
             print("DEBUG: searchOnline - No content fetched from URLs.")
             return []
@@ -316,10 +335,15 @@ class OnlineAgent:
         system_prompt = {
             "role": "system",
             "content": (
-                "You are an AI that recommends movies or TV series. "
-                "Provide exactly 20 unique recommendations in JSON format. "
-                "Each object must include a 'title' and 'media_type' ('movie' or 'tv'). "
-                "Respond only with the JSON array, no additional text."
+                "You are a helpful AI assistant specialized in recommending movies and TV series. "
+                "When parsing content and generating recommendations, always remember the user's likely intent is to *watch* something, not to play a game or read a book. " # Intent reinforcement
+                "Therefore, your recommendations MUST be exclusively movies and TV series. "
+                "Analyze the provided content and identify titles that are clearly movies or TV series. "
+                "**If a title is ambiguous or could be a video game, err on the side of caution and exclude it unless you have strong evidence it's a movie or TV series.** " # Caution with ambiguity
+                "Output 20 unique movie/TV series titles in JSON format. Each title must have 'title' and 'media_type' ('movie' or 'tv'). "
+                "Ensure 'media_type' is always 'movie' or 'tv'. "
+                "Respond only with the JSON array within ```json``` code blocks. No extra text."
+                "Current year is 2025"
             )
         }
 
@@ -338,3 +362,40 @@ class OnlineAgent:
         print(response)
         print('----------------------------------------------------------')
         return extract_json(response)
+
+class CustomUrlPicker:
+    def __init__(self, llm: any, temperature: float = 0.8):
+        self.llm = llm
+        self.temperature = temperature
+
+    def pick_best_url(self, question: str, urls: List[str]) -> str:
+        system_prompt = {
+            "role": "system",
+            "content": (
+                "You are an expert in selecting the most relevant URLs for finding *movie and TV series* recommendations online. " # Explicit focus
+                "Given a user's question about movies or TV series and a list of URLs, your task is to choose and order the FIVE most relevant URLs. "
+                "Prioritize URLs that are highly likely to contain lists, reviews, databases, or information directly about movies and TV series that are relevant to the user's question. "
+                "**Specifically prioritize URLs from well-known movie and TV websites and databases** (e.g., Rotten Tomatoes, The Movie Database (TMDb), Letterboxd, IMDb, reputable entertainment news sites). " # Prioritize known sites
+                "Order the selected URLs with the most relevant and direct sources first. "
+                "Discard URLs that are generic search engine results pages, unrelated to movies/TV series, or primarily focused on video games, books, or other media types. " # Discard irrelevant URLs
+                "Respond in JSON format: `{\"urls\": [\"most_relevant_url\", \"second_most\", ... , \"fifth\"]}`.  Include up to 5 URLs, or fewer if less relevant ones are found."
+                "Current year is 2025"
+            )
+        }
+        user_prompt = {
+            "role": "user",
+            "content": f"Users Question: {question}\n\nURLS:\n{json.dumps(urls, indent=2)}"
+        }
+        print('user_prompt', user_prompt,'\n')
+        response = self.llm.ask([system_prompt, user_prompt], format="json", temperature=self.temperature)
+        print('response', response,'\n')
+        response_json = self._safe_read_json(response)
+        if response_json and "urls" in response_json:
+            return response_json["urls"][:5]  # Ensure max 5 URLs
+        return []
+
+    def _safe_read_json(self, response: str) -> dict:
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            return None
