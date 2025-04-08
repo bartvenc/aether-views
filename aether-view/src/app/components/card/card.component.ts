@@ -6,6 +6,8 @@ import { TmdbService } from '@services/tmdb.service';
 import { Series } from '@app/interfaces/series';
 import { Movie } from '@app/interfaces/movies';
 
+import { HttpClient } from '@angular/common/http';
+
 @Component({
   selector: 'app-card',
   standalone: true,
@@ -27,8 +29,12 @@ export class CardComponent implements OnInit {
 
   protected readonly tmdbService = inject(TmdbService);
   protected readonly router = inject(Router);
+  private readonly http = inject(HttpClient);
 
   isMobile = false;
+
+  // API endpoint for the click event
+  private clickEventEndpoint = 'http://localhost:8080/api/events/click';
 
   ngOnInit() {
     this.isMobile = window.innerWidth < 768;
@@ -41,6 +47,7 @@ export class CardComponent implements OnInit {
     return text.substring(0, length) + '...';
   }
   onItemClicked(event: Event): void {
+    this.sendClickEvent()
     let route: string[] = [];
     let queryParams = {};
     if (this.tmdbService.isSeries(this.item)) {
@@ -76,5 +83,36 @@ export class CardComponent implements OnInit {
       return this.tmdbService.isContentSeen(this.type === 'movies' ? 'movie' : 'tv', this.item.id);
     }
     return false;
+  }
+
+  private sendClickEvent(): void {
+    // Only send if we have a valid item with ID
+    if (!this.item) return;
+    const id = typeof this.item !== 'number' ? this.item.id : this.item;
+    const clickEvent = {
+      itemId: id,  
+      itemType: this.getItemType(),
+      timestamp: Date.now()
+    };
+
+    console.log('Sending click event:', clickEvent);
+
+    // Send the event to the backend
+    this.http.post(this.clickEventEndpoint, clickEvent)
+      .subscribe({
+        next: () => console.log('Click event sent successfully'),
+        error: (error) => console.error('Error sending click event:', error)
+      });
+  }
+
+  // Helper to determine the item type
+  private getItemType(): string {
+    if (this.tmdbService.isSeries(this.item)) return 'series';
+    if (this.tmdbService.isMovie(this.item)) return 'movie';
+    if (this.tmdbService.isPerson(this.item)) return 'person';
+    if (this.tmdbService.isGenre(this.item)) return 'genre';
+    if (this.tmdbService.isStudio(this.item)) return 'studio';
+    if (this.tmdbService.isNetwork(this.item)) return 'network';
+    return 'unknown';
   }
 }
