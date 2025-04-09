@@ -42,10 +42,10 @@ import { TmdbService } from '@services/tmdb.service';
     
     .content-count {
       position: absolute;
-      top: 8px;
-      right: 8px;
-      background-color: rgba(32, 26, 35, 0.8);
-      color: white;
+      top: 5px;
+      left: 8px;
+      background-color: rgba(143, 111, 136, 0.3);
+      color: yellow;
       border-radius: 9999px;
       padding: 0.25rem 0.5rem;
       font-weight: 600;

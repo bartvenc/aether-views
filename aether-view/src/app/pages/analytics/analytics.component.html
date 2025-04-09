@@ -59,7 +59,9 @@
                 [title]="item.media_type === 'movie' ? item.release_date : item.first_air_date"
                 [item]="item"
                 [icon]="item.media_type"
-                [imageUrl]="item ? tmdbService.getImageUrl(item) : null">
+                [imageUrl]="item ? tmdbService.getImageUrl(item) : null"
+                [analytics]=true
+                >
                 
               </app-card>
               <div class="content-count">
