@@ -19,4 +19,8 @@ export const routes: Routes = [
     path: 'person/:id',
     loadComponent: () => import('./pages/person-details/person-details.component').then(m => m.PersonDetailsComponent),
   },
+  {
+    path: 'analytics',
+    loadComponent: () => import('./pages/analytics/analytics.component').then(m => m.AnalyticsComponent),
+  }
 ];

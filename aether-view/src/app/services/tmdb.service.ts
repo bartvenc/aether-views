@@ -10,6 +10,7 @@ import { Genre, Person } from '@interfaces/common-interfaces';
 import { Studio } from '@app/data/constants/studios';
 import { ContentItem } from '@pages/filter-page/filter-page.component';
 import { Network } from '@app/data/constants/networks';
+import { PopularContent } from '@app/interfaces/analytics';
 
 interface TmdbConfig {
   apiKey: string;
@@ -117,7 +118,7 @@ export class TmdbService {
     }
   }
 
-  getImageUrl(item: Series | Movie | Studio | Genre | Person | null | ContentItem | undefined, isPriority = false): string {
+  getImageUrl(item: Series | Movie | Studio | Genre | Person | null | PopularContent | ContentItem | PopularContent |undefined, isPriority = false): string {
     if (!item) return 'assets/poster.jpg';
 
     let path: string | undefined | null = null;

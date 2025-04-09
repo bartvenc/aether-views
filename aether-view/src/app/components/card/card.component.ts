@@ -8,6 +8,8 @@ import { Movie } from '@app/interfaces/movies';
 
 import { HttpClient } from '@angular/common/http';
 
+import { PopularContent } from '@app/interfaces/analytics';
+
 @Component({
   selector: 'app-card',
   standalone: true,
@@ -22,7 +24,7 @@ export class CardComponent implements OnInit {
   @Input() type: 'movies' | 'series' | 'person' | 'genreStudio' | 'studio' | 'network' = 'movies';
   @Input() overview?: string | null = null;
   @Input() maxOverviewLength?: number = 100;
-  @Input() item?: number | Series | Movie | null = null;
+  @Input() item?: number | Series | Movie | PopularContent | null = null;
   @Input() icon?: string | null = null;
   @Input() index = 0;
   @Input() loading?: string = 'lazy';
